@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f8f7f2;
+  --foreground: #101814;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--background);
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  color: var(--foreground);
+  background:
+    linear-gradient(135deg, rgba(217, 247, 223, 0.86) 0%, rgba(248, 247, 242, 0.8) 28%, rgba(220, 238, 247, 0.72) 100%),
+    var(--background);
+  font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(255, 111, 94, 0.45);
+  outline-offset: 2px;
+}
+
+.mesh-panel {
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.64)),
+    radial-gradient(circle at 10% 10%, rgba(244, 200, 74, 0.26), transparent 28%),
+    radial-gradient(circle at 88% 20%, rgba(36, 107, 79, 0.16), transparent 30%);
+}
+
+.paper-grid {
+  background-image:
+    linear-gradient(rgba(16, 24, 20, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 24, 20, 0.055) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(36, 107, 79, 0.3);
+  border-radius: 999px;
+}
