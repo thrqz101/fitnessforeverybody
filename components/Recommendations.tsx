@@ -47,7 +47,7 @@ const mealSlotFilters: Array<{ value: MealSlotFilter; label: string }> = [
 const styleFilters: Array<{ value: StyleFilter; label: string; regions: RegionFilter[] }> = [
   { value: "all", label: "全部品类", regions: ["all", "chinese", "western"] },
   { value: "breakfast", label: "早餐早点", regions: ["all", "chinese"] },
-  { value: "stir_fry", label: "炒菜 / 菜系", regions: ["all", "chinese"] },
+  { value: "stir_fry", label: "家常菜 / 炒菜", regions: ["all", "chinese"] },
   { value: "hotpot", label: "火锅", regions: ["all", "chinese"] },
   { value: "malatang", label: "麻辣烫 / 冒菜", regions: ["all", "chinese"] },
   { value: "korean_bbq", label: "韩式烤肉", regions: ["all", "chinese"] },
@@ -71,10 +71,10 @@ type RecommendationsProps = {
   totals: MacroTotals;
   foods: FoodLogItem[];
   onChoose: (food: FoodLogItem) => void;
-  onCaptureRequested: () => void;
+  onRecognizeRequested: () => void;
 };
 
-export function Recommendations({ profile, day, gaps, targets, totals, foods, onChoose, onCaptureRequested }: RecommendationsProps) {
+export function Recommendations({ profile, day, gaps, targets, totals, foods, onChoose, onRecognizeRequested }: RecommendationsProps) {
   const [aiRecommendations, setAiRecommendations] = useState<Recommendation[]>([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiNotice, setAiNotice] = useState("");
@@ -239,10 +239,10 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
         </button>
         <button
           type="button"
-          onClick={onCaptureRequested}
+          onClick={onRecognizeRequested}
           className="mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-[8px] border border-white/20 bg-white/10 px-4 text-center text-sm font-black text-white"
         >
-          不想吃你的推荐，我再拍一餐给你算
+          不想吃你的推荐，再识别一餐
         </button>
         <button
           type="button"
@@ -340,7 +340,6 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
             <RecommendationCard
               key={recommendation.id}
               recommendation={recommendation}
-              gaps={gaps}
               targets={targets}
               totals={totals}
               selected={picked?.id === recommendation.id}
@@ -462,7 +461,6 @@ function FilterButton({ active, onClick, children }: { active: boolean; onClick:
 
 function RecommendationCard({
   recommendation,
-  gaps,
   targets,
   totals,
   selected,
@@ -470,7 +468,6 @@ function RecommendationCard({
   onChoose
 }: {
   recommendation: Recommendation;
-  gaps: MacroTotals;
   targets: MacroTotals;
   totals: MacroTotals;
   selected: boolean;
@@ -504,7 +501,7 @@ function RecommendationCard({
 
       <div className="mt-4 grid grid-cols-3 gap-2">
         {(["protein", "carbs", "fat"] as const).map((macro) => {
-          const percent = gaps[macro] <= 0 ? 100 : completion(recommendation.macros[macro], gaps[macro]);
+          const percent = afterCompletion[macro];
           const over = percent > 115;
           return (
             <div key={macro} className="rounded-[8px] bg-white p-3">
@@ -611,7 +608,7 @@ function matchesStyleFilter(recommendation: Recommendation, filter: StyleFilter)
   const text = getRecommendationText(recommendation);
 
   if (filter === "breakfast") return /早餐|早点|包子|馒头|胡辣汤|馄饨|云吞|煎饼|鸡蛋灌饼|小米粥|油条|肠粉|小笼包|热干面|豆浆/.test(text);
-  if (filter === "stir_fry") return /炒菜|小炒|川菜|湘菜|粤菜|赣菜|江西|江浙|本帮|云贵|贵州|东北|西北|宫保|麻婆|鱼香|清蒸鱼|白切鸡|龙井虾仁|汽锅鸡|酸汤鱼|番茄炒蛋|西兰花/.test(text);
+  if (filter === "stir_fry") return /家常菜|自己做饭|炒菜|小炒|川菜|湘菜|粤菜|赣菜|江西|江浙|本帮|云贵|贵州|东北|西北|宫保|麻婆|鱼香|清蒸鱼|白切鸡|龙井虾仁|汽锅鸡|酸汤鱼|番茄炒蛋|西红柿炒鸡蛋|西兰花|青椒肉丝|土豆丝|家常豆腐|肉末茄子|虾仁滑蛋|虾仁炒蛋|香菇滑鸡|清蒸鲈鱼|蒜蓉青菜|土豆炖牛肉|冬瓜排骨汤|木耳炒鸡蛋|白菜豆腐|番茄牛腩|西红柿牛腩|芹菜炒牛肉|胡萝卜鸡丁/.test(text);
   if (filter === "hotpot") return /火锅|海底捞|巴奴|呷哺|番茄锅|清汤锅|毛肚|虾滑|肥牛/.test(text);
   if (filter === "malatang") return /麻辣烫|冒菜|杨国福|张亮|宽粉|豆腐皮/.test(text);
   if (filter === "korean_bbq") return /韩式烤肉|烤肉店|瘦牛肉|生菜包|泡菜|五花肉/.test(text);

@@ -1,7 +1,7 @@
 "use client";
 
-import { Camera, CheckCircle2, Dice5, Dumbbell, Moon, Target, Trash2, Utensils } from "lucide-react";
-import type { ReactNode } from "react";
+import { CheckCircle2, Dice5, Dumbbell, Keyboard, Loader2, Moon, Sparkles, Trash2, Utensils } from "lucide-react";
+import { useEffect, useState } from "react";
 import { MacroProgress } from "@/components/MacroProgress";
 import { dietStatusLabels, estimateBmr, formatMacro, goalLabels, macroKeys, macroLabels } from "@/lib/nutrition";
 import type { DayState, FoodLogItem, MacroTotals, UserProfile } from "@/lib/types";
@@ -14,8 +14,9 @@ type DashboardProps = {
   gaps: MacroTotals;
   foods: FoodLogItem[];
   todayLabel: string;
-  onNavigate: (view: "calendar" | "capture" | "recommend" | "settings") => void;
+  onNavigate: (view: "calendar" | "recommend" | "settings") => void;
   onDayChange: (day: DayState) => void;
+  onAddFoods: (foods: FoodLogItem[]) => void;
   onRemoveFood: (id: string) => void;
   onSaveFood: (id: string) => void;
   onClearDrafts: () => void;
@@ -31,13 +32,72 @@ export function Dashboard({
   todayLabel,
   onNavigate,
   onDayChange,
+  onAddFoods,
   onRemoveFood,
   onSaveFood,
   onClearDrafts
 }: DashboardProps) {
+  const [mealDescription, setMealDescription] = useState("");
+  const [recognitionNotice, setRecognitionNotice] = useState("");
+  const [isRecognizing, setIsRecognizing] = useState(false);
   const bmr = profile.bmrKcal > 0 ? profile.bmrKcal : estimateBmr(profile);
   const draftFoods = foods.filter((food) => !food.savedToCalendar);
   const savedFoods = foods.filter((food) => food.savedToCalendar);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      void fetch("/api/food-ai", {
+        method: "GET",
+        signal: controller.signal
+      }).catch(() => {
+        // Warmup is best-effort; the visible recognition flow handles real errors.
+      });
+    }, 800);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, []);
+
+  async function recognizeMeal() {
+    const description = mealDescription.trim();
+    if (!description) {
+      setRecognitionNotice("先写一下你吃了什么，比如品牌、套餐、配菜、饮料和大概份量。");
+      return;
+    }
+
+    const form = new FormData();
+    form.append("description", description);
+    setIsRecognizing(true);
+    setRecognitionNotice("正在识别这一餐的营养素...");
+
+    try {
+      const aiResult = await requestFoodAi(form);
+
+      if (!aiResult.ok || !aiResult.result?.ok) {
+        setRecognitionNotice(withRetryHint(aiResult.message || aiResult.result?.message || "AI 这次没算准。"));
+        return;
+      }
+
+      const result = aiResult.result;
+      const recognizedFoods = result.foods ?? [];
+
+      if (!result.isFoodRelated || !recognizedFoods.length) {
+        setRecognitionNotice("我没有测出这一餐，请输入正确的食物信息。");
+        return;
+      }
+
+      onAddFoods(recognizedFoods);
+      setMealDescription("");
+      setRecognitionNotice(`已识别 ${recognizedFoods.length} 个食物条目，已经放进草稿箱。确认没问题后保存到日历。`);
+    } catch {
+      setRecognitionNotice(withRetryHint("AI 这次没接住。"));
+    } finally {
+      setIsRecognizing(false);
+    }
+  }
 
   return (
     <div className="grid gap-5 xl:grid-cols-[1fr_380px]">
@@ -90,11 +150,41 @@ export function Dashboard({
           ))}
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          <ActionButton icon={<Camera size={18} aria-hidden="true" />} label="拍照记录" onClick={() => onNavigate("capture")} tone="coral" />
-          <ActionButton icon={<Utensils size={18} aria-hidden="true" />} label="推荐下一顿" onClick={() => onNavigate("recommend")} tone="moss" />
-          <ActionButton icon={<Target size={18} aria-hidden="true" />} label="系统设置" onClick={() => onNavigate("settings")} tone="ink" />
-        </div>
+        <section className="mt-6 rounded-[8px] border border-moss/18 bg-mint/45 p-4">
+          <div className="flex items-start gap-3">
+            <Keyboard className="mt-0.5 shrink-0 text-moss" size={20} aria-hidden="true" />
+            <div>
+              <h2 className="text-lg font-black text-ink">今天吃了什么</h2>
+              <p className="mt-1 text-sm leading-6 text-ink/58">
+                直接写品牌、套餐、主食、配菜、饮料和份量。识别后会先进入草稿箱，你再确认是否保存到日历。
+              </p>
+            </div>
+          </div>
+          <textarea
+            className="mt-4 min-h-28 w-full resize-y rounded-[8px] border border-ink/12 bg-white p-3 text-sm leading-6 text-ink outline-none focus:border-moss"
+            value={mealDescription}
+            onChange={(event) => setMealDescription(event.target.value)}
+            placeholder="比如：麦当劳巨无霸套餐，一个汉堡 + 中薯 + 大可乐；或者一碗麻辣烫，里面有宽粉、牛肉丸、青菜、金针菇、豆腐皮..."
+          />
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs font-semibold leading-5 text-ink/52">识别结果会直接放进右侧草稿箱。</p>
+            <button
+              type="button"
+              onClick={recognizeMeal}
+              disabled={isRecognizing}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] bg-coral px-4 text-sm font-black text-white shadow-soft disabled:cursor-not-allowed disabled:opacity-65"
+            >
+              {isRecognizing ? <Loader2 className="animate-spin" size={17} aria-hidden="true" /> : <Sparkles size={17} aria-hidden="true" />}
+              {isRecognizing ? "正在识别" : "识别并放入草稿箱"}
+            </button>
+          </div>
+          {recognitionNotice ? (
+            <div className="mt-3 rounded-[8px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
+              {recognitionNotice}
+            </div>
+          ) : null}
+        </section>
+
       </section>
 
       <aside className="grid gap-5">
@@ -224,31 +314,60 @@ export function Dashboard({
   );
 }
 
-function ActionButton({
-  icon,
-  label,
-  onClick,
-  tone
-}: {
-  icon: ReactNode;
-  label: string;
-  onClick: () => void;
-  tone: "coral" | "moss" | "ink";
-}) {
-  const styles = {
-    coral: "bg-coral text-white",
-    moss: "bg-moss text-white",
-    ink: "bg-ink text-white"
-  };
+type FoodAiResult = {
+  ok?: boolean;
+  isFoodRelated?: boolean;
+  message?: string;
+  needsConfig?: boolean;
+  foods?: FoodLogItem[];
+};
 
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`inline-flex h-12 items-center justify-center gap-2 rounded-[8px] px-4 text-sm font-black shadow-soft transition hover:opacity-90 ${styles[tone]}`}
-    >
-      {icon}
-      {label}
-    </button>
-  );
+async function requestFoodAi(form: FormData): Promise<{
+  ok: boolean;
+  retryable: boolean;
+  message?: string;
+  result?: FoodAiResult;
+}> {
+  try {
+    const response = await fetch("/api/food-ai", {
+      method: "POST",
+      body: form
+    });
+    const retryable = response.status === 408 || response.status === 429 || response.status >= 500;
+    let result: FoodAiResult;
+
+    try {
+      result = await response.json();
+    } catch {
+      return {
+        ok: false,
+        retryable,
+        message: retryable ? "AI 服务响应太慢或暂时不可用。" : "AI 返回内容有点乱，可以再点一次试试。"
+      };
+    }
+
+    if (!response.ok || !result.ok) {
+      return {
+        ok: false,
+        retryable: !result.needsConfig && retryable,
+        message: result.message || (retryable ? "AI 服务响应太慢或暂时不可用。" : "AI 这次没算准，可以再点一次试试。"),
+        result
+      };
+    }
+
+    return { ok: true, retryable: false, result };
+  } catch {
+    return {
+      ok: false,
+      retryable: true,
+      message: "AI 服务连接失败。"
+    };
+  }
+}
+
+function withRetryHint(message: string) {
+  const trimmed = message.trim().replace(/[。,.，\s]+$/, "");
+  if (!trimmed) return "AI 这次没接住（请再试一次）";
+  if (trimmed.endsWith("（请再试一次）")) return trimmed;
+  return `${trimmed}（请再试一次）`;
 }

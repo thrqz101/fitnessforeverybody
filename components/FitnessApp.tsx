@@ -1,10 +1,9 @@
 "use client";
 
-import { Activity, CalendarDays, Camera, ClipboardList, Settings, Utensils } from "lucide-react";
+import { Activity, CalendarDays, ClipboardList, Settings, Utensils } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Dashboard } from "@/components/Dashboard";
-import { FoodCapture } from "@/components/FoodCapture";
 import { ProfilePanel } from "@/components/ProfilePanel";
 import { Recommendations } from "@/components/Recommendations";
 import { TrainingCalendar } from "@/components/TrainingCalendar";
@@ -12,7 +11,7 @@ import { getBeijingDateKey } from "@/lib/dates";
 import { calculateTargets, defaultDayState, defaultProfile, hasMeaningfulGap, remainingMacros, sumFoods } from "@/lib/nutrition";
 import type { DayRecord, DayState, FoodLogItem, UserProfile } from "@/lib/types";
 
-type View = "calendar" | "dashboard" | "capture" | "recommend" | "settings";
+type View = "calendar" | "dashboard" | "recommend" | "settings";
 
 const profileKey = "ffe-profile";
 const dayKey = "ffe-day";
@@ -189,7 +188,6 @@ export function FitnessApp() {
           </div>
           <nav className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin" aria-label="主要导航">
             <NavButton active={view === "calendar"} icon={<CalendarDays size={17} aria-hidden="true" />} label="日历" onClick={() => setView("calendar")} />
-            <NavButton active={view === "capture"} icon={<Camera size={17} aria-hidden="true" />} label="拍照" onClick={() => setView("capture")} />
             <NavButton active={view === "dashboard"} icon={<ClipboardList size={17} aria-hidden="true" />} label="今日任务" onClick={() => setView("dashboard")} />
             <NavButton active={view === "recommend"} icon={<Utensils size={17} aria-hidden="true" />} label="推荐" onClick={() => setView("recommend")} />
             <NavButton active={false} icon={<Settings size={17} aria-hidden="true" />} label="系统设置" onClick={() => setView("settings")} />
@@ -223,13 +221,12 @@ export function FitnessApp() {
             todayLabel={todayLabel}
             onNavigate={setView}
             onDayChange={setDay}
+            onAddFoods={addFoods}
             onRemoveFood={removeFood}
             onSaveFood={saveFoodToCalendar}
             onClearDrafts={clearDraftFoods}
           />
         ) : null}
-
-        {view === "capture" ? <FoodCapture onAddFoods={addFoods} onBack={() => setView("dashboard")} /> : null}
 
         {view === "recommend" ? (
           <Recommendations
@@ -240,7 +237,7 @@ export function FitnessApp() {
             totals={totals}
             foods={foods}
             onChoose={chooseRecommendation}
-            onCaptureRequested={() => setView("capture")}
+            onRecognizeRequested={() => setView("dashboard")}
           />
         ) : null}
 
@@ -267,11 +264,11 @@ export function FitnessApp() {
                   type="button"
                   onClick={() => {
                     setTopUpPromptOpen(false);
-                    setView("capture");
+                    setView("dashboard");
                   }}
                   className="inline-flex min-h-11 items-center justify-center rounded-[8px] bg-coral px-3 text-sm font-black text-white"
                 >
-                  我再拍一餐
+                  再识别一餐
                 </button>
                 <button
                   type="button"

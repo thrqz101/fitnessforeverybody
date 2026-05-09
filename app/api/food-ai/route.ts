@@ -26,6 +26,23 @@ type AiPayload = {
   foods?: AiFood[];
 };
 
+type AiRouteKind = "local_exact" | "brand_search" | "ai_estimate" | "not_food";
+
+type AiRouteDecision = {
+  isFoodRelated?: boolean;
+  message?: string;
+  route?: AiRouteKind;
+  brand?: string;
+  product?: string;
+  reason?: string;
+  foods?: AiFood[];
+};
+
+type ChatMessage = {
+  role: "system" | "user";
+  content: unknown;
+};
+
 type TavilySearchResult = {
   title?: string;
   url?: string;
@@ -39,15 +56,51 @@ type TavilySearchPayload = {
 };
 
 type ProviderConfig = {
-  name: "minimax" | "dashscope" | "openai";
+  name: "ccswitch" | "minimax" | "dashscope";
   apiKey: string;
   baseUrl: string;
   model: string;
   supportsImages: boolean;
+  apiStyle: "anthropic" | "openai";
 };
 
 const id = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 const mealValues: MealType[] = ["breakfast", "lunch", "dinner", "snack", "midnight"];
+const tavilySearchTimeoutMs = 5_000;
+const routingAiTimeoutMs = 20_000;
+const searchAiTimeoutMs = 25_000;
+const mainAiTimeoutMs = 35_000;
+const repairAiTimeoutMs = 20_000;
+const warmupAiTimeoutMs = 12_000;
+const maxRecognizedFoodItems = 6;
+
+export async function GET() {
+  const provider = getProviderConfig();
+  if (!provider) {
+    return Response.json(
+      { ok: false, needsConfig: true, message: "AI 服务还没配置好。" },
+      { status: 503 }
+    );
+  }
+
+  const { response, errorText } = await requestChatCompletion(
+    provider,
+    buildChatCompletionBody(provider, 24, [
+      {
+        role: "system",
+        content: "只返回 JSON。"
+      },
+      {
+        role: "user",
+        content: '返回 {"ok":true}'
+      }
+    ]),
+    warmupAiTimeoutMs
+  );
+
+  if (!response?.ok) return buildAiServiceErrorResponse(response, errorText);
+  return Response.json({ ok: true });
+}
 
 export async function POST(request: Request) {
   try {
@@ -64,6 +117,10 @@ export async function POST(request: Request) {
       });
     }
 
+    if (!files.length && exceedsExplicitFoodItemLimit(description)) {
+      return buildTooManyFoodsResponse();
+    }
+
     const provider = getProviderConfig();
 
     if (!provider) {
@@ -71,25 +128,74 @@ export async function POST(request: Request) {
         {
           ok: false,
           needsConfig: true,
-          message: "AI 解析还没配置。请先在部署平台里检查 AI 服务环境变量；如果要开放拍照识别，再添加支持视觉的 AI 服务。"
+          message: "AI 服务还没配置好。请检查 AI_PROVIDER、CCSWITCH_API_KEY 或 MINIMAX_API_KEY，以及模型名和 Base URL。"
         },
         { status: 503 }
       );
     }
 
-    if (description && shouldSearchNutrition(description)) {
+    const strictLocalMatches = findStrictLocalFoodMatches(description);
+    const routingResult = await classifyFoodRoute(provider, description, strictLocalMatches);
+
+    if (!routingResult.ok) return buildAiServiceErrorResponse(routingResult.response, routingResult.errorText);
+
+    const routeDecision = normalizeRouteDecision(routingResult.decision, description);
+    const hasOnlyStrictLocalMatches =
+      strictLocalMatches.length > 0 &&
+      !files.length &&
+      !hasMeaningfulResidualAfterLocal(description, strictLocalMatches);
+
+    if (isTooManyFoodDecision(routeDecision)) {
+      return buildTooManyFoodsResponse();
+    }
+
+    if (!routeDecision.isFoodRelated || routeDecision.route === "not_food") {
+      return Response.json({
+        ok: true,
+        isFoodRelated: false,
+        foods: [],
+        message: routeDecision.message || "我没有测出这一餐，请输入具体食物、品牌、套餐、配菜、饮料或份量。"
+      });
+    }
+
+    if (routeDecision.route === "local_exact" && hasOnlyStrictLocalMatches) {
+      return Response.json(buildStrictLocalResponse(strictLocalMatches));
+    }
+
+    if (description && shouldUseBrandSearch(routeDecision, description)) {
       const searchContext = await searchNutritionWithTavily(description);
       if (searchContext) {
         const searchedPayload = await extractAiPayloadFromSearch(provider, description, searchContext);
         if (searchedPayload.isFoodRelated && searchedPayload.foods?.length) {
+          const foods = mergeStrictLocalAndAiFoods(strictLocalMatches, searchedPayload.foods, description);
+          const tooManyResponse = buildTooManyFoodsResponseIfNeeded(foods);
+          if (tooManyResponse) return tooManyResponse;
+
           return Response.json({
             ok: true,
             provider: "tavily-ai",
             isFoodRelated: true,
             message: searchedPayload.message || "我先查了公开营养信息，再帮你整理好了；右侧数值可以继续手动微调。",
-            foods: searchedPayload.foods.map((food) => normalizeFood(applyBrandCatalogToAiFood(food, description), "ai-text"))
+            foods
           });
         }
+      }
+    }
+
+    if (routeDecision.route === "ai_estimate" && !files.length && routeDecision.foods?.length) {
+      const cleanedFoods = cleanAiFoodsForDescription(routeDecision.foods, description);
+      const foods = mergeStrictLocalAndAiFoods(strictLocalMatches, cleanedFoods, description);
+      if (foods.length) {
+        const tooManyResponse = buildTooManyFoodsResponseIfNeeded(foods);
+        if (tooManyResponse) return tooManyResponse;
+
+        return Response.json({
+          ok: true,
+          provider: "ai-fast-route",
+          isFoodRelated: true,
+          message: routeDecision.message || "识别好了，已直接估算并放进草稿箱；右侧数值可以继续手动微调。",
+          foods
+        });
       }
     }
 
@@ -130,17 +236,19 @@ export async function POST(request: Request) {
       "品牌+产品优先；识别不出品牌时，用同品类行业平均估算，recognitionMode=industry-average。",
       "如果用户文字里出现疑似品牌名或门店名，不要把 brand 留空；brand 填用户写出的品牌/门店，warning 说明是否查到公开资料。",
       getBrandCatalogPrompt(description),
+      getStrictLocalMatchPrompt(strictLocalMatches),
       "普通自然语言描述优先按中国餐饮行业平均估算，不要套用固定菜单模板。",
-      "严格只按用户写出的食物、配菜、主食和饮料估算；用户没有写到的米饭、冷面、金针菇、生菜、薯条、饮料等，不要自行添加。",
-      "不要把不完全一致的组合当成同一种食物；例如“鱼香肉丝盖浇饭”不是“鱼香肉丝 + 番茄炒蛋 + 米饭”，除非用户也明确说点了番茄炒蛋。",
+      "严格只按用户写出的食物、配菜、主食和饮料估算；用户没有写到的项目不要自行添加。",
+      "不要把不完全一致的组合当成同一种食物；组合餐要拆成不重叠条目，或合成一个完整组合。",
       "遇到盖饭、盖浇饭、粉面、麻辣烫、火锅、素菜拼盘、套餐时，严格按用户实际写出的主食、配菜、饮料和份量估算。",
-      "遇到韩式烤肉、火锅、麻辣烫这类一餐里有多个部分的描述时，不能生成互相包含的重复套餐；例如主烤肉组合、冷面、泡菜应拆成不重叠条目，或者合成一个完整组合。",
       getChinesePortionBaselinePrompt(),
-      "多食物必须拆开，例如汉堡、薯条、可乐、奶茶小料、麻辣烫配菜都要分项。",
+      `最多输出 ${maxRecognizedFoodItems} 个 foods；如果用户列出超过 ${maxRecognizedFoodItems} 个具体食物，返回空 foods 并提醒分批输入。`,
+      "多食物必须拆开，但不要生成互相包含的重复套餐。",
       "每个 food 必须有 name、brand、foodType、portionLabel、meal、macros、recognitionMode、warning。",
       "macros 包含 protein/carbs/fat/calories/fiber，单位 g/g/g/kcal/g，四舍五入为整数。",
+      "warning 最多 18 个中文字，只写关键假设。",
       "自检：calories 应大致等于 protein*4 + carbs*4 + fat*9，误差超过 25% 时先修正宏量营养素或热量。",
-      "返回格式：{\"isFoodRelated\":true,\"message\":\"识别好了\",\"foods\":[{\"name\":\"香辣鸡腿堡\",\"brand\":\"肯德基\",\"foodType\":\"汉堡\",\"portionLabel\":\"1 个\",\"meal\":\"lunch\",\"macros\":{\"protein\":23,\"carbs\":42,\"fat\":18,\"calories\":430,\"fiber\":2},\"recognitionMode\":\"brand-product\",\"warning\":\"按常见门店份量估算\"}]}",
+      "返回 JSON 字段：isFoodRelated、message、foods；food 字段同上。",
       `用户手动描述：${description || "无"}`,
       provider.supportsImages ? "" : "当前接入的是文本模型，不支持直接读取图片。请只根据用户文字描述解析食物。",
       skippedFiles.length ? `这些文件暂未送入视觉模型：${skippedFiles.join("、")}` : ""
@@ -152,31 +260,25 @@ export async function POST(request: Request) {
         ]
       : prompt;
 
-    const requestBody = JSON.stringify({
-      model: provider.model,
-      temperature: 0,
-      max_tokens: 1400,
-      messages: [
-        {
-          role: "system",
-          content: "你只输出可以被 JSON.parse 解析的 JSON。估算要稳定，同一句输入保持同一套常见份量假设。"
-        },
-        {
-          role: "user",
-          content: userContent
-        }
-      ]
-    });
-    const { response, errorText } = await requestChatCompletion(provider, requestBody);
+    const requestBody = buildChatCompletionBody(provider, 1400, [
+      {
+        role: "system",
+        content: "你只输出可以被 JSON.parse 解析的 JSON。估算要稳定，同一句输入保持同一套常见份量假设。"
+      },
+      {
+        role: "user",
+        content: userContent
+      }
+    ]);
+    const { response, errorText } = await requestChatCompletion(provider, requestBody, mainAiTimeoutMs);
 
     if (!response?.ok) {
+      if (strictLocalMatches.length) return Response.json(buildStrictLocalResponse(strictLocalMatches, true));
+
       const exactLocalResult = buildExactLocalResult(description);
       if (exactLocalResult) return Response.json(exactLocalResult);
 
-      return Response.json(
-        { ok: false, message: `AI 服务暂时没有识别成功：${response?.status ?? 502} ${errorText.slice(0, 180)}` },
-        { status: response?.status ?? 502 }
-      );
+      return buildAiServiceErrorResponse(response, errorText);
     }
 
     const json = await response.json();
@@ -188,6 +290,8 @@ export async function POST(request: Request) {
     }
 
     if (!parsed.isFoodRelated || !parsed.foods?.length) {
+      if (strictLocalMatches.length) return Response.json(buildStrictLocalResponse(strictLocalMatches, true));
+
       const exactLocalResult = buildExactLocalResult(description);
       if (exactLocalResult) return Response.json(exactLocalResult);
 
@@ -203,7 +307,10 @@ export async function POST(request: Request) {
 
     const source = provider.supportsImages && imageParts.length ? "ai-vision" : "ai-text";
     const cleanedFoods = cleanAiFoodsForDescription(parsed.foods, description);
-    const foods = cleanedFoods.map((food) => normalizeFood(applyBrandCatalogToAiFood(food, description), source));
+    const foods = mergeStrictLocalAndAiFoods(strictLocalMatches, cleanedFoods, description, source);
+    const tooManyResponse = buildTooManyFoodsResponseIfNeeded(foods);
+    if (tooManyResponse) return tooManyResponse;
+
     return Response.json({
       ok: true,
       provider: "ai",
@@ -212,47 +319,61 @@ export async function POST(request: Request) {
       foods
     });
   } catch (error) {
-    return Response.json(
-      { ok: false, message: error instanceof Error ? error.message : "AI 识别遇到未知错误。" },
-      { status: 500 }
-    );
+    return buildAiServiceErrorResponse(null, error instanceof Error ? error.message : "");
   }
 }
 
 function getProviderConfig(): ProviderConfig | null {
-  const requestedProvider = process.env.AI_PROVIDER?.toLowerCase();
+  const requestedProvider = process.env.AI_PROVIDER?.toLowerCase() || "minimax";
+  const ccswitchApiKey =
+    process.env.CCSWITCH_API_KEY ||
+    process.env.ANTHROPIC_AUTH_TOKEN ||
+    process.env.MINIMAX_API_KEY ||
+    process.env.MINIMAX_API_TOKEN;
+  const openAiBaseUrl = process.env.OPENAI_BASE_URL;
+  const minimaxApiKey =
+    process.env.MINIMAX_API_KEY ||
+    process.env.MINIMAX_API_TOKEN ||
+    ((isMiniMaxBaseUrl(openAiBaseUrl) || isMiniMaxBaseUrl(process.env.AI_BASE_URL)) ? process.env.OPENAI_API_KEY : undefined);
 
-  if ((requestedProvider === "minimax" || !requestedProvider) && process.env.MINIMAX_API_KEY) {
+  if (requestedProvider === "ccswitch" && ccswitchApiKey) {
     return {
-      name: "minimax",
-      apiKey: process.env.MINIMAX_API_KEY,
-      baseUrl: process.env.AI_BASE_URL || process.env.MINIMAX_BASE_URL || "https://api.minimax.io/v1",
-      model: process.env.AI_MODEL || "MiniMax-M2.7-highspeed",
-      supportsImages: false
+      name: "ccswitch",
+      apiKey: ccswitchApiKey,
+      baseUrl: process.env.CCSWITCH_BASE_URL || process.env.ANTHROPIC_BASE_URL || "https://v2.aicodee.com",
+      model: process.env.CCSWITCH_MODEL || process.env.ANTHROPIC_MODEL || process.env.MINIMAX_MODEL || process.env.AI_MODEL || "MiniMax-M2.7-highspeed",
+      supportsImages: false,
+      apiStyle: "anthropic"
     };
   }
 
-  if ((requestedProvider === "dashscope" || !requestedProvider) && process.env.DASHSCOPE_API_KEY) {
+  if (requestedProvider === "minimax" && minimaxApiKey) {
+    return {
+      name: "minimax",
+      apiKey: minimaxApiKey,
+      baseUrl: process.env.MINIMAX_BASE_URL || process.env.AI_BASE_URL || (isMiniMaxBaseUrl(openAiBaseUrl) ? openAiBaseUrl : undefined) || "https://api.minimax.io/v1",
+      model: process.env.MINIMAX_MODEL || process.env.AI_MODEL || "MiniMax-M2.7-highspeed",
+      supportsImages: false,
+      apiStyle: "openai"
+    };
+  }
+
+  if (requestedProvider === "dashscope" && process.env.DASHSCOPE_API_KEY) {
     return {
       name: "dashscope",
       apiKey: process.env.DASHSCOPE_API_KEY,
       baseUrl: process.env.AI_BASE_URL || "https://dashscope.aliyuncs.com/compatible-mode/v1",
       model: process.env.AI_MODEL || "qwen3-vl-plus",
-      supportsImages: true
-    };
-  }
-
-  if ((requestedProvider === "openai" || !requestedProvider) && process.env.OPENAI_API_KEY) {
-    return {
-      name: "openai",
-      apiKey: process.env.OPENAI_API_KEY,
-      baseUrl: process.env.AI_BASE_URL || "https://api.openai.com/v1",
-      model: process.env.AI_MODEL || "gpt-4o-mini",
-      supportsImages: true
+      supportsImages: true,
+      apiStyle: "openai"
     };
   }
 
   return null;
+}
+
+function isMiniMaxBaseUrl(value?: string) {
+  return Boolean(value && /minimax/i.test(value));
 }
 
 function isVagueFoodDescription(description: string) {
@@ -260,8 +381,151 @@ function isVagueFoodDescription(description: string) {
   if (!text) return false;
   if (text.length <= 12 && /^(我)?(今天|早上|中午|晚上)?(吃什么|吃啥|吃点啥|吃点什么|该吃什么)[？?。!！]*$/.test(text)) return true;
 
-  const foodSignals = /饭|面|粉|粥|包子|馒头|饺子|馄饨|汉堡|薯条|可乐|鸡|牛|猪|鱼|虾|肉|蛋|奶|豆腐|蔬菜|青菜|火锅|麻辣烫|冒菜|烧烤|烤肉|牛排|寿司|沙拉|奶茶|咖啡|水果|香蕉|苹果|肯德基|麦当劳|汉堡王|海底捞|瑞幸|星巴克|喜茶|奈雪|蜜雪|茶百道|古茗|全家|罗森|711|便利店/.test(text);
-  return text.length < 10 && !foodSignals;
+  return false;
+}
+
+function exceedsExplicitFoodItemLimit(description: string) {
+  return countExplicitFoodItems(description) > maxRecognizedFoodItems;
+}
+
+function countExplicitFoodItems(description: string) {
+  const splitText = description
+    .replace(/[()（）\[\]【】]/g, " ")
+    .replace(/(还有|另外|另加|再加|以及|加上|配上|配了|包含|包括|其中|分别|点了|吃了|喝了|一共|总共|和|跟|及)/g, "、")
+    .replace(/[+＋&、，,;；/／|｜\n]+/g, "、");
+
+  const items = splitText
+    .split("、")
+    .map(cleanExplicitFoodPart)
+    .filter(isLikelyExplicitFoodPart)
+    .map(normalizeSearchText);
+
+  return new Set(items).size;
+}
+
+function cleanExplicitFoodPart(value: string) {
+  return value
+    .trim()
+    .replace(/^(我|我们|本人|自己|今天|早上|上午|中午|下午|晚上|夜宵|早餐|午餐|晚餐|这顿|这一顿|本餐)/, "")
+    .replace(/^(\d+|[一二两三四五六七八九十]+)\s*(个人|人|位|个|份|碗|杯|根|块|片|只|条|盘|盒|袋|瓶)?/, "")
+    .trim();
+}
+
+function isLikelyExplicitFoodPart(value: string) {
+  const text = normalizeSearchText(value);
+  if (text.length < 2) return false;
+  if (/^(个人|人|位|聚餐|多人|一起|一起吃|分着吃|分食|吃饭|吃了一顿)$/.test(text)) return false;
+  if (hasFoodBrandMatch(value)) return true;
+
+  return /饭|米|面|粉|粥|饺|馄|包|馒|饼|糕|肉|鸡|鸭|鹅|牛|羊|猪|鱼|虾|蟹|贝|蛋|豆|菜|瓜|果|菇|笋|藕|奶|茶|咖啡|可乐|饮料|酒|汉堡|薯|披萨|寿司|沙拉|汤|串|丸|肠|棒|餐|火锅|烤|炸|煎|炒|蒸|拌|卤|烧|炖|煮/.test(text);
+}
+
+function buildTooManyFoodsResponse() {
+  return Response.json(
+    {
+      ok: false,
+      message: `一次最多识别 ${maxRecognizedFoodItems} 个食物，请分批输入。`
+    },
+    { status: 400 }
+  );
+}
+
+function buildTooManyFoodsResponseIfNeeded(foods: unknown[]) {
+  return foods.length > maxRecognizedFoodItems ? buildTooManyFoodsResponse() : null;
+}
+
+function isTooManyFoodDecision(decision: AiRouteDecision) {
+  const text = `${decision.message ?? ""}${decision.reason ?? ""}`;
+  return decision.route === "not_food" && /最多|超过|太多|过多|6|六/.test(text);
+}
+
+async function classifyFoodRoute(
+  provider: ProviderConfig,
+  description: string,
+  strictLocalMatches: StrictLocalFoodMatch[]
+): Promise<{ ok: true; decision: AiRouteDecision } | { ok: false; response: Response | null; errorText: string }> {
+  const prompt = [
+    "你是食物识别路由和营养估算助手。只返回严格 JSON 对象，不要 Markdown。",
+    "三条核心路由：",
+    "1. local_exact：服务端本地库候选完整覆盖用户输入且无额外食物；foods=[]。没有候选时禁止用。",
+    "2. brand_search：用户明确写了品牌/门店 + 具体产品/菜品；foods=[]，后端走 Tavily。",
+    "3. ai_estimate：其他具体食物/菜名/餐食；本次直接输出 foods。",
+    "not_food：没有具体食物、在问饮食建议，或明确列出超过 6 个具体食物；foods=[]。",
+    "你只是路由建议，服务端会复核本地库和品牌条件。",
+    formatStrictLocalCandidatesForRouting(strictLocalMatches),
+    getBrandCatalogPrompt(description),
+    "只按用户写出的食物、配菜、主食、饮料和份量估算；不要自行添加未提到的项目。",
+    getChinesePortionBaselinePrompt(),
+    `route=ai_estimate 时最多输出 ${maxRecognizedFoodItems} 个 foods；如果用户列出超过 ${maxRecognizedFoodItems} 个具体食物，route=not_food，message=一次最多识别 6 个食物，请分批输入。`,
+    "food 字段：name、brand、foodType、portionLabel、meal、macros、recognitionMode、warning。",
+    "macros 字段：protein、carbs、fat、calories、fiber，单位 g/g/g/kcal/g，整数。",
+    "warning 最多 18 个中文字，只写关键假设。",
+    "自检 calories≈protein*4+carbs*4+fat*9，误差大时先修正。",
+    `用户输入：${description || "无"}。`,
+    "输出 JSON 字段：isFoodRelated、route、brand、product、reason、message、foods。"
+  ].join("\n");
+
+  const { response, errorText } = await requestChatCompletion(
+    provider,
+    buildChatCompletionBody(provider, 900, [
+      {
+        role: "system",
+        content: "你只输出可以被 JSON.parse 解析的 JSON 对象。"
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ]),
+    routingAiTimeoutMs
+  );
+
+  if (!response?.ok) return { ok: false, response: response ?? null, errorText };
+
+  const json = await response.json();
+  return { ok: true, decision: parseAiRouteDecision(extractAssistantContent(json)) };
+}
+
+function parseAiRouteDecision(content: unknown): AiRouteDecision {
+  const payload = parseAiPayload(content) as AiRouteDecision;
+  return payload && typeof payload === "object" ? payload : {};
+}
+
+function normalizeRouteDecision(decision: AiRouteDecision, description: string): AiRouteDecision {
+  const route = decision.route;
+  const validRoute: AiRouteKind =
+    route === "local_exact" || route === "brand_search" || route === "ai_estimate" || route === "not_food"
+      ? route
+      : isVagueFoodDescription(description) || !description.trim()
+        ? "not_food"
+        : "ai_estimate";
+
+  return {
+    ...decision,
+    isFoodRelated: decision.isFoodRelated ?? validRoute !== "not_food",
+    route: validRoute
+  };
+}
+
+function formatStrictLocalCandidatesForRouting(matches: StrictLocalFoodMatch[]) {
+  if (!matches.length) return "服务端本地库严格命中候选：无。";
+
+  return [
+    "服务端本地库严格命中候选：",
+    ...matches.map((match, index) => {
+      const name = `${match.food.brand ?? ""} ${match.food.name ?? match.label}`.trim();
+      return `${index + 1}. ${name}；关键 token=${match.tokens.join("、")}`;
+    })
+  ].join("\n");
+}
+
+function shouldUseBrandSearch(decision: AiRouteDecision, description: string) {
+  if (decision.route !== "brand_search") return false;
+  if (hasFoodBrandMatch(description)) return true;
+
+  const brand = normalizeSearchText(decision.brand ?? "");
+  const product = normalizeSearchText(decision.product ?? "");
+  return brand.length >= 2 && product.length >= 2 && normalizeSearchText(description).includes(brand);
 }
 
 function shouldRepairAiPayload(parsed: AiPayload, content: unknown, description: string) {
@@ -342,19 +606,225 @@ const localFoodRules: Array<{
   }
 ];
 
-function buildExactLocalResult(description: string) {
-  if (!canUseExactLocalFallback(description)) return null;
+type StrictLocalFoodMatch = {
+  food: AiFood;
+  tokens: string[];
+  label: string;
+};
 
-  const exactLocalFoods = estimateFoodsFromExactLocalKnowledge(description);
-  if (!description || !exactLocalFoods.length) return null;
+const exactSingleFoodRules: Array<{
+  label: string;
+  tokenGroups: string[][];
+  food: AiFood;
+}> = [
+  {
+    label: "白米饭",
+    tokenGroups: [["白米饭", "米饭", "熟米饭"]],
+    food: {
+      name: "白米饭",
+      brand: "家常主食 / 行业平均",
+      foodType: "主食",
+      portionLabel: "1 碗熟米饭约 180g",
+      meal: "lunch",
+      macros: { protein: 5, carbs: 47, fat: 1, calories: 210, fiber: 1 },
+      recognitionMode: "industry-average",
+      warning: "按一碗熟白米饭约 180g 估算；大碗、小碗或半碗可以在右侧改。"
+    }
+  },
+  {
+    label: "蛋白棒",
+    tokenGroups: [["蛋白棒", "proteinbar"]],
+    food: {
+      name: "蛋白棒",
+      brand: "健身补剂 / 行业平均",
+      foodType: "蛋白零食",
+      portionLabel: "1 根",
+      meal: "snack",
+      macros: { protein: 20, carbs: 18, fat: 7, calories: 220, fiber: 5 },
+      recognitionMode: "industry-average",
+      warning: "按常见 50-60g 蛋白棒估算；不同品牌糖醇、脂肪和纤维差异较大。"
+    }
+  },
+  {
+    label: "旺旺鲜贝",
+    tokenGroups: [["旺旺"], ["鲜贝", "仙贝"]],
+    food: {
+      name: "旺旺鲜贝",
+      brand: "旺旺",
+      foodType: "膨化米果",
+      portionLabel: "1 块",
+      meal: "snack",
+      macros: { protein: 1, carbs: 7, fat: 1, calories: 40, fiber: 0 },
+      recognitionMode: "brand-product",
+      warning: "按一块小米果估算；如果是一整包，热量和碳水需要按包装份量上调。"
+    }
+  }
+];
 
+function findStrictLocalFoodMatches(description: string): StrictLocalFoodMatch[] {
+  const text = normalizeSearchText(description);
+  if (!text) return [];
+
+  const exactRuleMatches = exactSingleFoodRules.flatMap((rule): StrictLocalFoodMatch[] => {
+    const tokens = matchTokenGroups(rule.tokenGroups, text);
+    if (!tokens.length) return [];
+    return [{ food: { ...rule.food }, tokens, label: rule.label }];
+  });
+  const catalogMatches = foodCatalog.flatMap((item): StrictLocalFoodMatch[] => {
+    const tokens = getStrictCatalogMatchTokens(item, text);
+    if (!tokens.length) return [];
+    return [{ food: catalogItemToAiFood(item), tokens, label: item.title }];
+  });
+
+  const candidates = [...exactRuleMatches, ...catalogMatches]
+    .map((match) => ({ ...match, tokens: uniqueStrings(match.tokens).filter((token) => token.length >= 2) }))
+    .filter((match) => match.tokens.length)
+    .sort((a, b) => tokenCoverageLength(b.tokens) - tokenCoverageLength(a.tokens));
+
+  const usedTokens: string[] = [];
+  const picked: StrictLocalFoodMatch[] = [];
+
+  for (const candidate of candidates) {
+    if (candidate.tokens.every((token) => usedTokens.some((used) => used.includes(token) || token.includes(used)))) continue;
+    picked.push(candidate);
+    usedTokens.push(...candidate.tokens);
+  }
+
+  return uniqueStrictLocalMatches(picked).sort((a, b) => firstTokenIndex(text, a.tokens) - firstTokenIndex(text, b.tokens));
+}
+
+function matchTokenGroups(tokenGroups: string[][], text: string) {
+  const tokens: string[] = [];
+
+  for (const group of tokenGroups) {
+    const matched = group
+      .map(normalizeSearchText)
+      .filter(Boolean)
+      .sort((a, b) => b.length - a.length)
+      .find((token) => text.includes(token));
+
+    if (!matched) return [];
+    tokens.push(matched);
+  }
+
+  return tokens;
+}
+
+function hasMeaningfulResidualAfterLocal(description: string, matches: StrictLocalFoodMatch[]) {
+  let residual = normalizeSearchText(description);
+
+  for (const token of matches.flatMap((match) => match.tokens).sort((a, b) => b.length - a.length)) {
+    residual = residual.split(token).join("");
+  }
+
+  residual = residual.replace(
+    /(今天|早上|中午|晚上|我|吃了|吃|喝了|喝|了|和|及|与|加了|加|还有|另外|再来|大概|左右|约|一个|一根|一块|一片|一碗|一杯|一份|一包|一袋|一盒|半个|半根|半块|半片|半碗|半杯|半份|小份|中份|大份|小碗|大碗|正常|[0-9一二三四五六七八九十半两]+(个|根|块|片|碗|杯|份|包|袋|盒|瓶|条|颗|粒|勺|克|g|ml|毫升)?|[、，。；;,.+＋])/g,
+    ""
+  );
+
+  return residual.length >= 2;
+}
+
+function buildStrictLocalResponse(matches: StrictLocalFoodMatch[], partial = false) {
   return {
     ok: true,
     provider: "local-food-library",
     isFoodRelated: true,
-    message: "这个组合和本地食物库完全对上了，先按库里数值兜底估算；右侧还可以继续手动微调。",
-    foods: exactLocalFoods.map((food) => normalizeFood(food, "ai-text"))
+    message: partial
+      ? "AI 暂时没有稳定返回；我先把本地库严格命中的食物放进草稿箱，未命中的部分可以再补充识别。"
+      : "本地库已经严格命中这些食物，已直接放进草稿箱；右侧还可以继续手动微调。",
+    foods: matches.map((match) => normalizeFood(match.food, "ai-text"))
   };
+}
+
+function getStrictLocalMatchPrompt(matches: StrictLocalFoodMatch[]) {
+  if (!matches.length) return "";
+
+  const lines = matches.map((match) => {
+    const macros = match.food.macros;
+    return `- ${match.food.brand ?? "未标品牌"} ${match.food.name ?? match.label}，份量=${match.food.portionLabel ?? "本地库份量"}，P${macros?.protein ?? 0}/C${macros?.carbs ?? 0}/F${macros?.fat ?? 0}/K${macros?.calories ?? 0}/纤维${macros?.fiber ?? 0}`;
+  });
+
+  return [
+    "本地库已严格命中以下食物，并会由服务端计入最终结果：",
+    ...lines,
+    "规则：不要重复输出这些已命中的食物；只估算用户输入中除这些项目以外的额外食物。如果没有额外食物，foods 返回空数组。"
+  ].join("\n");
+}
+
+function mergeStrictLocalAndAiFoods(
+  localMatches: StrictLocalFoodMatch[],
+  aiFoods: AiFood[],
+  description: string,
+  source: "ai-vision" | "ai-text" = "ai-text"
+) {
+  const localFoods = localMatches.map((match) => normalizeFood(match.food, "ai-text"));
+  const filteredAiFoods = filterAiFoodsCoveredByStrictLocal(aiFoods, localMatches)
+    .map((food) => normalizeFood(applyBrandCatalogToAiFood(food, description), source));
+
+  return [...localFoods, ...filteredAiFoods];
+}
+
+function filterAiFoodsCoveredByStrictLocal(foods: AiFood[], localMatches: StrictLocalFoodMatch[]) {
+  if (!localMatches.length) return foods;
+
+  return foods.filter((food) => {
+    const foodText = normalizeSearchText(`${food.brand ?? ""}${food.name ?? ""}${food.foodType ?? ""}${food.portionLabel ?? ""}`);
+    return !localMatches.some((match) => match.tokens.some((token) => token.length >= 2 && foodText.includes(token)));
+  });
+}
+
+function getStrictCatalogMatchTokens(item: FoodCatalogItem, text: string) {
+  const title = normalizeSearchText(item.title);
+  if (title.length >= 4 && text.includes(title)) return [title];
+
+  const titleTokens = splitSearchTokens(item.title)
+    .map(cleanExactFoodToken)
+    .filter((token) => token.length >= 2 && !isLooseExactToken(token));
+  if (titleTokens.length >= 2 && titleTokens.every((token) => isExactTokenPresent(token, text))) {
+    return uniqueStrings(titleTokens);
+  }
+
+  const itemTokens = item.items
+    .flatMap((part) => splitSearchTokens(part))
+    .map(cleanExactFoodToken)
+    .filter((token) => token.length >= 2 && !isLooseExactToken(token));
+  if (itemTokens.length >= 2 && itemTokens.every((token) => isExactTokenPresent(token, text))) {
+    return uniqueStrings(itemTokens);
+  }
+
+  return [];
+}
+
+function tokenCoverageLength(tokens: string[]) {
+  return tokens.reduce((total, token) => total + token.length, 0);
+}
+
+function uniqueStrings(values: string[]) {
+  return Array.from(new Set(values.filter(Boolean)));
+}
+
+function uniqueStrictLocalMatches(matches: StrictLocalFoodMatch[]) {
+  const seen = new Set<string>();
+  return matches.filter((match) => {
+    const key = normalizeSearchText(`${match.food.brand ?? ""}${match.food.name ?? match.label}${match.food.foodType ?? ""}`);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function firstTokenIndex(text: string, tokens: string[]) {
+  const indexes = tokens
+    .map((token) => text.indexOf(token))
+    .filter((index) => index >= 0);
+  return indexes.length ? Math.min(...indexes) : Number.MAX_SAFE_INTEGER;
+}
+
+function buildExactLocalResult(description: string) {
+  const matches = findStrictLocalFoodMatches(description);
+  if (!matches.length) return null;
+  return buildStrictLocalResponse(matches, true);
 }
 
 function canUseExactLocalFallback(description: string) {
@@ -380,21 +850,7 @@ function estimateFoodsFromExactLocalKnowledge(description: string): AiFood[] {
 }
 
 function isExactCatalogFoodMatch(item: FoodCatalogItem, text: string) {
-  const title = normalizeSearchText(item.title);
-  if (title.length >= 4 && text.includes(title)) return true;
-
-  const titleTokens = splitSearchTokens(item.title)
-    .map(cleanExactFoodToken)
-    .filter((token) => token.length >= 2 && !isLooseExactToken(token));
-  if (titleTokens.length >= 2 && titleTokens.every((token) => isExactTokenPresent(token, text))) {
-    return true;
-  }
-
-  const itemTokens = item.items
-    .flatMap((part) => splitSearchTokens(part))
-    .map(cleanExactFoodToken)
-    .filter((token) => token.length >= 2 && !isLooseExactToken(token));
-  return itemTokens.length >= 2 && itemTokens.every((token) => isExactTokenPresent(token, text));
+  return getStrictCatalogMatchTokens(item, text).length > 0;
 }
 
 function cleanExactFoodToken(token: string) {
@@ -581,27 +1037,46 @@ function normalizeSearchText(value: string) {
 
 function getChinesePortionBaselinePrompt() {
   return [
-    "中国餐饮份量基准：",
-    "1. 口径先分清生重/熟重。熟白米饭约 116 kcal/100g、碳水约 26g/100g；生米约 75-80g 碳水/100g，不能把熟米饭按生米计算。",
-    "2. 一碗家用熟米饭通常按 150-200g；外卖盖饭/盖浇饭默认米饭 250-320g，小份/半份 150-200g，大份 350-420g。盖浇饭总碳水通常至少包含米饭碳水，再叠加酱汁、淀粉和配菜。",
-    "3. 普通粉面/米线/拉面一碗默认主食熟重 250-350g；凉皮/米皮/擀面皮一份默认 350-450g，碳水通常 70-100g，若有肉夹馍或饮料要拆开另算。",
-    "4. 麻辣烫/冒菜一碗默认可食固体 350-550g；有宽粉、土豆、方便面、粉丝时碳水上调；只选蔬菜和豆制品时碳水下调、蛋白按豆制品/肉丸估。",
-    "5. 饺子/馄饨按数量估：普通饺子 20-25g/个，10-15 个是一人份；小馄饨更轻，大馄饨更重。",
-    "6. 单人炒菜盖饭的浇头默认 180-250g；单点一盘炒菜默认 250-400g 且可能多人分享。中式炒菜通常含 10-25g 烹调油，鱼香、糖醋、红烧、干锅、烧烤、油炸要上调脂肪或糖。",
-    "7. 单人正餐肉/禽/鱼/蛋可食部分默认 100-180g；蔬菜一份默认 150-250g；水果一个/一份默认 150-250g。",
-    "8. 奶茶、咖啡和饮料必须按糖度、奶盖、小料拆分；用户没写糖度时按正常糖估，并在 warning 提醒可微调。",
-    "9. 如果用户给出明确克数、个数、杯型或大小份，优先用用户份量；否则按以上中国餐饮默认份量估算，并在 portionLabel 写明假设。"
+    "份量原则：不套固定菜品案例或克重表；按用户描述、菜系/品类、烹调方式、售卖规格和行业平均估算真实中位值。",
+    "用户给了克数、个数、规格、大小份、人数、分食或剩余比例时优先使用；未写明时按普通成年人一次正常摄入估算，不默认大份/小份/偏高。",
+    "多人共享餐按当前用户的实际摄入份额计算；共享菜分摊，个人主食/饮料/小吃单独计算，人数不明时说明假设。",
+    "注意生熟重、可食部分、干湿重和酱汁油脂；关键假设写进 portionLabel，warning 保持很短。"
   ].join("\n");
 }
 
 function shouldSearchNutrition(description: string) {
   const text = normalizeSearchText(description);
-  if (text.length < 3) return false;
-  if (hasFoodBrandMatch(description)) return true;
+  if (text.length < 2) return false;
   if (isGenericDiningDescription(description)) return false;
-  if (text.length < 6) return false;
+  if (hasExplicitBrandProductDescription(description)) return true;
   if (looksLikeBrandProductDescription(text)) return true;
   return /[A-Za-z]/.test(description) && /(营养|热量|套餐|汉堡|奶茶|咖啡|披萨|三明治|蛋糕|饮料|产品|口味)/.test(description);
+}
+
+function hasExplicitBrandProductDescription(description: string) {
+  const text = normalizeSearchText(description);
+  const matches = findFoodBrandMatches(description, 2);
+  if (!matches.length) return false;
+
+  return matches.some((entry) => {
+    const brandNames = [entry.brand, ...entry.aliases].map(normalizeSearchText).filter(Boolean);
+    const hasBrand = brandNames.some((brand) => brand.length >= 2 && text.includes(brand));
+    if (!hasBrand) return false;
+
+    const productTokens = entry.commonProducts
+      .flatMap(splitSearchTokens)
+      .map(cleanExactFoodToken)
+      .filter((token) => token.length >= 2);
+
+    if (productTokens.some((token) => text.includes(token))) return true;
+
+    let rest = text;
+    for (const brand of brandNames.sort((a, b) => b.length - a.length)) {
+      rest = rest.split(brand).join("");
+    }
+
+    return /(套餐|招牌|菜单|官方|营养|热量|汉堡|鸡腿堡|巨无霸|薯条|炸鸡|鸡翅|披萨|三明治|拿铁|奶茶|茶饮|饭团|便当|产品|口味)/.test(rest);
+  });
 }
 
 function looksLikeBrandProductDescription(text: string) {
@@ -626,7 +1101,7 @@ async function searchNutritionWithTavily(description: string) {
   if (!apiKey) return "";
 
   try {
-    const response = await fetch("https://api.tavily.com/search", {
+    const response = await fetchWithTimeout("https://api.tavily.com/search", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -642,7 +1117,7 @@ async function searchNutritionWithTavily(description: string) {
         include_images: false,
         country: "china"
       })
-    });
+    }, tavilySearchTimeoutMs);
 
     if (!response.ok) return "";
     const payload = await response.json() as TavilySearchPayload;
@@ -672,12 +1147,13 @@ async function extractAiPayloadFromSearch(provider: ProviderConfig, description:
     "严格只按用户写出的食物和份量估算；不要补充用户没写的配菜、主食或饮料。",
     getBrandCatalogPrompt(description),
     getChinesePortionBaselinePrompt(),
+    `最多输出 ${maxRecognizedFoodItems} 个 foods；如果用户列出超过 ${maxRecognizedFoodItems} 个具体食物，返回空 foods 并提醒分批输入。`,
     "多食物必须拆分。每个 food 必须有 name、brand、foodType、portionLabel、meal、macros、recognitionMode、warning。",
     "不能生成互相包含的重复套餐；同一份肉、主食或配菜只能算一次。",
     "macros 包含 protein/carbs/fat/calories/fiber，单位 g/g/g/kcal/g，四舍五入为整数。",
     "自检：calories 应大致等于 protein*4 + carbs*4 + fat*9，误差超过 25% 时先修正。",
-    "warning 里用一句中文说明依据，例如“参考公开搜索结果并按常见份量估算，可手动微调”。",
-    '输出格式：{"isFoodRelated":true,"message":"已参考公开信息估算","foods":[{"name":"产品名","brand":"品牌","foodType":"类型","portionLabel":"正常一份","meal":"lunch","macros":{"protein":20,"carbs":30,"fat":10,"calories":300,"fiber":3},"recognitionMode":"brand-product","warning":"参考公开搜索结果估算"}]}',
+    "warning 最多 18 个中文字，只写关键依据。",
+    "输出 JSON 字段：isFoodRelated、message、foods；food 字段同上。",
     `用户描述：${description}`,
     `搜索结果：\n${searchContext}`
   ].join("\n");
@@ -685,21 +1161,17 @@ async function extractAiPayloadFromSearch(provider: ProviderConfig, description:
   try {
     const { response } = await requestChatCompletion(
       provider,
-      JSON.stringify({
-        model: provider.model,
-        temperature: 0,
-        max_tokens: 1300,
-        messages: [
-          {
-            role: "system",
-            content: "你只输出可以被 JSON.parse 解析的 JSON 对象。"
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ]
-      })
+      buildChatCompletionBody(provider, 1300, [
+        {
+          role: "system",
+          content: "你只输出可以被 JSON.parse 解析的 JSON 对象。"
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ]),
+      searchAiTimeoutMs
     );
 
     if (!response?.ok) return {};
@@ -718,11 +1190,13 @@ async function repairAiPayload(provider: ProviderConfig, description: string, fi
     "严格只按用户写出的食物和份量估算；不要补充用户没写的配菜、主食或饮料，也不要生成互相包含的重复套餐。",
     getBrandCatalogPrompt(description),
     getChinesePortionBaselinePrompt(),
+    `最多输出 ${maxRecognizedFoodItems} 个 foods；如果用户列出超过 ${maxRecognizedFoodItems} 个具体食物，返回空 foods 并提醒分批输入。`,
     "每个 food 必须有 name、brand、foodType、portionLabel、meal、macros、recognitionMode、warning。",
     "macros 必须包含 protein/carbs/fat/calories/fiber，单位分别是 g/g/g/kcal/g，数值用合理估算。",
     "自检：calories 应大致等于 protein*4 + carbs*4 + fat*9，误差超过 25% 时先修正。",
     "如果品牌或具体产品能从文本识别出来，recognitionMode 用 brand-product；否则用 industry-average。",
-    '输出格式示例：{"isFoodRelated":true,"message":"识别好了","foods":[{"name":"香辣鸡腿堡","brand":"肯德基","foodType":"汉堡","portionLabel":"1 个","meal":"lunch","macros":{"protein":23,"carbs":42,"fat":18,"calories":430,"fiber":2},"recognitionMode":"brand-product","warning":"按常见门店份量估算"}]}',
+    "warning 最多 18 个中文字，只写关键依据。",
+    "输出 JSON 字段：isFoodRelated、message、foods；food 字段同上。",
     `用户描述：${description}`,
     `第一轮模型输出：${stringifyForPrompt(firstContent)}`
   ].join("\n");
@@ -730,21 +1204,17 @@ async function repairAiPayload(provider: ProviderConfig, description: string, fi
   try {
     const { response } = await requestChatCompletion(
       provider,
-      JSON.stringify({
-        model: provider.model,
-        temperature: 0,
-        max_tokens: 1100,
-        messages: [
-          {
-            role: "system",
-            content: "你只输出可以被 JSON.parse 解析的 JSON 对象。"
-          },
-          {
-            role: "user",
-            content: repairPrompt
-          }
-        ]
-      })
+      buildChatCompletionBody(provider, 1100, [
+        {
+          role: "system",
+          content: "你只输出可以被 JSON.parse 解析的 JSON 对象。"
+        },
+        {
+          role: "user",
+          content: repairPrompt
+        }
+      ]),
+      repairAiTimeoutMs
     );
 
     if (!response?.ok) return fallback;
@@ -772,6 +1242,16 @@ function extractAssistantContent(json: unknown): unknown {
     content?: unknown;
   };
   const choice = data.choices?.[0];
+  if (Array.isArray(data.content)) {
+    return data.content
+      .map((part) => {
+        if (!part || typeof part !== "object") return "";
+        const item = part as { text?: unknown; content?: unknown };
+        return typeof item.text === "string" ? item.text : typeof item.content === "string" ? item.content : "";
+      })
+      .filter(Boolean)
+      .join("\n");
+  }
   return choice?.message?.content ?? choice?.text ?? choice?.delta?.content ?? data.output_text ?? data.content;
 }
 
@@ -784,34 +1264,167 @@ function stringifyForPrompt(value: unknown) {
   }
 }
 
-async function requestChatCompletion(provider: ProviderConfig, body: string) {
+function buildChatCompletionBody(provider: ProviderConfig, maxTokens: number, messages: ChatMessage[]) {
+  if (provider.apiStyle === "anthropic") return buildAnthropicMessagesBody(provider, maxTokens, messages);
+
+  const tokenLimit =
+    provider.name === "minimax"
+      ? { max_completion_tokens: maxTokens }
+      : { max_tokens: maxTokens };
+
+  return JSON.stringify({
+    model: provider.model,
+    temperature: provider.name === "minimax" ? 0.1 : 0,
+    ...tokenLimit,
+    messages
+  });
+}
+
+function buildAnthropicMessagesBody(provider: ProviderConfig, maxTokens: number, messages: ChatMessage[]) {
+  const system = messages
+    .filter((message) => message.role === "system")
+    .map((message) => messageContentToText(message.content))
+    .filter(Boolean)
+    .join("\n\n");
+  const anthropicMessages = messages
+    .filter((message) => message.role !== "system")
+    .map((message) => ({
+      role: message.role,
+      content: messageContentToText(message.content)
+    }));
+
+  return JSON.stringify({
+    model: provider.model,
+    max_tokens: maxTokens,
+    temperature: 0.1,
+    system: system || undefined,
+    messages: anthropicMessages.length ? anthropicMessages : [{ role: "user", content: "" }]
+  });
+}
+
+function messageContentToText(content: unknown) {
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => {
+        if (!part || typeof part !== "object") return "";
+        const item = part as { text?: unknown; type?: unknown };
+        return typeof item.text === "string" ? item.text : "";
+      })
+      .filter(Boolean)
+      .join("\n");
+  }
+
+  try {
+    return JSON.stringify(content);
+  } catch {
+    return "";
+  }
+}
+
+function buildAiServiceErrorResponse(response: Response | null, errorText = "") {
+  const status = response?.status ?? 502;
+  const message = getUserFacingAiErrorMessage(status, errorText);
+  return Response.json({ ok: false, message }, { status });
+}
+
+function getUserFacingAiErrorMessage(status: number, errorText: string) {
+  const text = errorText.toLowerCase();
+
+  if (status === 401 || status === 403 || /api key|unauthorized|forbidden|incorrect|auth|token/.test(text)) {
+    return "AI 服务鉴权失败。请检查 CC Switch / MiniMax Key、模型名和部署环境变量。";
+  }
+
+  if (status === 429) {
+    return "AI 服务请求太频繁了，稍等一下再识别。";
+  }
+
+  if (status === 408 || /timeout|超过|connect_timeout|fetch failed/.test(text)) {
+    return "AI 服务连接超时。请确认服务端网络或本地代理已经生效。";
+  }
+
+  return "AI 服务暂时没有识别成功，请稍后再试。";
+}
+
+async function requestChatCompletion(provider: ProviderConfig, body: string, timeoutMs = mainAiTimeoutMs) {
+  const maxAttempts = provider.name === "ccswitch" ? 2 : 1;
   let lastResponse: Response | null = null;
   let lastErrorText = "";
 
-  for (const endpoint of getChatCompletionUrls(provider.baseUrl)) {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${provider.apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body
-    });
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    for (const endpoint of getChatCompletionUrls(provider.baseUrl, provider)) {
+      try {
+        const response = await fetchWithTimeout(endpoint, {
+          method: "POST",
+          headers: getCompletionHeaders(provider),
+          body
+        }, timeoutMs);
 
-    if (response.ok) return { response, errorText: "" };
+        if (response.ok) return { response, errorText: "" };
 
-    lastResponse = response;
-    lastErrorText = await response.text();
+        lastResponse = response;
+        lastErrorText = await response.text();
 
-    if (response.status !== 404 && response.status !== 405) {
-      return { response, errorText: lastErrorText };
+        if (!shouldRetryAiResponse(response, lastErrorText) || attempt === maxAttempts) {
+          if (response.status !== 404 && response.status !== 405) {
+            return { response, errorText: lastErrorText };
+          }
+        }
+      } catch (error) {
+        lastErrorText = error instanceof Error ? error.message : "AI 请求超时或网络异常。";
+        if (attempt === maxAttempts) {
+          return {
+            response: lastResponse,
+            errorText: lastErrorText
+          };
+        }
+      }
     }
   }
 
   return { response: lastResponse, errorText: lastErrorText };
 }
 
-function getChatCompletionUrls(baseUrl: string) {
+function shouldRetryAiResponse(response: Response, errorText: string) {
+  if (response.status === 408 || response.status === 429 || response.status >= 500) return true;
+  return /timeout|超时|请求超过|fetch failed|connect_timeout|temporarily|upstream/i.test(errorText);
+}
+
+function getCompletionHeaders(provider: ProviderConfig) {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${provider.apiKey}`,
+    "Content-Type": "application/json"
+  };
+
+  if (provider.apiStyle === "anthropic") {
+    headers["anthropic-version"] = "2023-06-01";
+  }
+
+  return headers;
+}
+
+async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit, timeoutMs: number) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(input, {
+      ...init,
+      signal: controller.signal
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error(`请求超过 ${Math.round(timeoutMs / 1000)} 秒未返回`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function getChatCompletionUrls(baseUrl: string, provider?: ProviderConfig) {
+  if (provider?.apiStyle === "anthropic") return getAnthropicMessageUrls(baseUrl);
+
   const trimmed = baseUrl.replace(/\/+$/, "");
   if (trimmed.endsWith("/chat/completions")) return [trimmed];
 
@@ -826,6 +1439,30 @@ function getChatCompletionUrls(baseUrl: string) {
   }
 
   urls.push(`${trimmed}/chat/completions`);
+  return Array.from(new Set(urls));
+}
+
+function getAnthropicMessageUrls(baseUrl: string) {
+  const trimmed = baseUrl.replace(/\/+$/, "");
+  if (trimmed.endsWith("/v1/messages")) return [trimmed];
+  if (trimmed.endsWith("/messages")) return [trimmed];
+
+  const urls: string[] = [];
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.pathname === "/" || parsed.pathname === "") {
+      urls.push(`${trimmed}/v1/messages`);
+    } else if (trimmed.endsWith("/v1")) {
+      urls.push(`${trimmed}/messages`);
+    } else {
+      urls.push(`${trimmed}/v1/messages`);
+      urls.push(`${trimmed}/messages`);
+    }
+  } catch {
+    return [`${trimmed}/v1/messages`];
+  }
+
   return Array.from(new Set(urls));
 }
 
