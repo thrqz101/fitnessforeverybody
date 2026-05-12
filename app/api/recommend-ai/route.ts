@@ -4,9 +4,16 @@ import { getFoodCatalogPromptSummary } from "@/lib/food-catalog";
 export const runtime = "nodejs";
 
 type ProviderConfig = {
+  name: "ccswitch" | "minimax";
   apiKey: string;
   baseUrl: string;
   model: string;
+  apiStyle: "anthropic" | "openai";
+};
+
+type ChatMessage = {
+  role: "system" | "user";
+  content: string;
 };
 
 type RecommendPayload = {
@@ -33,21 +40,16 @@ export async function POST(request: Request) {
     const prompt = buildRecommendationPrompt(body);
     const { response, errorText } = await requestChatCompletion(
       provider,
-      JSON.stringify({
-        model: provider.model,
-        temperature: 0,
-        max_tokens: 3600,
-        messages: [
-          {
-            role: "system",
-            content: "你是中国市场的健身饮食推荐助手，只返回可被 JSON.parse 解析的严格 JSON 对象。同一输入保持稳定推荐逻辑。"
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ]
-      })
+      buildChatCompletionBody(provider, 3600, [
+        {
+          role: "system",
+          content: "你是中国市场的健身饮食推荐助手，只返回可被 JSON.parse 解析的严格 JSON 对象。同一输入保持稳定推荐逻辑。"
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ])
     );
 
     if (!response?.ok) {
@@ -122,25 +124,84 @@ function buildRecommendationPrompt(body: {
 }
 
 function getProviderConfig(): ProviderConfig | null {
-  if (!process.env.MINIMAX_API_KEY) return null;
-  return {
-    apiKey: process.env.MINIMAX_API_KEY,
-    baseUrl: process.env.AI_BASE_URL || process.env.MINIMAX_BASE_URL || "https://api.minimax.io/v1",
-    model: process.env.AI_MODEL || "MiniMax-M2.7-highspeed"
-  };
+  const requestedProvider = process.env.AI_PROVIDER?.toLowerCase() || "minimax";
+  const ccswitchApiKey =
+    process.env.CCSWITCH_API_KEY ||
+    process.env.ANTHROPIC_AUTH_TOKEN ||
+    process.env.MINIMAX_API_KEY ||
+    process.env.MINIMAX_API_TOKEN;
+  const minimaxApiKey = process.env.MINIMAX_API_KEY || process.env.MINIMAX_API_TOKEN;
+
+  if (requestedProvider === "ccswitch" && ccswitchApiKey) {
+    return {
+      name: "ccswitch",
+      apiKey: ccswitchApiKey,
+      baseUrl: process.env.CCSWITCH_BASE_URL || process.env.ANTHROPIC_BASE_URL || "https://v2.aicodee.com",
+      model: process.env.CCSWITCH_MODEL || process.env.ANTHROPIC_MODEL || process.env.MINIMAX_MODEL || process.env.AI_MODEL || "MiniMax-M2.7-highspeed",
+      apiStyle: "anthropic"
+    };
+  }
+
+  if (requestedProvider === "minimax" && minimaxApiKey) {
+    return {
+      name: "minimax",
+      apiKey: minimaxApiKey,
+      baseUrl: process.env.AI_BASE_URL || process.env.MINIMAX_BASE_URL || "https://api.minimax.io/v1",
+      model: process.env.AI_MODEL || process.env.MINIMAX_MODEL || "MiniMax-M2.7-highspeed",
+      apiStyle: "openai"
+    };
+  }
+
+  return null;
+}
+
+function buildChatCompletionBody(provider: ProviderConfig, maxTokens: number, messages: ChatMessage[]) {
+  if (provider.apiStyle === "anthropic") return buildAnthropicMessagesBody(provider, maxTokens, messages);
+
+  const tokenLimit =
+    provider.name === "minimax"
+      ? { max_completion_tokens: maxTokens }
+      : { max_tokens: maxTokens };
+
+  return JSON.stringify({
+    model: provider.model,
+    temperature: provider.name === "minimax" ? 0.1 : 0,
+    ...tokenLimit,
+    messages
+  });
+}
+
+function buildAnthropicMessagesBody(provider: ProviderConfig, maxTokens: number, messages: ChatMessage[]) {
+  const system = messages
+    .filter((message) => message.role === "system")
+    .map((message) => message.content)
+    .filter(Boolean)
+    .join("\n\n");
+  const anthropicMessages = messages
+    .filter((message) => message.role !== "system")
+    .map((message) => ({
+      role: message.role,
+      content: message.content
+    }));
+
+  return JSON.stringify({
+    model: provider.model,
+    max_tokens: maxTokens,
+    temperature: 0.1,
+    thinking: { type: "disabled" },
+    system: system || undefined,
+    messages: anthropicMessages.length ? anthropicMessages : [{ role: "user", content: "" }]
+  });
 }
 
 async function requestChatCompletion(provider: ProviderConfig, body: string) {
   let lastResponse: Response | null = null;
   let lastErrorText = "";
 
-  for (const endpoint of getChatCompletionUrls(provider.baseUrl)) {
+  for (const endpoint of getChatCompletionUrls(provider.baseUrl, provider)) {
     const response = await fetch(endpoint, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${provider.apiKey}`,
-        "Content-Type": "application/json"
-      },
+      headers: getCompletionHeaders(provider),
       body
     });
 
@@ -157,7 +218,9 @@ async function requestChatCompletion(provider: ProviderConfig, body: string) {
   return { response: lastResponse, errorText: lastErrorText };
 }
 
-function getChatCompletionUrls(baseUrl: string) {
+function getChatCompletionUrls(baseUrl: string, provider?: ProviderConfig) {
+  if (provider?.apiStyle === "anthropic") return getAnthropicMessageUrls(baseUrl);
+
   const trimmed = baseUrl.replace(/\/+$/, "");
   if (trimmed.endsWith("/chat/completions")) return [trimmed];
 
@@ -175,6 +238,43 @@ function getChatCompletionUrls(baseUrl: string) {
   return Array.from(new Set(urls));
 }
 
+function getAnthropicMessageUrls(baseUrl: string) {
+  const trimmed = baseUrl.replace(/\/+$/, "");
+  if (trimmed.endsWith("/v1/messages")) return [trimmed];
+  if (trimmed.endsWith("/messages")) return [trimmed];
+
+  const urls: string[] = [];
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.pathname === "/" || parsed.pathname === "") {
+      urls.push(`${trimmed}/v1/messages`);
+    } else if (trimmed.endsWith("/v1")) {
+      urls.push(`${trimmed}/messages`);
+    } else {
+      urls.push(`${trimmed}/v1/messages`);
+      urls.push(`${trimmed}/messages`);
+    }
+  } catch {
+    return [`${trimmed}/v1/messages`];
+  }
+
+  return Array.from(new Set(urls));
+}
+
+function getCompletionHeaders(provider: ProviderConfig) {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${provider.apiKey}`,
+    "Content-Type": "application/json"
+  };
+
+  if (provider.apiStyle === "anthropic") {
+    headers["anthropic-version"] = "2023-06-01";
+  }
+
+  return headers;
+}
+
 function extractAssistantContent(json: unknown): unknown {
   if (!json || typeof json !== "object") return undefined;
   const data = json as {
@@ -188,6 +288,16 @@ function extractAssistantContent(json: unknown): unknown {
     content?: unknown;
   };
   const choice = data.choices?.[0];
+  if (Array.isArray(data.content)) {
+    return data.content
+      .map((part) => {
+        if (!part || typeof part !== "object") return "";
+        const item = part as { text?: unknown; content?: unknown };
+        return typeof item.text === "string" ? item.text : typeof item.content === "string" ? item.content : "";
+      })
+      .filter(Boolean)
+      .join("\n");
+  }
   return choice?.message?.content ?? choice?.text ?? data.output_text ?? data.content;
 }
 

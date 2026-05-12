@@ -1297,6 +1297,7 @@ function buildAnthropicMessagesBody(provider: ProviderConfig, maxTokens: number,
     model: provider.model,
     max_tokens: maxTokens,
     temperature: 0.1,
+    thinking: { type: "disabled" },
     system: system || undefined,
     messages: anthropicMessages.length ? anthropicMessages : [{ role: "user", content: "" }]
   });
