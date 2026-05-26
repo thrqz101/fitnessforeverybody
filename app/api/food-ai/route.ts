@@ -136,10 +136,12 @@ export async function POST(request: Request) {
 
     const strictLocalMatches = findStrictLocalFoodMatches(description);
     const routingResult = await classifyFoodRoute(provider, description, strictLocalMatches);
-
-    if (!routingResult.ok) return buildAiServiceErrorResponse(routingResult.response, routingResult.errorText);
-
-    const routeDecision = normalizeRouteDecision(routingResult.decision, description);
+    const routeDecision = normalizeRouteDecision(
+      routingResult.ok
+        ? routingResult.decision
+        : buildFallbackRouteDecision(description, strictLocalMatches, Boolean(files.length)),
+      description
+    );
     const hasOnlyStrictLocalMatches =
       strictLocalMatches.length > 0 &&
       !files.length &&
@@ -504,6 +506,42 @@ function normalizeRouteDecision(decision: AiRouteDecision, description: string):
     ...decision,
     isFoodRelated: decision.isFoodRelated ?? validRoute !== "not_food",
     route: validRoute
+  };
+}
+
+function buildFallbackRouteDecision(
+  description: string,
+  strictLocalMatches: StrictLocalFoodMatch[],
+  hasFiles: boolean
+): AiRouteDecision {
+  if (!description.trim() && !hasFiles) {
+    return {
+      isFoodRelated: false,
+      route: "not_food",
+      message: "我没有测出这一餐，请输入具体食物、品牌、套餐、配菜、饮料或份量。"
+    };
+  }
+
+  if (strictLocalMatches.length && !hasMeaningfulResidualAfterLocal(description, strictLocalMatches)) {
+    return {
+      isFoodRelated: true,
+      route: "local_exact",
+      reason: "路由 AI 暂时失败，使用本地严格命中兜底。"
+    };
+  }
+
+  if (shouldSearchNutrition(description)) {
+    return {
+      isFoodRelated: true,
+      route: "brand_search",
+      reason: "路由 AI 暂时失败，使用品牌搜索规则兜底。"
+    };
+  }
+
+  return {
+    isFoodRelated: true,
+    route: "ai_estimate",
+    reason: "路由 AI 暂时失败，使用通用营养估算兜底。"
   };
 }
 
