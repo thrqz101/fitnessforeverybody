@@ -2,6 +2,9 @@ export type Gender = "male" | "female";
 export type GoalType = "muscle" | "fat_loss" | "weight_loss" | "health";
 export type MealType = "breakfast" | "lunch" | "dinner" | "snack" | "midnight";
 export type DietDayStatus = "normal" | "high_carb" | "low_carb" | "high_protein" | "free";
+export type MacroMultiplierKey = "protein" | "carbs" | "fat";
+
+export type MacroMultipliers = Record<MacroMultiplierKey, number>;
 
 export type MacroTotals = {
   protein: number;
@@ -23,6 +26,8 @@ export type UserProfile = {
   bodyFat?: number;
   trainingStyle: string;
   eatingPattern: string;
+  macroMultipliers?: MacroMultipliers;
+  fiberGrams?: number;
 };
 
 export type DayState = {

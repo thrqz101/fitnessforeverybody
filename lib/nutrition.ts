@@ -1,6 +1,27 @@
-import type { DayState, DietDayStatus, FoodLogItem, GoalType, MacroKey, MacroTotals, Recommendation, UserProfile } from "@/lib/types";
+import type { DayState, DietDayStatus, FoodLogItem, GoalType, MacroKey, MacroMultiplierKey, MacroMultipliers, MacroTotals, Recommendation, UserProfile } from "@/lib/types";
 
 export const macroKeys: MacroKey[] = ["protein", "carbs", "fat", "calories", "fiber"];
+export const macroMultiplierKeys: MacroMultiplierKey[] = ["protein", "carbs", "fat"];
+
+export const macroMultiplierBounds: Record<MacroMultiplierKey, { min: number; max: number; step: number }> = {
+  protein: { min: 0.8, max: 2.6, step: 0.01 },
+  carbs: { min: 0.8, max: 6, step: 0.01 },
+  fat: { min: 0.35, max: 1.25, step: 0.01 }
+};
+
+export const defaultMacroMultipliers: MacroMultipliers = {
+  protein: 1.6,
+  carbs: 2.8,
+  fat: 0.75
+};
+
+export const fiberGramBounds = {
+  min: 15,
+  max: 50,
+  step: 1
+};
+
+export const defaultFiberGrams = 30;
 
 export const defaultProfile: UserProfile = {
   heightCm: 172,
@@ -54,6 +75,101 @@ export function estimateBmr(profile: Pick<UserProfile, "heightCm" | "weightKg" |
 }
 
 export function calculateTargets(profile: UserProfile, day: DayState): MacroTotals {
+  const targets = calculateSystemTargets(profile, day);
+  const fiber = profile.fiberGrams ? normalizeFiberGrams(profile.fiberGrams, targets.fiber) : targets.fiber;
+
+  if (!profile.macroMultipliers || profile.weightKg <= 0) {
+    return {
+      ...targets,
+      fiber
+    };
+  }
+
+  const multipliers = normalizeMacroMultipliers(
+    profile.macroMultipliers,
+    calculateMacroMultipliersFromTargets(targets, profile.weightKg)
+  );
+
+  return roundMacros({
+    ...targets,
+    protein: profile.weightKg * multipliers.protein,
+    carbs: profile.weightKg * multipliers.carbs,
+    fat: profile.weightKg * multipliers.fat,
+    fiber
+  });
+}
+
+export function calculateRecommendedMacroMultipliers(profile: UserProfile, day: DayState): MacroMultipliers {
+  return calculateMacroMultipliersFromTargets(calculateSystemTargets(profile, day), profile.weightKg);
+}
+
+export function calculateSystemCalorieBudget(profile: UserProfile, day: DayState) {
+  return calculateSystemTargets(profile, day).calories;
+}
+
+export function calculateRecommendedFiberGrams(profile: UserProfile, day: DayState) {
+  return normalizeFiberGrams(calculateSystemTargets(profile, day).fiber);
+}
+
+export function calculateCaloriesFromMacroMultipliers(weightKg: number, multipliers: MacroMultipliers) {
+  const weight = Math.max(0, weightKg);
+
+  return calculateCaloriesFromMacros({
+    protein: weight * multipliers.protein,
+    carbs: weight * multipliers.carbs,
+    fat: weight * multipliers.fat
+  });
+}
+
+export function calculateCaloriesFromMacros(macros: Pick<MacroTotals, "protein" | "carbs" | "fat">) {
+  return Math.round(
+    Math.max(0, macros.protein) * 4 +
+    Math.max(0, macros.carbs) * 4 +
+    Math.max(0, macros.fat) * 9
+  );
+}
+
+export function calculateMacroMultipliersFromTargets(targets: MacroTotals, weightKg: number): MacroMultipliers {
+  const divisor = Math.max(1, weightKg);
+
+  return normalizeMacroMultipliers(
+    {
+      protein: targets.protein / divisor,
+      carbs: targets.carbs / divisor,
+      fat: targets.fat / divisor
+    },
+    defaultMacroMultipliers
+  );
+}
+
+export function normalizeMacroMultipliers(
+  multipliers: Partial<MacroMultipliers> | undefined,
+  fallback: MacroMultipliers = defaultMacroMultipliers
+): MacroMultipliers {
+  return macroMultiplierKeys.reduce((normalized, key) => {
+    const value = Number(multipliers?.[key]);
+    normalized[key] = clampMacroMultiplier(key, Number.isFinite(value) && value > 0 ? value : fallback[key]);
+    return normalized;
+  }, {} as MacroMultipliers);
+}
+
+export function clampMacroMultiplier(key: MacroMultiplierKey, value: number) {
+  const bounds = macroMultiplierBounds[key];
+  const safeValue = Number.isFinite(value) ? value : defaultMacroMultipliers[key];
+  return roundMultiplier(Math.min(bounds.max, Math.max(bounds.min, safeValue)));
+}
+
+export function normalizeFiberGrams(value: number | undefined, fallback = defaultFiberGrams) {
+  const safeValue = typeof value === "number" && Number.isFinite(value) && value > 0 ? value : fallback;
+  return clampFiberGrams(safeValue);
+}
+
+export function clampFiberGrams(value: number) {
+  const safeValue = Number.isFinite(value) ? value : defaultFiberGrams;
+  return Math.round(Math.min(fiberGramBounds.max, Math.max(fiberGramBounds.min, safeValue)));
+}
+
+function calculateSystemTargets(profile: UserProfile, day: DayState): MacroTotals {
   const bmr = profile.bmrKcal > 0 ? profile.bmrKcal : estimateBmr(profile);
   const trainingBoost = day.isTrainingDay ? 1 : 0;
   const intensityBoost = day.intensity === "hard" ? 120 : day.intensity === "medium" ? 60 : 0;
@@ -102,6 +218,10 @@ export function calculateTargets(profile: UserProfile, day: DayState): MacroTota
     fiber: 30
   };
   return applyDietAdjustments(targets, profile, day);
+}
+
+function roundMultiplier(value: number) {
+  return Math.round(value * 100) / 100;
 }
 
 export function emptyMacros(): MacroTotals {

@@ -1,9 +1,27 @@
 "use client";
 
-import { Activity, ArrowRight, HeartPulse, Maximize2, Scale, Sparkles, X } from "lucide-react";
+import { Activity, ArrowRight, Check, HeartPulse, Maximize2, RotateCcw, Scale, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
-import { defaultDayState, defaultProfile, estimateBmr, goalLabels } from "@/lib/nutrition";
-import type { DayState, GoalType, UserProfile } from "@/lib/types";
+import {
+  calculateCaloriesFromMacroMultipliers,
+  calculateRecommendedMacroMultipliers,
+  calculateRecommendedFiberGrams,
+  calculateSystemCalorieBudget,
+  clampFiberGrams,
+  clampMacroMultiplier,
+  defaultDayState,
+  defaultProfile,
+  dietStatusLabels,
+  estimateBmr,
+  fiberGramBounds,
+  goalLabels,
+  macroLabels,
+  macroMultiplierBounds,
+  macroMultiplierKeys,
+  normalizeFiberGrams,
+  normalizeMacroMultipliers
+} from "@/lib/nutrition";
+import type { DayState, GoalType, MacroMultiplierKey, MacroMultipliers, UserProfile } from "@/lib/types";
 
 type OnboardingProps = {
   initialProfile?: UserProfile;
@@ -80,6 +98,18 @@ const bodyFatPhotoRefs = [
 
 type BodyFatPhotoRef = (typeof bodyFatPhotoRefs)[number];
 
+const macroAccentColor: Record<MacroMultiplierKey, string> = {
+  protein: "#246b4f",
+  carbs: "#d9a900",
+  fat: "#ff6f5e"
+};
+
+const macroPillClass: Record<MacroMultiplierKey, string> = {
+  protein: "bg-moss/10 text-moss",
+  carbs: "bg-citrus/25 text-ink",
+  fat: "bg-coral/10 text-coral"
+};
+
 export function Onboarding({
   initialProfile = defaultProfile,
   initialDay = defaultDayState,
@@ -98,7 +128,29 @@ export function Onboarding({
   const [day, setDay] = useState<DayState>(initialDay);
   const [bodyFatOpen, setBodyFatOpen] = useState(false);
   const [expandedBodyFat, setExpandedBodyFat] = useState<BodyFatPhotoRef | null>(null);
+  const [macroDialogOpen, setMacroDialogOpen] = useState(false);
+  const [macroDraft, setMacroDraft] = useState<MacroMultipliers>(() => {
+    const merged = { ...defaultProfile, ...initialProfile };
+    return normalizeMacroMultipliers(
+      initialProfile.macroMultipliers,
+      calculateRecommendedMacroMultipliers(merged, initialDay)
+    );
+  });
+  const [fiberDraft, setFiberDraft] = useState(() => {
+    const merged = { ...defaultProfile, ...initialProfile };
+    return normalizeFiberGrams(
+      initialProfile.fiberGrams,
+      calculateRecommendedFiberGrams(merged, initialDay)
+    );
+  });
   const estimatedBmr = useMemo(() => estimateBmr(profile), [profile]);
+  const recommendedMultipliers = useMemo(() => calculateRecommendedMacroMultipliers(profile, day), [profile, day]);
+  const recommendedFiberGrams = useMemo(() => calculateRecommendedFiberGrams(profile, day), [profile, day]);
+  const calorieBudget = useMemo(() => calculateSystemCalorieBudget(profile, day), [profile, day]);
+  const estimatedMacroCalories = useMemo(
+    () => calculateCaloriesFromMacroMultipliers(profile.weightKg, macroDraft),
+    [macroDraft, profile.weightKg]
+  );
 
   function updateNumber(key: keyof UserProfile, value: string) {
     setProfile((current) => ({
@@ -109,11 +161,40 @@ export function Onboarding({
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onComplete(profile, day);
+    setMacroDraft(normalizeMacroMultipliers(profile.macroMultipliers, recommendedMultipliers));
+    setFiberDraft(normalizeFiberGrams(profile.fiberGrams, recommendedFiberGrams));
+    setMacroDialogOpen(true);
   }
 
   function applyEstimatedBmr() {
     setProfile((current) => ({ ...current, bmrKcal: estimateBmr(current) }));
+  }
+
+  function updateMacroDraft(key: MacroMultiplierKey, value: string) {
+    setMacroDraft((current) => ({
+      ...current,
+      [key]: clampMacroMultiplier(key, Number(value))
+    }));
+  }
+
+  function updateFiberDraft(value: string) {
+    setFiberDraft(clampFiberGrams(Number(value)));
+  }
+
+  function resetMacroDraft() {
+    setMacroDraft(recommendedMultipliers);
+    setFiberDraft(recommendedFiberGrams);
+  }
+
+  function confirmMacroDraft() {
+    onComplete(
+      {
+        ...profile,
+        macroMultipliers: normalizeMacroMultipliers(macroDraft, recommendedMultipliers),
+        fiberGrams: normalizeFiberGrams(fiberDraft, recommendedFiberGrams)
+      },
+      day
+    );
   }
 
   return (
@@ -282,6 +363,120 @@ export function Onboarding({
           </div>
         </section>
       </form>
+      {macroDialogOpen ? (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/45 px-4 py-5 backdrop-blur-sm">
+          <section className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[8px] border border-ink/10 bg-white shadow-soft">
+            <div className="min-h-0 overflow-auto p-5 sm:p-6">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-moss/20 bg-mint/65 px-3 py-1.5 text-sm font-black text-moss">
+                    <SlidersHorizontal size={16} aria-hidden="true" />
+                    宏量倍数确认
+                  </div>
+                  <h2 className="mt-3 text-2xl font-black text-ink sm:text-3xl">保存前，确认你的每日营养倍数</h2>
+                  <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-ink/62">
+                    根据你的身高 {profile.heightCm}cm、体重 {profile.weightKg}kg、基础代谢 {profile.bmrKcal || estimatedBmr}kcal、体脂率 {formatOptionalPercent(profile.bodyFat)}、{profile.trainingStyle} 和 {profile.eatingPattern}，系统推荐你先使用：
+                    蛋白质 {formatMultiplier(recommendedMultipliers.protein)}、碳水 {formatMultiplier(recommendedMultipliers.carbs)}、脂肪 {formatMultiplier(recommendedMultipliers.fat)}、膳食纤维 {recommendedFiberGrams}g/天。热量目标按系统预算计算：{calorieBudget} kcal。
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMacroDialogOpen(false)}
+                  aria-label="关闭宏量倍数确认"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border border-ink/12 bg-paper text-ink"
+                >
+                  <X size={18} aria-hidden="true" />
+                </button>
+              </div>
+
+              <div className="mt-5 grid gap-3 md:grid-cols-4">
+                <MacroContext label="目标" value={goalLabels[profile.goal]} />
+                <MacroContext label="今日状态" value={day.isTrainingDay ? `${day.trainingPart}训练` : "休息"} />
+                <MacroContext label="饮食日" value={dietStatusLabels[day.dietStatus].label} />
+                <MacroContext label="体脂目标" value={formatOptionalPercent(profile.targetBodyFat)} />
+              </div>
+
+              <div className="mt-5 grid gap-3 md:grid-cols-3">
+                {macroMultiplierKeys.map((macro) => (
+                  <MacroMultiplierControl
+                    key={macro}
+                    macro={macro}
+                    value={macroDraft[macro]}
+                    recommended={recommendedMultipliers[macro]}
+                    weightKg={profile.weightKg}
+                    onChange={(value) => updateMacroDraft(macro, value)}
+                  />
+                ))}
+              </div>
+
+              <div className="mt-5 grid gap-3 lg:grid-cols-[0.85fr_1.15fr]">
+                <FiberControl
+                  value={fiberDraft}
+                  recommended={recommendedFiberGrams}
+                  onChange={updateFiberDraft}
+                />
+                <CalorieEstimatePanel
+                  macroCalories={estimatedMacroCalories}
+                  calorieBudget={calorieBudget}
+                  proteinGrams={macroGrams(profile.weightKg, macroDraft.protein)}
+                  carbGrams={macroGrams(profile.weightKg, macroDraft.carbs)}
+                  fatGrams={macroGrams(profile.weightKg, macroDraft.fat)}
+                />
+              </div>
+
+              <div className="mt-5 rounded-[8px] border border-moss/15 bg-mint/45 p-4">
+                <p className="text-sm font-black text-moss">当前确认后会保存为：</p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                  {macroMultiplierKeys.map((macro) => (
+                    <div key={macro} className="rounded-[8px] bg-white/80 px-3 py-2">
+                      <p className="text-xs font-bold text-ink/48">{macroLabels[macro].label}</p>
+                      <p className="mt-1 text-lg font-black text-ink">
+                        {formatMultiplier(macroDraft[macro])}
+                        <span className="ml-2 text-sm text-ink/48">{macroGrams(profile.weightKg, macroDraft[macro])}g/天</span>
+                      </p>
+                    </div>
+                  ))}
+                  <div className="rounded-[8px] bg-white/80 px-3 py-2">
+                    <p className="text-xs font-bold text-ink/48">{macroLabels.fiber.label}</p>
+                    <p className="mt-1 text-lg font-black text-ink">{fiberDraft}g/天</p>
+                  </div>
+                  <div className="rounded-[8px] bg-white/80 px-3 py-2">
+                    <p className="text-xs font-bold text-ink/48">{macroLabels.calories.label}</p>
+                    <p className="mt-1 text-lg font-black text-ink">{calorieBudget}kcal</p>
+                    <p className="mt-1 text-xs font-bold text-ink/42">系统预算</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col-reverse gap-3 border-t border-ink/10 bg-white px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+              <button
+                type="button"
+                onClick={resetMacroDraft}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] border border-moss/20 bg-paper px-4 text-sm font-black text-moss"
+              >
+                <RotateCcw size={16} aria-hidden="true" />
+                使用系统推荐
+              </button>
+              <button
+                type="button"
+                onClick={() => setMacroDialogOpen(false)}
+                className="inline-flex min-h-11 items-center justify-center rounded-[8px] border border-ink/12 bg-white px-4 text-sm font-black text-ink"
+              >
+                返回修改设置
+              </button>
+              <button
+                type="button"
+                onClick={confirmMacroDraft}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] bg-coral px-5 text-sm font-black text-white shadow-soft transition hover:bg-coral/90"
+              >
+                <Check size={17} aria-hidden="true" />
+                确认并保存
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
       {bodyFatOpen ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-ink/45 px-4 backdrop-blur-sm">
           <section className="max-h-[88vh] w-full max-w-4xl overflow-auto rounded-[8px] border border-ink/10 bg-white p-5 shadow-soft sm:p-6">
@@ -400,6 +595,163 @@ function BodyFatColumn({ title, rows }: { title: string; rows: string[][] }) {
   );
 }
 
+function MacroContext({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-[8px] border border-ink/10 bg-paper px-3 py-2">
+      <p className="text-xs font-black uppercase tracking-[0.14em] text-ink/42">{label}</p>
+      <p className="mt-1 text-sm font-black text-ink">{value}</p>
+    </div>
+  );
+}
+
+function MacroMultiplierControl({
+  macro,
+  value,
+  recommended,
+  weightKg,
+  onChange
+}: {
+  macro: MacroMultiplierKey;
+  value: number;
+  recommended: number;
+  weightKg: number;
+  onChange: (value: string) => void;
+}) {
+  const bounds = macroMultiplierBounds[macro];
+
+  return (
+    <article className="rounded-[8px] border border-ink/10 bg-paper p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-lg font-black text-ink">{macroLabels[macro].label}</p>
+          <p className="mt-1 text-xs font-bold text-ink/50">推荐 {formatMultiplier(recommended)} · {macroGrams(weightKg, recommended)}g/天</p>
+        </div>
+        <span className={`rounded-full px-2.5 py-1 text-xs font-black ${macroPillClass[macro]}`}>
+          {formatMultiplier(value)}
+        </span>
+      </div>
+
+      <div className="mt-5">
+        <input
+          type="range"
+          min={bounds.min}
+          max={bounds.max}
+          step={bounds.step}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="h-2 w-full cursor-pointer"
+          style={{ accentColor: macroAccentColor[macro] }}
+          aria-label={`${macroLabels[macro].label}体重倍数`}
+        />
+        <div className="mt-2 flex items-center justify-between text-xs font-bold text-ink/42">
+          <span>{formatMultiplier(bounds.min)}</span>
+          <span>{formatMultiplier(bounds.max)}</span>
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center justify-between gap-3 rounded-[8px] bg-white/78 px-3 py-2">
+        <span className="text-xs font-bold text-ink/45">目标克数</span>
+        <strong className="text-base text-ink">{macroGrams(weightKg, value)}g/天</strong>
+      </div>
+    </article>
+  );
+}
+
+function FiberControl({
+  value,
+  recommended,
+  onChange
+}: {
+  value: number;
+  recommended: number;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <article className="rounded-[8px] border border-ink/10 bg-paper p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-lg font-black text-ink">{macroLabels.fiber.label}</p>
+          <p className="mt-1 text-xs font-bold text-ink/50">推荐 {recommended}g/天 · 可按肠胃耐受微调</p>
+        </div>
+        <span className="rounded-full bg-skyglass px-2.5 py-1 text-xs font-black text-ink">
+          {value}g
+        </span>
+      </div>
+
+      <div className="mt-5">
+        <input
+          type="range"
+          min={fiberGramBounds.min}
+          max={fiberGramBounds.max}
+          step={fiberGramBounds.step}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="h-2 w-full cursor-pointer"
+          style={{ accentColor: "#4e8fa8" }}
+          aria-label="膳食纤维每日克数"
+        />
+        <div className="mt-2 flex items-center justify-between text-xs font-bold text-ink/42">
+          <span>{fiberGramBounds.min}g</span>
+          <span>{fiberGramBounds.max}g</span>
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center justify-between gap-3 rounded-[8px] bg-white/78 px-3 py-2">
+        <span className="text-xs font-bold text-ink/45">每日目标</span>
+        <strong className="text-base text-ink">{value}g/天</strong>
+      </div>
+    </article>
+  );
+}
+
+function CalorieEstimatePanel({
+  macroCalories,
+  calorieBudget,
+  proteinGrams,
+  carbGrams,
+  fatGrams
+}: {
+  macroCalories: number;
+  calorieBudget: number;
+  proteinGrams: number;
+  carbGrams: number;
+  fatGrams: number;
+}) {
+  const delta = macroCalories - calorieBudget;
+
+  return (
+    <article className="rounded-[8px] border border-ink/10 bg-ink p-4 text-white">
+      <p className="text-xs font-black uppercase tracking-[0.14em] text-citrus">Calorie Budget</p>
+      <h3 className="mt-2 text-2xl font-black">{calorieBudget} kcal</h3>
+      <p className="mt-2 text-sm font-semibold leading-6 text-white/72">
+        系统热量目标按 BMR、训练计划和饮食目标估算。根据你当前调整后的蛋白质、碳水和脂肪，折算热量为 {macroCalories} kcal，{formatCalorieDelta(delta)}。
+      </p>
+      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+        <MacroFormula label="蛋白质" grams={proteinGrams} kcal={proteinGrams * 4} />
+        <MacroFormula label="碳水" grams={carbGrams} kcal={carbGrams * 4} />
+        <MacroFormula label="脂肪" grams={fatGrams} kcal={fatGrams * 9} />
+      </div>
+    </article>
+  );
+}
+
+function formatCalorieDelta(delta: number) {
+  const absDelta = Math.abs(delta);
+
+  if (absDelta <= 25) return "与系统预算基本贴合";
+  return delta > 0 ? `比系统预算高 ${absDelta} kcal` : `比系统预算低 ${absDelta} kcal`;
+}
+
+function MacroFormula({ label, grams, kcal }: { label: string; grams: number; kcal: number }) {
+  return (
+    <div className="rounded-[8px] bg-white/10 px-3 py-2">
+      <p className="text-xs font-bold text-white/50">{label}</p>
+      <p className="mt-1 text-sm font-black">{grams}g</p>
+      <p className="mt-0.5 text-xs font-semibold text-white/55">{Math.round(kcal)} kcal</p>
+    </div>
+  );
+}
+
 function Field({ label, value, onChange }: { label: string; value: number; onChange: (value: string) => void }) {
   return (
     <label className="grid gap-2 text-sm font-semibold text-ink">
@@ -418,4 +770,17 @@ function Field({ label, value, onChange }: { label: string; value: number; onCha
 function formatNumberInputValue(value: number) {
   if (!Number.isFinite(value) || value === 0) return "";
   return value;
+}
+
+function formatOptionalPercent(value?: number) {
+  if (!value || value <= 0) return "未填写";
+  return `${value}%`;
+}
+
+function formatMultiplier(value: number) {
+  return `${value.toFixed(2)} 倍`;
+}
+
+function macroGrams(weightKg: number, multiplier: number) {
+  return Math.round(Math.max(0, weightKg) * multiplier);
 }

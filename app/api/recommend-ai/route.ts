@@ -138,7 +138,7 @@ function getProviderConfig(): ProviderConfig | null {
       apiKey: ccswitchApiKey,
       baseUrl: process.env.CCSWITCH_BASE_URL || process.env.ANTHROPIC_BASE_URL || "https://v2.aicodee.com",
       model: process.env.CCSWITCH_MODEL || process.env.ANTHROPIC_MODEL || process.env.MINIMAX_MODEL || process.env.AI_MODEL || "MiniMax-M2.7-highspeed",
-      apiStyle: "anthropic"
+      apiStyle: "openai"
     };
   }
 

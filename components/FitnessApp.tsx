@@ -8,7 +8,7 @@ import { ProfilePanel } from "@/components/ProfilePanel";
 import { Recommendations } from "@/components/Recommendations";
 import { TrainingCalendar } from "@/components/TrainingCalendar";
 import { getBeijingDateKey } from "@/lib/dates";
-import { calculateTargets, defaultDayState, defaultProfile, hasMeaningfulGap, remainingMacros, sumFoods } from "@/lib/nutrition";
+import { calculateRecommendedFiberGrams, calculateRecommendedMacroMultipliers, calculateTargets, defaultDayState, defaultProfile, hasMeaningfulGap, normalizeFiberGrams, normalizeMacroMultipliers, remainingMacros, sumFoods } from "@/lib/nutrition";
 import type { DayRecord, DayState, FoodLogItem, UserProfile } from "@/lib/types";
 
 type View = "calendar" | "dashboard" | "recommend" | "settings";
@@ -290,12 +290,27 @@ function normalizeProfile(profile: Partial<UserProfile>): UserProfile {
   const merged = { ...defaultProfile, ...profile };
   const validTrainingStyles = ["三分化", "五分化", "功能性训练", "徒手训练", "不训练"];
   const validDietPatterns = ["三餐正常", "16+8 间歇性断食", "碳循环", "地中海 / 均衡饮食", "外卖 / 便利店为主", "不确定，先按普通模式算"];
-
-  return {
+  const normalized = {
     ...merged,
     bmrKcal: merged.bmrKcal || defaultProfile.bmrKcal,
     trainingStyle: validTrainingStyles.includes(merged.trainingStyle) ? merged.trainingStyle : defaultProfile.trainingStyle,
     eatingPattern: validDietPatterns.includes(merged.eatingPattern) ? merged.eatingPattern : defaultProfile.eatingPattern
+  };
+
+  return {
+    ...normalized,
+    macroMultipliers: profile.macroMultipliers
+      ? normalizeMacroMultipliers(
+        profile.macroMultipliers,
+        calculateRecommendedMacroMultipliers(normalized, defaultDayState)
+      )
+      : undefined,
+    fiberGrams: profile.fiberGrams
+      ? normalizeFiberGrams(
+        profile.fiberGrams,
+        calculateRecommendedFiberGrams(normalized, defaultDayState)
+      )
+      : undefined
   };
 }
 
