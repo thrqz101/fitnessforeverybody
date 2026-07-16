@@ -4,7 +4,7 @@ import { getFoodCatalogPromptSummary } from "@/lib/food-catalog";
 export const runtime = "nodejs";
 
 type ProviderConfig = {
-  name: "ccswitch" | "minimax";
+  name: "ccswitch" | "deepseek" | "minimax";
   apiKey: string;
   baseUrl: string;
   model: string;
@@ -125,12 +125,23 @@ function buildRecommendationPrompt(body: {
 
 function getProviderConfig(): ProviderConfig | null {
   const requestedProvider = process.env.AI_PROVIDER?.toLowerCase() || "minimax";
+  const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
   const ccswitchApiKey =
     process.env.CCSWITCH_API_KEY ||
     process.env.ANTHROPIC_AUTH_TOKEN ||
     process.env.MINIMAX_API_KEY ||
     process.env.MINIMAX_API_TOKEN;
   const minimaxApiKey = process.env.MINIMAX_API_KEY || process.env.MINIMAX_API_TOKEN;
+
+  if (requestedProvider === "deepseek" && deepseekApiKey) {
+    return {
+      name: "deepseek",
+      apiKey: deepseekApiKey,
+      baseUrl: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
+      model: process.env.DEEPSEEK_MODEL || "deepseek-v4-flash",
+      apiStyle: "openai"
+    };
+  }
 
   if (requestedProvider === "ccswitch" && ccswitchApiKey) {
     return {
@@ -167,6 +178,7 @@ function buildChatCompletionBody(provider: ProviderConfig, maxTokens: number, me
     model: provider.model,
     temperature: provider.name === "minimax" ? 0.1 : 0,
     ...tokenLimit,
+    ...(provider.name === "deepseek" ? { thinking: { type: "disabled" } } : {}),
     messages
   });
 }

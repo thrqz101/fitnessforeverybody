@@ -56,7 +56,7 @@ type TavilySearchPayload = {
 };
 
 type ProviderConfig = {
-  name: "ccswitch" | "minimax" | "dashscope";
+  name: "ccswitch" | "deepseek" | "minimax" | "dashscope";
   apiKey: string;
   baseUrl: string;
   model: string;
@@ -327,6 +327,7 @@ export async function POST(request: Request) {
 
 function getProviderConfig(): ProviderConfig | null {
   const requestedProvider = process.env.AI_PROVIDER?.toLowerCase() || "minimax";
+  const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
   const ccswitchApiKey =
     process.env.CCSWITCH_API_KEY ||
     process.env.ANTHROPIC_AUTH_TOKEN ||
@@ -337,6 +338,17 @@ function getProviderConfig(): ProviderConfig | null {
     process.env.MINIMAX_API_KEY ||
     process.env.MINIMAX_API_TOKEN ||
     ((isMiniMaxBaseUrl(openAiBaseUrl) || isMiniMaxBaseUrl(process.env.AI_BASE_URL)) ? process.env.OPENAI_API_KEY : undefined);
+
+  if (requestedProvider === "deepseek" && deepseekApiKey) {
+    return {
+      name: "deepseek",
+      apiKey: deepseekApiKey,
+      baseUrl: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
+      model: process.env.DEEPSEEK_MODEL || "deepseek-v4-flash",
+      supportsImages: false,
+      apiStyle: "openai"
+    };
+  }
 
   if (requestedProvider === "ccswitch" && ccswitchApiKey) {
     return {
@@ -1314,6 +1326,7 @@ function buildChatCompletionBody(provider: ProviderConfig, maxTokens: number, me
     model: provider.model,
     temperature: provider.name === "minimax" ? 0.1 : 0,
     ...tokenLimit,
+    ...(provider.name === "deepseek" ? { thinking: { type: "disabled" } } : {}),
     messages
   });
 }
@@ -1371,7 +1384,7 @@ function getUserFacingAiErrorMessage(status: number, errorText: string) {
   const text = errorText.toLowerCase();
 
   if (status === 401 || status === 403 || /api key|unauthorized|forbidden|incorrect|auth|token/.test(text)) {
-    return "AI 服务鉴权失败。请检查 CC Switch / MiniMax Key、模型名和部署环境变量。";
+    return "AI 服务鉴权失败。请检查 DeepSeek / CC Switch / MiniMax Key、模型名和部署环境变量。";
   }
 
   if (status === 429) {
