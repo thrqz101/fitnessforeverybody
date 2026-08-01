@@ -248,7 +248,8 @@ export async function POST(request: Request) {
       "多食物必须拆开，但不要生成互相包含的重复套餐。",
       "每个 food 必须有 name、brand、foodType、portionLabel、meal、macros、recognitionMode、warning。",
       "macros 包含 protein/carbs/fat/calories/fiber，单位 g/g/g/kcal/g，四舍五入为整数。",
-      "warning 最多 18 个中文字，只写关键假设。",
+      "warning 是给用户的简短营养行动建议；高油、高糖、低纤维或精制主食偏多时，写成去皮少油、换无糖饮料、搭配蔬菜、部分主食换杂粮等具体做法；无需提醒时可为空。",
+      "warning 最多 24 个中文字，不写说教或疾病判断。",
       "自检：calories 应大致等于 protein*4 + carbs*4 + fat*9，误差超过 25% 时先修正宏量营养素或热量。",
       "返回 JSON 字段：isFoodRelated、message、foods；food 字段同上。",
       `用户手动描述：${description || "无"}`,
@@ -473,7 +474,7 @@ async function classifyFoodRoute(
     `route=ai_estimate 时最多输出 ${maxRecognizedFoodItems} 个 foods；如果用户列出超过 ${maxRecognizedFoodItems} 个具体食物，route=not_food，message=一次最多识别 6 个食物，请分批输入。`,
     "food 字段：name、brand、foodType、portionLabel、meal、macros、recognitionMode、warning。",
     "macros 字段：protein、carbs、fat、calories、fiber，单位 g/g/g/kcal/g，整数。",
-    "warning 最多 18 个中文字，只写关键假设。",
+    "warning 是最多 24 个中文字的营养行动建议；高油、高糖、低纤维或精制主食偏多时给出一个具体替换或搭配方法，无需提醒时可为空。",
     "自检 calories≈protein*4+carbs*4+fat*9，误差大时先修正。",
     `用户输入：${description || "无"}。`,
     "输出 JSON 字段：isFoodRelated、route、brand、product、reason、message、foods。"
@@ -1202,7 +1203,7 @@ async function extractAiPayloadFromSearch(provider: ProviderConfig, description:
     "不能生成互相包含的重复套餐；同一份肉、主食或配菜只能算一次。",
     "macros 包含 protein/carbs/fat/calories/fiber，单位 g/g/g/kcal/g，四舍五入为整数。",
     "自检：calories 应大致等于 protein*4 + carbs*4 + fat*9，误差超过 25% 时先修正。",
-    "warning 最多 18 个中文字，只写关键依据。",
+    "warning 是最多 24 个中文字的营养行动建议；高油、高糖、低纤维或精制主食偏多时给出一个具体替换或搭配方法，无需提醒时可为空。",
     "输出 JSON 字段：isFoodRelated、message、foods；food 字段同上。",
     `用户描述：${description}`,
     `搜索结果：\n${searchContext}`
@@ -1245,7 +1246,7 @@ async function repairAiPayload(provider: ProviderConfig, description: string, fi
     "macros 必须包含 protein/carbs/fat/calories/fiber，单位分别是 g/g/g/kcal/g，数值用合理估算。",
     "自检：calories 应大致等于 protein*4 + carbs*4 + fat*9，误差超过 25% 时先修正。",
     "如果品牌或具体产品能从文本识别出来，recognitionMode 用 brand-product；否则用 industry-average。",
-    "warning 最多 18 个中文字，只写关键依据。",
+    "warning 是最多 24 个中文字的营养行动建议；高油、高糖、低纤维或精制主食偏多时给出一个具体替换或搭配方法，无需提醒时可为空。",
     "输出 JSON 字段：isFoodRelated、message、foods；food 字段同上。",
     `用户描述：${description}`,
     `第一轮模型输出：${stringifyForPrompt(firstContent)}`

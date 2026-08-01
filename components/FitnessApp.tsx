@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, CalendarDays, ClipboardList, Settings, Utensils } from "lucide-react";
+import { Activity, BarChart3, Camera, ChefHat, Settings, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Dashboard } from "@/components/Dashboard";
@@ -8,10 +8,11 @@ import { ProfilePanel } from "@/components/ProfilePanel";
 import { Recommendations } from "@/components/Recommendations";
 import { TrainingCalendar } from "@/components/TrainingCalendar";
 import { getBeijingDateKey } from "@/lib/dates";
-import { calculateRecommendedFiberGrams, calculateRecommendedMacroMultipliers, calculateTargets, defaultDayState, defaultProfile, hasMeaningfulGap, normalizeFiberGrams, normalizeMacroMultipliers, remainingMacros, sumFoods } from "@/lib/nutrition";
+import { calculateRecommendedFiberGrams, calculateRecommendedMacroMultipliers, calculateTargets, defaultDayState, defaultProfile, goalLabels, hasMeaningfulGap, normalizeFiberGrams, normalizeMacroMultipliers, remainingMacros, sumFoods } from "@/lib/nutrition";
 import type { DayRecord, DayState, FoodLogItem, UserProfile } from "@/lib/types";
 
 type View = "calendar" | "dashboard" | "recommend" | "settings";
+type MainView = Exclude<View, "settings">;
 
 const profileKey = "ffe-profile";
 const dayKey = "ffe-day";
@@ -28,6 +29,7 @@ export function FitnessApp() {
   const [hasProfile, setHasProfile] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [view, setView] = useState<View>("dashboard");
+  const [lastMainView, setLastMainView] = useState<MainView>("dashboard");
   const [topUpPromptOpen, setTopUpPromptOpen] = useState(false);
 
   useEffect(() => {
@@ -67,6 +69,11 @@ export function FitnessApp() {
     if (!hydrated || !hasProfile) return;
     window.localStorage.setItem(profileKey, JSON.stringify(profile));
   }, [hydrated, hasProfile, profile]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [hydrated, view]);
 
   const savedFoods = useMemo(() => foods.filter((food) => food.savedToCalendar), [foods]);
 
@@ -129,6 +136,11 @@ export function FitnessApp() {
     setView("dashboard");
   }
 
+  function openSettings() {
+    if (view !== "settings") setLastMainView(view);
+    setView("settings");
+  }
+
   function addFoods(newFoods: FoodLogItem[]) {
     setFoods((current) => [...newFoods.map(markFoodAsDraft), ...current]);
     setView("dashboard");
@@ -157,43 +169,58 @@ export function FitnessApp() {
 
   if (!hydrated) {
     return (
-      <main className="flex min-h-screen items-center justify-center px-4">
-        <div className="rounded-[8px] border border-ink/10 bg-white/86 p-6 text-center shadow-soft">
-          <Activity className="mx-auto animate-pulse text-moss" size={28} aria-hidden="true" />
-          <p className="mt-3 text-sm font-bold text-ink/60">正在准备你的营养仪表盘</p>
+      <main className="app-shell flex min-h-screen items-center justify-center px-4">
+        <div className="wellness-card relative z-10 p-8 text-center">
+          <div className="brand-mark mx-auto">
+            <Activity className="animate-pulse" size={24} aria-hidden="true" />
+          </div>
+          <p className="mt-4 text-sm font-black text-ink/65">正在准备你的健康空间</p>
         </div>
       </main>
     );
   }
 
   if (!hasProfile || view === "settings") {
-    return <ProfilePanel profile={profile} day={day} onSave={completeProfile} />;
+    return <ProfilePanel profile={profile} day={day} onSave={completeProfile} onBack={hasProfile ? () => setView(lastMainView) : undefined} />;
   }
 
   return (
-    <main className="min-h-screen paper-grid px-4 py-5 sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-7xl">
-        <header className="mb-5 flex flex-col gap-4 rounded-[8px] border border-ink/10 bg-white/82 p-4 shadow-soft md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-moss">Fitness for Everybody</p>
-              <span className="rounded-full border border-moss/20 bg-moss/8 px-2.5 py-1 text-[11px] font-black text-moss/75">
-                Built by thrqz
-              </span>
-            </div>
-            <h1 className="mt-1 text-2xl font-black text-ink">今天吃什么，练什么，都记在这里</h1>
-            <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-ink/62">
-              不用天天水煮鸡胸、西兰花，快乐饮食也能把每天营养补够。
-            </p>
+    <main className="wellness-app">
+      <aside className="wellness-sidebar">
+        <div className="wellness-brand">
+          <div className="wellness-brand__mark"><BrandLogo /></div>
+          <div className="wellness-brand__copy"><strong>Fitness for Everybody</strong><span>AI nutrition guide</span></div>
+        </div>
+
+        <nav className="wellness-nav" aria-label="主要导航">
+          <NavButton active={view === "dashboard"} icon={<Camera size={19} aria-hidden="true" />} label="今天" hint="识别与记录" onClick={() => setView("dashboard")} />
+          <NavButton active={view === "calendar"} icon={<BarChart3 size={19} aria-hidden="true" />} label="进度" hint="趋势与日历" onClick={() => setView("calendar")} />
+          <NavButton active={view === "recommend"} icon={<ChefHat size={19} aria-hidden="true" />} label="灵感" hint="聪明吃什么" onClick={() => setView("recommend")} />
+          <NavButton active={false} icon={<Settings size={19} aria-hidden="true" />} label="设置" hint="调整目标" onClick={openSettings} />
+        </nav>
+
+        <div className="sidebar-insight">
+          <span><Sparkles size={14} /> 今日节奏</span>
+          <strong>{day.isTrainingDay ? "训练日" : "恢复日"}</strong>
+          <p>{goalLabels[profile.goal]} · 还可摄入 {Math.max(0, Math.round(gaps.calories))} kcal</p>
+        </div>
+
+        <div className="sidebar-profile">
+          <div>N</div>
+          <span><strong>你的健康计划</strong><small>{profile.trainingStyle}</small></span>
+        </div>
+      </aside>
+
+      <section className="wellness-main">
+        <header className="mobile-wellness-header">
+          <div className="wellness-brand">
+            <div className="wellness-brand__mark"><BrandLogo /></div>
+            <div className="wellness-brand__copy"><strong>Fitness for Everybody</strong><span>AI nutrition guide</span></div>
           </div>
-          <nav className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin" aria-label="主要导航">
-            <NavButton active={view === "calendar"} icon={<CalendarDays size={17} aria-hidden="true" />} label="日历" onClick={() => setView("calendar")} />
-            <NavButton active={view === "dashboard"} icon={<ClipboardList size={17} aria-hidden="true" />} label="今日任务" onClick={() => setView("dashboard")} />
-            <NavButton active={view === "recommend"} icon={<Utensils size={17} aria-hidden="true" />} label="推荐" onClick={() => setView("recommend")} />
-            <NavButton active={false} icon={<Settings size={17} aria-hidden="true" />} label="系统设置" onClick={() => setView("settings")} />
-          </nav>
+          <button type="button" onClick={openSettings} aria-label="打开设置"><Settings size={20} /></button>
         </header>
 
+        <div key={view} className="view-stage">
         {view === "calendar" ? (
           <TrainingCalendar
             profile={profile}
@@ -240,10 +267,11 @@ export function FitnessApp() {
             onRecognizeRequested={() => setView("dashboard")}
           />
         ) : null}
+        </div>
 
         {topUpPromptOpen ? (
           <div className="fixed inset-0 z-50 grid place-items-center bg-ink/45 px-4 backdrop-blur-sm">
-            <section className="w-full max-w-lg rounded-[8px] border border-ink/10 bg-white p-5 shadow-soft sm:p-6">
+            <section className="wellness-card w-full max-w-lg p-5 sm:p-6">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-moss">Snack Check</p>
               <h2 className="mt-2 text-2xl font-black text-ink">今天距离营养达标还差一点噢</h2>
               <p className="mt-3 text-sm leading-6 text-ink/62">
@@ -256,7 +284,7 @@ export function FitnessApp() {
                     setTopUpPromptOpen(false);
                     setView("recommend");
                   }}
-                  className="inline-flex min-h-11 items-center justify-center rounded-[8px] bg-moss px-3 text-sm font-black text-white"
+                  className="inline-flex min-h-11 items-center justify-center rounded-[18px] bg-moss px-3 text-sm font-black text-white"
                 >
                   看加餐推荐
                 </button>
@@ -266,14 +294,14 @@ export function FitnessApp() {
                     setTopUpPromptOpen(false);
                     setView("dashboard");
                   }}
-                  className="inline-flex min-h-11 items-center justify-center rounded-[8px] bg-coral px-3 text-sm font-black text-white"
+                  className="inline-flex min-h-11 items-center justify-center rounded-[18px] bg-coral px-3 text-sm font-black text-white"
                 >
                   再识别一餐
                 </button>
                 <button
                   type="button"
                   onClick={() => setTopUpPromptOpen(false)}
-                  className="inline-flex min-h-11 items-center justify-center rounded-[8px] border border-ink/12 bg-paper px-3 text-sm font-black text-ink"
+                  className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-ink/12 bg-paper px-3 text-sm font-black text-ink"
                 >
                   今天先这样
                 </button>
@@ -281,7 +309,7 @@ export function FitnessApp() {
             </section>
           </div>
         ) : null}
-      </div>
+      </section>
     </main>
   );
 }
@@ -377,11 +405,13 @@ function markFoodAsDraft(food: FoodLogItem): FoodLogItem {
 function NavButton({
   active,
   icon,
+  hint,
   label,
   onClick
 }: {
   active: boolean;
   icon: ReactNode;
+  hint: string;
   label: string;
   onClick: () => void;
 }) {
@@ -389,12 +419,16 @@ function NavButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-[8px] px-3 text-sm font-black transition ${
-        active ? "bg-ink text-white" : "border border-ink/12 bg-paper text-ink hover:border-moss/45"
-      }`}
+      className={`wellness-nav__item ${active ? "is-active" : ""}`}
     >
-      {icon}
-      {label}
+      <span className="wellness-nav__icon">{icon}</span>
+      <span className="wellness-nav__copy"><strong>{label}</strong><small>{hint}</small></span>
     </button>
+  );
+}
+
+function BrandLogo() {
+  return (
+    <img src="/images/fitness-for-everybody-mark.png" alt="" aria-hidden="true" />
   );
 }

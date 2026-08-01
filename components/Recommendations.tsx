@@ -3,6 +3,7 @@
 import { Check, Dice5, Flame, Loader2, Sparkles, Utensils, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { catalogItemToRecommendation, foodCatalog, type FoodCatalogItem } from "@/lib/food-catalog";
 import { addMacros, completion, dietStatusLabels, macroKeys, macroLabels, recommendationCoverage, scaleMacros } from "@/lib/nutrition";
 import { recommendationToFood, recommendations } from "@/lib/mock-data";
@@ -158,6 +159,15 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
     return () => window.clearInterval(timer);
   }, [shuffleOpen, shufflePool, shuffleRunId]);
 
+  useEffect(() => {
+    if (!shuffleOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [shuffleOpen]);
+
   function startShuffle() {
     if (!shufflePool.length) return;
     setShuffleDone(false);
@@ -204,102 +214,48 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
   }
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[380px_1fr]">
-      <aside className="rounded-[8px] border border-ink/10 bg-ink p-5 text-white shadow-soft">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-citrus">Recommend</p>
-        <h1 className="mt-1 text-3xl font-black">下一顿怎么吃</h1>
-        <p className="mt-2 text-sm leading-6 text-white/65">
-          {shouldLightOnly
-            ? "今天整体营养达成已经超过 80%：接下来只优先水果、零食、酸奶、蛋白粉、便利店轻加餐这类简单补充。"
-            : "整体达成还没到 80%，优先用正餐或第四顿饭补齐；吃不够也先尽量补，尤其是蛋白质。"}
-        </p>
-        <p className="mt-2 rounded-[8px] bg-white/10 px-3 py-2 text-xs font-bold text-white/72">
-          今日饮食状态：{dietStatusLabels[day.dietStatus].label}
-        </p>
-        <p className="mt-2 rounded-[8px] bg-white/10 px-3 py-2 text-xs font-bold text-white/72">
-          当前平均达成：{currentPercentages.average}% · 已记录 {mainMealCount} 顿正餐
-        </p>
-
-        <div className="mt-5 grid gap-3">
-          {(["protein", "carbs", "fat", "fiber"] as const).map((macro) => (
-            <div key={macro} className="rounded-[8px] bg-white/10 p-3">
-              <p className="text-xs text-white/55">剩余{macroLabels[macro].label}</p>
-              <p className="mt-1 text-2xl font-black">{Math.round(gaps[macro])}{macroLabels[macro].unit}</p>
-            </div>
-          ))}
-        </div>
-
-        <button
-          type="button"
-          onClick={startShuffle}
-          className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-[8px] bg-citrus px-4 text-sm font-black text-ink"
-        >
-          <Dice5 size={18} aria-hidden="true" />
-          选择困难症犯了，随机帮我推荐吃什么
-        </button>
-        <button
-          type="button"
-          onClick={onRecognizeRequested}
-          className="mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-[8px] border border-white/20 bg-white/10 px-4 text-center text-sm font-black text-white"
-        >
-          不想吃你的推荐，再识别一餐
-        </button>
-        <button
-          type="button"
-          onClick={requestAiRecommendations}
-          disabled={isAiLoading}
-          className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[8px] border border-citrus/35 bg-citrus/15 px-4 text-center text-sm font-black text-citrus disabled:cursor-not-allowed disabled:opacity-70"
-        >
-          {isAiLoading ? <Loader2 className="animate-spin" size={17} aria-hidden="true" /> : <Sparkles size={17} aria-hidden="true" />}
-          让 AI 再推荐 30 种
-        </button>
-        {aiNotice ? <p className="mt-2 text-xs font-bold leading-5 text-white/55">{aiNotice}</p> : null}
-
-        {picked ? (
-          <div className="mt-5 rounded-[8px] border border-white/15 bg-white/10 p-4">
-            <p className="flex items-center gap-2 text-sm font-bold text-citrus">
-              <Flame size={16} aria-hidden="true" />
-              今天吃这个
-            </p>
-            <h2 className="mt-2 text-xl font-black">{picked.title}</h2>
-            <p className="mt-1 text-sm text-white/58">{picked.brand}</p>
-            <button
-              type="button"
-              onClick={() => onChoose(recommendationToFood(picked))}
-              className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] bg-white px-4 text-sm font-black text-ink"
-            >
-              <Check size={17} aria-hidden="true" />
-              就吃这个
+    <div className="recommend-experience">
+      <section className="recommend-hero">
+        <img src="/images/recommendation-rail-v2.png" alt="为今天推荐的三种均衡餐食" />
+        <div className="recommend-hero__veil" />
+        <div className="recommend-hero__content">
+          <span className="experience-kicker experience-kicker--light"><Sparkles size={14} /> For your next bite</span>
+          <h1><span>下一餐，</span><span>不靠猜。</span></h1>
+          <p>{shouldLightOnly ? "当前营养完成度较高，优先推荐水果、酸奶或轻量加餐。" : "根据已有饮食记录、训练状态和营养缺口生成推荐。"}</p>
+          <div className="recommend-hero__metrics">
+            <div><span>今日完成</span><strong>{currentPercentages.average}%</strong></div>
+            <div><span>蛋白缺口</span><strong>{Math.max(0, Math.round(gaps.protein))}g</strong></div>
+            <div><span>已记录</span><strong>{mainMealCount} 餐</strong></div>
+          </div>
+          <div className="recommend-hero__actions">
+            <button type="button" onClick={startShuffle}><Dice5 size={18} /> 帮我选一个</button>
+            <button type="button" onClick={requestAiRecommendations} disabled={isAiLoading}>
+              {isAiLoading ? <Loader2 className="animate-spin" size={17} /> : <Sparkles size={17} />} AI 生成更多
             </button>
+            <button type="button" onClick={onRecognizeRequested}>重新识别食物</button>
           </div>
-        ) : null}
-      </aside>
+          {aiNotice ? <p className="recommend-hero__notice">{aiNotice}</p> : null}
+        </div>
+      </section>
 
-      <section className="rounded-[8px] border border-ink/10 bg-white/88 p-5 shadow-soft sm:p-6">
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-moss">Meal Options</p>
-            <h2 className="mt-1 text-2xl font-black text-ink">推荐方案</h2>
-            {shouldLightOnly ? (
-              <p className="mt-2 max-w-2xl rounded-[8px] border border-moss/18 bg-mint/55 px-3 py-2 text-sm font-black leading-6 text-moss">
-                今日平均达成 {currentPercentages.average}%，已切换轻补模式：本轮不会优先推火锅、烧烤、大份夜宵这类正餐。
-              </p>
-            ) : null}
-            <p className="mt-2 text-xs font-bold text-ink/42">
-              当前展示 {filteredRanked.length} / {ranked.length} 个不重样候选；摇一摇会从 {shufflePool.length} 个底层食物候选里按品类轮换抽。
-            </p>
+      {picked ? (
+        <section className="picked-meal">
+          <div><span><Flame size={15} /> 此刻最合适</span><h2>{picked.title}</h2><p>{picked.brand} · {dietStatusLabels[day.dietStatus].label}</p></div>
+          <div className="picked-meal__macros">
+            <span><strong>{Math.round(picked.macros.protein)}g</strong> 蛋白</span>
+            <span><strong>{Math.round(picked.macros.calories)}</strong> kcal</span>
           </div>
-          <button
-            type="button"
-            onClick={startShuffle}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-[8px] border border-ink/12 bg-paper px-3 text-sm font-black text-ink"
-          >
-            <Dice5 size={16} aria-hidden="true" />
-            选择困难症犯了，随机帮我推荐吃什么
-          </button>
+          <button type="button" onClick={() => onChoose(recommendationToFood(picked))}><Check size={17} /> 就吃这个</button>
+        </section>
+      ) : null}
+
+      <section className="recommendation-library">
+        <div className="section-heading">
+          <div><span className="experience-kicker">Curated for you</span><h2>推荐方案</h2></div>
+          <p>{filteredRanked.length} 个匹配方案 · {shouldLightOnly ? "轻补模式" : "平衡正餐模式"}</p>
         </div>
 
-        <div className="mb-5 rounded-[8px] border border-ink/10 bg-paper p-4">
+        <div className="recommend-filters">
           <FilterGroup label="餐饮地域">
             {regionFilters.map((filter) => (
               <FilterButton
@@ -335,7 +291,7 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
           </FilterGroup>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="recommendation-grid">
           {filteredRanked.map((recommendation) => (
             <RecommendationCard
               key={recommendation.id}
@@ -349,33 +305,33 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
           ))}
         </div>
         {!filteredRanked.length ? (
-          <div className="rounded-[8px] border border-dashed border-ink/15 bg-paper p-8 text-center">
+          <div className="empty-recommendations">
             <p className="text-lg font-black text-ink">这个筛选组合暂时没有候选</p>
             <p className="mt-2 text-sm font-semibold leading-6 text-ink/55">可以放宽一个筛选项，或者点 AI 再推荐 30 种。</p>
           </div>
         ) : null}
       </section>
 
-      {shuffleOpen && shuffleCandidate ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 px-4 backdrop-blur-sm">
-          <section className="w-full max-w-lg rounded-[8px] border border-white/20 bg-white p-5 shadow-soft sm:p-6">
-            <div className="mb-5 flex items-start justify-between gap-3">
+      {shuffleOpen && shuffleCandidate ? createPortal(
+        <div className="shuffle-overlay">
+          <section className={`shuffle-flashcard ${shuffleDone ? "is-complete" : "is-shuffling"}`} role="dialog" aria-modal="true" aria-label="随机推荐结果">
+            <div className="shuffle-flashcard__header">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-coral">Lucky Draw</p>
-                <h2 className="mt-1 text-2xl font-black text-ink">给今晚摇个号</h2>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-coral">Random Pick</p>
+                <h2 className="mt-1 text-2xl font-black text-ink">随机推荐</h2>
               </div>
               <button
                 type="button"
                 onClick={() => setShuffleOpen(false)}
                 aria-label="关闭随机推荐"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-[8px] border border-ink/12 bg-paper text-ink"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-[18px] border border-ink/12 bg-paper text-ink"
               >
                 <X size={18} aria-hidden="true" />
               </button>
             </div>
-            <div className={`rounded-[8px] border p-5 text-center transition ${shuffleDone ? "border-coral bg-coral/10" : "border-moss bg-mint/55"}`}>
+            <div className="shuffle-flashcard__stage">
               <p className="text-xs font-black uppercase tracking-[0.16em] text-moss">
-                {shuffleDone ? "摇到了" : "正在跳转候选"}
+                {shuffleDone ? "摇到了" : "正在为你翻牌"}
               </p>
               <h3 className="mt-3 text-3xl font-black leading-tight text-ink">{shuffleCandidate.title}</h3>
               <p className="mt-2 text-sm font-bold text-ink/58">{shuffleCandidate.brand}</p>
@@ -390,12 +346,12 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
                 蛋白 {Math.round(shuffleCandidate.macros.protein)}g · 碳水 {Math.round(shuffleCandidate.macros.carbs)}g · 脂肪 {Math.round(shuffleCandidate.macros.fat)}g
               </p>
               {shuffleDone ? (
-                <div className="mt-4 rounded-[8px] border border-white bg-white/80 p-3">
+                <div className="mt-4 rounded-[18px] border border-white bg-white/80 p-3">
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-coral">吃完预计达成</p>
                   <p className="mt-1 text-3xl font-black text-ink">{shuffleCompletion.average}%</p>
                   <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
                     {macroKeys.map((macro) => (
-                      <div key={macro} className="rounded-[8px] bg-paper px-2 py-2">
+                      <div key={macro} className="rounded-[18px] bg-paper px-2 py-2">
                         <p className="text-[11px] font-bold text-ink/45">{macroLabels[macro].short}</p>
                         <p className="mt-1 text-sm font-black text-moss">{shuffleCompletion[macro]}%</p>
                       </div>
@@ -412,7 +368,7 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
                   onChoose(recommendationToFood(shuffleCandidate));
                   setShuffleOpen(false);
                 }}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-moss px-4 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-moss px-4 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Check size={17} aria-hidden="true" />
                 就吃摇到的
@@ -420,14 +376,15 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
               <button
                 type="button"
                 onClick={startShuffle}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border border-ink/12 bg-paper px-4 text-sm font-black text-ink"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] border border-ink/12 bg-paper px-4 text-sm font-black text-ink"
               >
                 <Dice5 size={17} aria-hidden="true" />
                 再摇一次
               </button>
             </div>
           </section>
-        </div>
+        </div>,
+        document.body
       ) : null}
     </div>
   );
@@ -478,7 +435,7 @@ function RecommendationCard({
   const suggestedMeal = inferSuggestedMeal(recommendation);
 
   return (
-    <article className={`rounded-[8px] border p-4 transition ${selected ? "border-coral bg-coral/10" : "border-ink/10 bg-paper"}`}>
+    <article className={`recommendation-card border p-4 transition ${selected ? "border-coral bg-coral/10 shadow-soft" : "border-ink/10 bg-paper/75"}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold uppercase tracking-[0.16em] text-moss">
@@ -504,7 +461,7 @@ function RecommendationCard({
           const percent = afterCompletion[macro];
           const over = percent > 115;
           return (
-            <div key={macro} className="rounded-[8px] bg-white p-3">
+            <div key={macro} className="rounded-[18px] bg-white p-3">
               <p className="text-xs text-ink/48">{macroLabels[macro].label}</p>
               <p className="mt-1 text-base font-black text-ink">
                 {Math.round(recommendation.macros[macro])}{macroLabels[macro].unit}
@@ -517,7 +474,7 @@ function RecommendationCard({
 
       <p className="mt-4 text-sm leading-6 text-ink/62">{recommendation.note}</p>
       {recommendation.caution ? <p className="mt-2 text-sm font-semibold text-coral">{recommendation.caution}</p> : null}
-      <div className="mt-3 rounded-[8px] border border-moss/12 bg-mint/45 px-3 py-2">
+      <div className="mt-3 rounded-[18px] border border-moss/12 bg-mint/45 px-3 py-2">
         <p className="text-xs font-black uppercase tracking-[0.14em] text-moss">吃完预计达成</p>
         <p className="mt-1 text-sm font-black text-ink">平均 {afterCompletion.average}% · 热量 {afterCompletion.calories}% · 蛋白 {afterCompletion.protein}%</p>
       </div>
@@ -526,14 +483,14 @@ function RecommendationCard({
         <button
           type="button"
           onClick={onPick}
-          className="inline-flex h-10 items-center justify-center rounded-[8px] border border-ink/12 bg-white px-3 text-sm font-black text-ink"
+          className="inline-flex h-10 items-center justify-center rounded-[18px] border border-ink/12 bg-white px-3 text-sm font-black text-ink"
         >
           先看这个
         </button>
         <button
           type="button"
           onClick={onChoose}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-[8px] bg-moss px-3 text-sm font-black text-white"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-[18px] bg-moss px-3 text-sm font-black text-white"
         >
           <Check size={16} aria-hidden="true" />
           选择这个

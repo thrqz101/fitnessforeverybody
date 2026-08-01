@@ -216,15 +216,15 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
-      <section className="rounded-[8px] border border-ink/10 bg-white/88 p-5 shadow-soft sm:p-6">
+      <section className="rounded-[18px] border border-ink/10 bg-white/88 p-5 shadow-soft sm:p-6">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-moss">AI Food Log</p>
         <h1 className="mt-1 text-3xl font-black text-ink">多图拍照记录</h1>
-        <div className="mt-4 rounded-[8px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
+        <div className="mt-4 rounded-[18px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
           拍照功能测试中，暂不可用。当前先用文字描述，写“品牌 + 套餐 + 配料 + 份量”，AI 会按文字帮你估算。
         </div>
 
         <div
-          className={`mt-6 flex min-h-60 flex-col items-center justify-center rounded-[8px] border border-dashed p-6 text-center transition ${
+          className={`mt-6 flex min-h-60 flex-col items-center justify-center rounded-[18px] border border-dashed p-6 text-center transition ${
             isDragging ? "border-coral bg-coral/10" : "border-moss/35 bg-mint/45"
           }`}
           onDrop={handleDrop}
@@ -240,7 +240,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             <button
               type="button"
               onClick={showPhotoUnavailable}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-white px-3 text-sm font-black text-ink/45 shadow-soft"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-white px-3 text-sm font-black text-ink/45 shadow-soft"
             >
               <FolderOpen size={16} aria-hidden="true" />
               从文件选择 · 测试中
@@ -248,7 +248,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             <button
               type="button"
               onClick={showPhotoUnavailable}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-white px-3 text-sm font-black text-ink/45 shadow-soft"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-white px-3 text-sm font-black text-ink/45 shadow-soft"
             >
               <Images size={16} aria-hidden="true" />
               从相册选择 · 测试中
@@ -256,7 +256,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             <button
               type="button"
               onClick={showPhotoUnavailable}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-moss/45 px-3 text-sm font-black text-white shadow-soft"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-moss/45 px-3 text-sm font-black text-white shadow-soft"
             >
               <Camera size={16} aria-hidden="true" />
               手机拍照上传 · 测试中
@@ -264,7 +264,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             <button
               type="button"
               onClick={openCamera}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-coral/55 px-3 text-sm font-black text-white shadow-soft"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-coral/55 px-3 text-sm font-black text-white shadow-soft"
             >
               <Camera size={16} aria-hidden="true" />
               打开电脑摄像头 · 测试中
@@ -273,29 +273,29 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
         </div>
 
         {cameraError ? (
-          <div className="mt-4 rounded-[8px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
+          <div className="mt-4 rounded-[18px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
             {cameraError}
           </div>
         ) : null}
 
         {cameraOpen ? (
-          <div className="mt-4 rounded-[8px] border border-ink/10 bg-ink p-3 text-white">
+          <div className="mt-4 rounded-[18px] border border-ink/10 bg-ink p-3 text-white">
             <div className="mb-3 flex items-center justify-between gap-3">
               <p className="text-sm font-black">现场拍一张</p>
               <button
                 type="button"
                 onClick={() => stopCamera()}
                 aria-label="关闭摄像头"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-[8px] bg-white/10 text-white"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-[18px] bg-white/10 text-white"
               >
                 <X size={16} aria-hidden="true" />
               </button>
             </div>
-            <video ref={videoRef} autoPlay playsInline muted className="aspect-video w-full rounded-[8px] bg-black object-cover" />
+            <video ref={videoRef} autoPlay playsInline muted className="aspect-video w-full rounded-[18px] bg-black object-cover" />
             <button
               type="button"
               onClick={capturePhoto}
-              className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] bg-citrus px-4 text-sm font-black text-ink"
+              className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[18px] bg-citrus px-4 text-sm font-black text-ink"
             >
               <Camera size={17} aria-hidden="true" />
               拍下这餐
@@ -304,7 +304,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
         ) : null}
 
         {notice ? (
-          <div className="mt-4 rounded-[8px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
+          <div className="mt-4 rounded-[18px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
             {notice}
           </div>
         ) : null}
@@ -312,7 +312,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
         {files.length ? (
           <div className="mt-4 grid gap-2">
             {files.map((file) => (
-              <div key={`${file.name}-${file.size}`} className="flex items-center justify-between rounded-[8px] border border-ink/10 bg-paper px-3 py-2 text-sm">
+              <div key={`${file.name}-${file.size}`} className="flex items-center justify-between rounded-[18px] border border-ink/10 bg-paper px-3 py-2 text-sm">
                 <span className="truncate font-semibold text-ink">{file.name}</span>
                 <div className="flex shrink-0 items-center gap-2">
                   <span className="text-xs text-ink/48">{Math.max(1, Math.round(file.size / 1024))} KB</span>
@@ -320,7 +320,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                     type="button"
                     onClick={() => removeFile(file)}
                     aria-label={`删除 ${file.name}`}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-[8px] text-ink/50 hover:bg-white hover:text-coral"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-[18px] text-ink/50 hover:bg-white hover:text-coral"
                   >
                     <Trash2 size={15} aria-hidden="true" />
                   </button>
@@ -335,7 +335,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             type="button"
             onClick={runAiRecognition}
             disabled={isRecognizing}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[8px] bg-coral px-4 text-sm font-black text-white shadow-soft disabled:cursor-not-allowed disabled:opacity-65"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-[18px] bg-coral px-4 text-sm font-black text-white shadow-soft disabled:cursor-not-allowed disabled:opacity-65"
           >
             <Upload size={18} aria-hidden="true" />
             {isRecognizing ? "AI 正在解析" : "根据描述估算"}
@@ -343,7 +343,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[8px] border border-ink/12 bg-white px-4 text-sm font-black text-ink"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-[18px] border border-ink/12 bg-white px-4 text-sm font-black text-ink"
           >
             <RotateCcw size={18} aria-hidden="true" />
             返回
@@ -351,7 +351,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
         </div>
       </section>
 
-      <section className="rounded-[8px] border border-ink/10 bg-white/88 p-5 shadow-soft sm:p-6">
+      <section className="rounded-[18px] border border-ink/10 bg-white/88 p-5 shadow-soft sm:p-6">
         <div className="mb-5 flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-moss">Food Detail</p>
@@ -361,7 +361,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             <button
               type="button"
               onClick={addToLog}
-              className="inline-flex h-11 shrink-0 items-center gap-2 rounded-[8px] bg-moss px-4 text-sm font-black text-white"
+              className="inline-flex h-11 shrink-0 items-center gap-2 rounded-[18px] bg-moss px-4 text-sm font-black text-white"
             >
               <Check size={17} aria-hidden="true" />
               加入今日
@@ -369,7 +369,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
           ) : null}
         </div>
 
-        <section className="mb-5 rounded-[8px] border border-moss/18 bg-mint/45 p-4">
+        <section className="mb-5 rounded-[18px] border border-moss/18 bg-mint/45 p-4">
           <div className="flex items-start gap-3">
             <Keyboard className="mt-0.5 shrink-0 text-moss" size={20} aria-hidden="true" />
             <div>
@@ -380,7 +380,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             </div>
           </div>
           <textarea
-            className="mt-4 min-h-28 w-full resize-y rounded-[8px] border border-ink/12 bg-white p-3 text-sm leading-6 text-ink outline-none focus:border-moss"
+            className="mt-4 min-h-28 w-full resize-y rounded-[18px] border border-ink/12 bg-white p-3 text-sm leading-6 text-ink outline-none focus:border-moss"
             value={manualDescription}
             onChange={(event) => setManualDescription(event.target.value)}
             placeholder="比如：麦当劳巨无霸套餐，一个汉堡 + 中薯 + 大可乐；或者一碗麻辣烫，里面有宽粉、牛肉丸、青菜、金针菇、豆腐皮..."
@@ -390,7 +390,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             <button
               type="button"
               onClick={() => setExampleSeed((current) => current + 1)}
-              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[8px] border border-moss/18 bg-white px-3 text-xs font-black text-moss"
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[18px] border border-moss/18 bg-white px-3 text-xs font-black text-moss"
             >
               <Shuffle size={14} aria-hidden="true" />
               换一批示例
@@ -402,7 +402,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                 key={example}
                 type="button"
                 onClick={() => setManualDescription(example)}
-                className="rounded-[8px] border border-ink/10 bg-white px-3 py-2 text-left text-xs font-semibold leading-5 text-ink/62 transition hover:border-moss/45 hover:text-ink"
+                className="rounded-[18px] border border-ink/10 bg-white px-3 py-2 text-left text-xs font-semibold leading-5 text-ink/62 transition hover:border-moss/45 hover:text-ink"
               >
                 {example}
               </button>
@@ -412,7 +412,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             type="button"
             onClick={runAiRecognition}
             disabled={isRecognizing}
-            className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] bg-ink px-4 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-65"
+            className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[18px] bg-ink px-4 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-65"
           >
             <Upload size={17} aria-hidden="true" />
             {isRecognizing ? "AI 正在解析" : "让 AI 根据描述估算"}
@@ -420,13 +420,13 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
         </section>
 
         {stagedFoods.length === 0 ? (
-          <div className="rounded-[8px] border border-dashed border-ink/18 bg-paper p-8 text-center">
+          <div className="rounded-[18px] border border-dashed border-ink/18 bg-paper p-8 text-center">
             <Plus className="mx-auto text-ink/35" size={34} aria-hidden="true" />
             <p className="mt-3 text-sm font-semibold text-ink/58">写好描述并点击“让 AI 根据描述估算”后，这里会出现可编辑的食物条目。</p>
           </div>
         ) : (
           <div className="space-y-4">
-            <section className="rounded-[8px] border border-moss/18 bg-mint/55 p-4">
+            <section className="rounded-[18px] border border-moss/18 bg-mint/55 p-4">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-moss">This Input Total</p>
@@ -438,7 +438,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
               </div>
               <div className="mt-4 grid gap-2 sm:grid-cols-5">
                 {macroKeys.map((macro) => (
-                  <div key={macro} className="rounded-[8px] border border-moss/12 bg-white/78 px-3 py-2">
+                  <div key={macro} className="rounded-[18px] border border-moss/12 bg-white/78 px-3 py-2">
                     <p className="text-xs font-bold text-ink/50">{macroLabels[macro].short}</p>
                     <p className="mt-1 text-lg font-black text-ink">
                       {Math.round(stagedTotals[macro])}
@@ -449,12 +449,12 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
               </div>
             </section>
             {stagedFoods.map((food) => (
-              <article key={food.id} className="overflow-hidden rounded-[8px] border border-ink/10 bg-paper p-4">
+              <article key={food.id} className="overflow-hidden rounded-[18px] border border-ink/10 bg-paper p-4">
                 <div className="mb-3 flex justify-end">
                   <button
                     type="button"
                     onClick={() => removeStagedFood(food.id)}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-[8px] border border-ink/12 bg-white px-2.5 text-xs font-bold text-ink/62 hover:border-coral hover:text-coral"
+                    className="inline-flex h-9 items-center gap-1.5 rounded-[18px] border border-ink/12 bg-white px-2.5 text-xs font-bold text-ink/62 hover:border-coral hover:text-coral"
                   >
                     <Trash2 size={14} aria-hidden="true" />
                     删掉这个
@@ -466,7 +466,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                       <label className="grid min-w-0 gap-1.5 text-sm font-bold text-ink">
                         品牌
                         <input
-                          className="h-11 w-full min-w-0 rounded-[8px] border border-ink/12 bg-white px-3"
+                          className="h-11 w-full min-w-0 rounded-[18px] border border-ink/12 bg-white px-3"
                           value={food.brand ?? ""}
                           onChange={(event) => updateFood(food.id, { brand: event.target.value })}
                         />
@@ -474,7 +474,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                       <label className="grid min-w-0 gap-1.5 text-sm font-bold text-ink">
                         食品类型
                         <input
-                          className="h-11 w-full min-w-0 rounded-[8px] border border-ink/12 bg-white px-3"
+                          className="h-11 w-full min-w-0 rounded-[18px] border border-ink/12 bg-white px-3"
                           value={food.foodType}
                           onChange={(event) => updateFood(food.id, { foodType: event.target.value })}
                         />
@@ -483,7 +483,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                     <label className="mt-3 grid min-w-0 gap-1.5 text-sm font-bold text-ink">
                       产品 / 食物名称
                       <input
-                        className="h-11 w-full min-w-0 rounded-[8px] border border-ink/12 bg-white px-3"
+                        className="h-11 w-full min-w-0 rounded-[18px] border border-ink/12 bg-white px-3"
                         value={food.name}
                         onChange={(event) => updateFood(food.id, { name: event.target.value })}
                       />
@@ -496,7 +496,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                   <label className="grid min-w-0 gap-1.5 text-sm font-bold text-ink">
                     份量
                     <select
-                      className="h-11 w-full min-w-0 rounded-[8px] border border-ink/12 bg-white px-3"
+                      className="h-11 w-full min-w-0 rounded-[18px] border border-ink/12 bg-white px-3"
                       value={food.portionScale}
                       onChange={(event) => updatePortion(food.id, Number(event.target.value))}
                     >
@@ -514,7 +514,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                     <label key={macro} className="grid min-w-0 gap-1.5 text-xs font-bold text-ink/70">
                       {macroLabels[macro].short}
                       <input
-                        className="h-10 w-full min-w-0 rounded-[8px] border border-ink/12 bg-white px-2 text-sm text-ink"
+                        className="h-10 w-full min-w-0 rounded-[18px] border border-ink/12 bg-white px-2 text-sm text-ink"
                         type="number"
                         min="0"
                         value={Math.round(food.macros[macro])}

@@ -7,8 +7,9 @@ type ProfilePanelProps = {
   profile: UserProfile;
   day: DayState;
   onSave: (profile: UserProfile, day: DayState) => void;
+  onBack?: () => void;
 };
 
-export function ProfilePanel({ profile, day, onSave }: ProfilePanelProps) {
-  return <Onboarding initialProfile={profile} initialDay={day} onComplete={onSave} submitLabel="保存系统设置" />;
+export function ProfilePanel({ profile, day, onSave, onBack }: ProfilePanelProps) {
+  return <Onboarding initialProfile={profile} initialDay={day} onComplete={onSave} onBack={onBack} submitLabel="保存系统设置" />;
 }

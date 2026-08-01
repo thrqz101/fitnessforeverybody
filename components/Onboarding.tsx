@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, ArrowRight, Check, HeartPulse, Maximize2, RotateCcw, Scale, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { Activity, ArrowLeft, ArrowRight, Check, HeartPulse, Maximize2, RotateCcw, Scale, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
 import {
   calculateCaloriesFromMacroMultipliers,
@@ -27,6 +27,7 @@ type OnboardingProps = {
   initialProfile?: UserProfile;
   initialDay?: DayState;
   onComplete: (profile: UserProfile, day: DayState) => void;
+  onBack?: () => void;
   submitLabel?: string;
 };
 
@@ -114,6 +115,7 @@ export function Onboarding({
   initialProfile = defaultProfile,
   initialDay = defaultDayState,
   onComplete,
+  onBack,
   submitLabel = "进入 Dashboard"
 }: OnboardingProps) {
   const [profile, setProfile] = useState<UserProfile>(() => {
@@ -198,9 +200,15 @@ export function Onboarding({
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-7xl items-center px-4 py-6 sm:px-6 lg:px-8">
-      <form onSubmit={submit} className="grid w-full gap-5 lg:grid-cols-[0.92fr_1.08fr]">
-        <section className="mesh-panel rounded-[8px] border border-ink/10 p-6 shadow-soft sm:p-8">
+    <main className={`settings-shell app-shell flex min-h-screen items-center px-4 py-6 sm:px-6 lg:px-8 ${onBack ? "has-settings-back" : ""}`}>
+      {onBack ? (
+        <button type="button" className="settings-back-button" onClick={onBack}>
+          <ArrowLeft size={18} aria-hidden="true" />
+          返回上一页
+        </button>
+      ) : null}
+      <form onSubmit={submit} className="relative z-10 mx-auto grid w-full max-w-7xl gap-5 lg:grid-cols-[0.92fr_1.08fr]">
+        <section className="mesh-panel rounded-[32px] border border-ink/10 p-6 shadow-float sm:p-8">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-moss/20 bg-white/70 px-3 py-1.5 text-sm font-semibold text-moss">
             <Sparkles size={16} aria-hidden="true" />
             本地系统设置
@@ -213,17 +221,17 @@ export function Onboarding({
           </p>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-[8px] border border-ink/10 bg-white/72 p-4">
+            <div className="rounded-[18px] border border-ink/10 bg-white/72 p-4">
               <Activity className="mb-3 text-moss" size={22} aria-hidden="true" />
               <p className="text-sm font-bold">目标驱动</p>
               <p className="mt-1 text-xs leading-5 text-ink/58">增肌、减脂、减肥/减重和健康管理各自计算。</p>
             </div>
-            <div className="rounded-[8px] border border-ink/10 bg-white/72 p-4">
+            <div className="rounded-[18px] border border-ink/10 bg-white/72 p-4">
               <Scale className="mb-3 text-coral" size={22} aria-hidden="true" />
               <p className="text-sm font-bold">估算即可</p>
               <p className="mt-1 text-xs leading-5 text-ink/58">用小份、标准份、大份替代称重。</p>
             </div>
-            <div className="rounded-[8px] border border-ink/10 bg-white/72 p-4">
+            <div className="rounded-[18px] border border-ink/10 bg-white/72 p-4">
               <HeartPulse className="mb-3 text-ink" size={22} aria-hidden="true" />
               <p className="text-sm font-bold">快乐补齐</p>
               <p className="mt-1 text-xs leading-5 text-ink/58">今日状态在日历里设置，推荐会跟着变。</p>
@@ -231,7 +239,7 @@ export function Onboarding({
           </div>
         </section>
 
-        <section className="rounded-[8px] border border-ink/10 bg-white/86 p-5 shadow-soft sm:p-6">
+        <section className="wellness-card p-5 sm:p-6">
           <div className="grid gap-5">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-moss">Settings</p>
@@ -245,7 +253,7 @@ export function Onboarding({
               <label className="grid gap-2 text-sm font-semibold text-ink">
                 性别
                 <select
-                  className="h-12 rounded-[8px] border border-ink/12 bg-paper px-3 text-ink"
+                  className="h-12 rounded-[18px] border border-ink/12 bg-paper px-3 text-ink"
                   value={profile.gender}
                   onChange={(event) => setProfile((current) => ({ ...current, gender: event.target.value as UserProfile["gender"] }))}
                 >
@@ -255,12 +263,12 @@ export function Onboarding({
               </label>
             </div>
 
-            <div className="rounded-[8px] border border-moss/18 bg-mint/55 p-4">
+            <div className="rounded-[18px] border border-moss/18 bg-mint/55 p-4">
               <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
                 <label className="grid gap-2 text-sm font-bold text-moss">
                   基础代谢 BMR kcal
                   <input
-                    className="h-12 rounded-[8px] border border-moss/20 bg-white px-3 text-2xl font-black text-ink"
+                    className="h-12 rounded-[18px] border border-moss/20 bg-white px-3 text-2xl font-black text-ink"
                     type="number"
                     min="0"
                     value={formatNumberInputValue(profile.bmrKcal)}
@@ -270,7 +278,7 @@ export function Onboarding({
                 <button
                   type="button"
                   onClick={applyEstimatedBmr}
-                  className="inline-flex min-h-12 items-center justify-center rounded-[8px] bg-moss px-4 py-2 text-center text-sm font-black leading-5 text-white"
+                  className="inline-flex min-h-12 items-center justify-center rounded-[18px] bg-moss px-4 py-2 text-center text-sm font-black leading-5 text-white"
                 >
                   如果不记得，点击一键估算
                 </button>
@@ -290,7 +298,7 @@ export function Onboarding({
                   type="button"
                   aria-pressed={profile.goal === goal.value}
                   onClick={() => setProfile((current) => ({ ...current, goal: goal.value }))}
-                  className={`min-h-24 rounded-[8px] border p-4 text-left transition ${
+                  className={`min-h-24 rounded-[18px] border p-4 text-left transition ${
                     profile.goal === goal.value
                       ? "border-moss bg-moss text-white shadow-soft"
                       : "border-ink/12 bg-paper text-ink hover:border-moss/50"
@@ -312,7 +320,7 @@ export function Onboarding({
                 <button
                   type="button"
                   onClick={() => setBodyFatOpen(true)}
-                  className="inline-flex min-h-10 items-center justify-center rounded-[8px] border border-moss/25 bg-mint/50 px-3 text-sm font-black text-moss"
+                  className="inline-flex min-h-10 items-center justify-center rounded-[18px] border border-moss/25 bg-mint/50 px-3 text-sm font-black text-moss"
                 >
                   查看体脂率评判标准图
                 </button>
@@ -320,7 +328,7 @@ export function Onboarding({
               <label className="grid gap-2 text-sm font-semibold text-ink">
                 训练结构
                 <select
-                  className="h-12 rounded-[8px] border border-ink/12 bg-paper px-3 text-ink"
+                  className="h-12 rounded-[18px] border border-ink/12 bg-paper px-3 text-ink"
                   value={profile.trainingStyle}
                   onChange={(event) => {
                     const nextTrainingStyle = event.target.value;
@@ -338,7 +346,7 @@ export function Onboarding({
               <label className="grid gap-2 text-sm font-semibold text-ink">
                 饮食结构
                 <select
-                  className="h-12 rounded-[8px] border border-ink/12 bg-paper px-3 text-ink"
+                  className="h-12 rounded-[18px] border border-ink/12 bg-paper px-3 text-ink"
                   value={profile.eatingPattern}
                   onChange={(event) => setProfile((current) => ({ ...current, eatingPattern: event.target.value }))}
                 >
@@ -348,14 +356,14 @@ export function Onboarding({
                 </select>
               </label>
             </div>
-            <div className="grid gap-3 rounded-[8px] border border-ink/10 bg-paper p-4 text-sm leading-6 text-ink/62">
+            <div className="grid gap-3 rounded-[18px] border border-ink/10 bg-paper p-4 text-sm leading-6 text-ink/62">
               <p><span className="font-black text-ink">目标逻辑：</span>{goalLogic[profile.goal]}</p>
               <p><span className="font-black text-ink">训练结构：</span>{trainingDescriptions[profile.trainingStyle]}</p>
               <p><span className="font-black text-ink">饮食结构：</span>{dietDescriptions[profile.eatingPattern]}</p>
             </div>
             <button
               type="submit"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-[8px] bg-coral px-5 text-sm font-black text-white shadow-soft transition hover:bg-coral/90"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-[18px] bg-coral px-5 text-sm font-black text-white shadow-soft transition hover:bg-coral/90"
             >
               {submitLabel}
               <ArrowRight size={18} aria-hidden="true" />
@@ -365,7 +373,7 @@ export function Onboarding({
       </form>
       {macroDialogOpen ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-ink/45 px-4 py-5 backdrop-blur-sm">
-          <section className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[8px] border border-ink/10 bg-white shadow-soft">
+          <section className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[18px] border border-ink/10 bg-white shadow-soft">
             <div className="min-h-0 overflow-auto p-5 sm:p-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -383,7 +391,7 @@ export function Onboarding({
                   type="button"
                   onClick={() => setMacroDialogOpen(false)}
                   aria-label="关闭宏量倍数确认"
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border border-ink/12 bg-paper text-ink"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[18px] border border-ink/12 bg-paper text-ink"
                 >
                   <X size={18} aria-hidden="true" />
                 </button>
@@ -424,11 +432,11 @@ export function Onboarding({
                 />
               </div>
 
-              <div className="mt-5 rounded-[8px] border border-moss/15 bg-mint/45 p-4">
+              <div className="mt-5 rounded-[18px] border border-moss/15 bg-mint/45 p-4">
                 <p className="text-sm font-black text-moss">当前确认后会保存为：</p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                   {macroMultiplierKeys.map((macro) => (
-                    <div key={macro} className="rounded-[8px] bg-white/80 px-3 py-2">
+                    <div key={macro} className="rounded-[18px] bg-white/80 px-3 py-2">
                       <p className="text-xs font-bold text-ink/48">{macroLabels[macro].label}</p>
                       <p className="mt-1 text-lg font-black text-ink">
                         {formatMultiplier(macroDraft[macro])}
@@ -436,11 +444,11 @@ export function Onboarding({
                       </p>
                     </div>
                   ))}
-                  <div className="rounded-[8px] bg-white/80 px-3 py-2">
+                  <div className="rounded-[18px] bg-white/80 px-3 py-2">
                     <p className="text-xs font-bold text-ink/48">{macroLabels.fiber.label}</p>
                     <p className="mt-1 text-lg font-black text-ink">{fiberDraft}g/天</p>
                   </div>
-                  <div className="rounded-[8px] bg-white/80 px-3 py-2">
+                  <div className="rounded-[18px] bg-white/80 px-3 py-2">
                     <p className="text-xs font-bold text-ink/48">{macroLabels.calories.label}</p>
                     <p className="mt-1 text-lg font-black text-ink">{calorieBudget}kcal</p>
                     <p className="mt-1 text-xs font-bold text-ink/42">系统预算</p>
@@ -453,7 +461,7 @@ export function Onboarding({
               <button
                 type="button"
                 onClick={resetMacroDraft}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] border border-moss/20 bg-paper px-4 text-sm font-black text-moss"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[18px] border border-moss/20 bg-paper px-4 text-sm font-black text-moss"
               >
                 <RotateCcw size={16} aria-hidden="true" />
                 使用系统推荐
@@ -461,14 +469,14 @@ export function Onboarding({
               <button
                 type="button"
                 onClick={() => setMacroDialogOpen(false)}
-                className="inline-flex min-h-11 items-center justify-center rounded-[8px] border border-ink/12 bg-white px-4 text-sm font-black text-ink"
+                className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-ink/12 bg-white px-4 text-sm font-black text-ink"
               >
                 返回修改设置
               </button>
               <button
                 type="button"
                 onClick={confirmMacroDraft}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] bg-coral px-5 text-sm font-black text-white shadow-soft transition hover:bg-coral/90"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[18px] bg-coral px-5 text-sm font-black text-white shadow-soft transition hover:bg-coral/90"
               >
                 <Check size={17} aria-hidden="true" />
                 确认并保存
@@ -479,7 +487,7 @@ export function Onboarding({
       ) : null}
       {bodyFatOpen ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-ink/45 px-4 backdrop-blur-sm">
-          <section className="max-h-[88vh] w-full max-w-4xl overflow-auto rounded-[8px] border border-ink/10 bg-white p-5 shadow-soft sm:p-6">
+          <section className="max-h-[88vh] w-full max-w-4xl overflow-auto rounded-[18px] border border-ink/10 bg-white p-5 shadow-soft sm:p-6">
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-moss">Body Fat Guide</p>
@@ -493,7 +501,7 @@ export function Onboarding({
                   setExpandedBodyFat(null);
                 }}
                 aria-label="关闭体脂率参考"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-[8px] border border-ink/12 bg-paper text-ink"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-[18px] border border-ink/12 bg-paper text-ink"
               >
                 <X size={18} aria-hidden="true" />
               </button>
@@ -515,7 +523,7 @@ export function Onboarding({
       ) : null}
       {expandedBodyFat ? (
         <div className="fixed inset-0 z-[60] bg-ink/78 p-3 backdrop-blur-sm sm:p-6">
-          <section className="flex h-full flex-col rounded-[8px] border border-white/18 bg-white shadow-soft">
+          <section className="flex h-full flex-col rounded-[18px] border border-white/18 bg-white shadow-soft">
             <div className="flex items-center justify-between gap-3 border-b border-ink/10 px-4 py-3">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-moss">Body Fat Guide</p>
@@ -525,7 +533,7 @@ export function Onboarding({
                 type="button"
                 onClick={() => setExpandedBodyFat(null)}
                 aria-label="关闭放大图"
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border border-ink/12 bg-paper text-ink"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[18px] border border-ink/12 bg-paper text-ink"
               >
                 <X size={18} aria-hidden="true" />
               </button>
@@ -534,7 +542,7 @@ export function Onboarding({
               <img
                 src={expandedBodyFat.src}
                 alt={`${expandedBodyFat.title}放大图`}
-                className="mx-auto h-auto w-full max-w-6xl rounded-[8px] bg-white object-contain shadow-soft"
+                className="mx-auto h-auto w-full max-w-6xl rounded-[18px] bg-white object-contain shadow-soft"
               />
             </div>
           </section>
@@ -552,7 +560,7 @@ function BodyFatPhoto({
   onExpand: () => void;
 }) {
   return (
-    <article className="overflow-hidden rounded-[8px] border border-ink/10 bg-paper">
+    <article className="overflow-hidden rounded-[18px] border border-ink/10 bg-paper">
       <button
         type="button"
         onClick={onExpand}
@@ -560,7 +568,7 @@ function BodyFatPhoto({
         className="group relative block w-full cursor-zoom-in bg-white"
       >
         <img src={photo.src} alt={photo.title} className="h-full max-h-[64vh] w-full object-contain" loading="lazy" />
-        <span className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-[8px] border border-ink/10 bg-white/90 text-moss shadow-soft transition group-hover:scale-105">
+        <span className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-[18px] border border-ink/10 bg-white/90 text-moss shadow-soft transition group-hover:scale-105">
           <Maximize2 size={18} aria-hidden="true" />
         </span>
       </button>
@@ -575,11 +583,11 @@ function BodyFatPhoto({
 
 function BodyFatColumn({ title, rows }: { title: string; rows: string[][] }) {
   return (
-    <div className="rounded-[8px] border border-ink/10 bg-paper p-4">
+    <div className="rounded-[18px] border border-ink/10 bg-paper p-4">
       <h3 className="text-lg font-black text-ink">{title}</h3>
       <div className="mt-4 grid gap-3">
         {rows.map(([range, label, detail], index) => (
-          <div key={range} className="grid gap-2 rounded-[8px] border border-ink/8 bg-white p-3">
+          <div key={range} className="grid gap-2 rounded-[18px] border border-ink/8 bg-white p-3">
             <div className="flex items-center justify-between gap-3">
               <p className="font-black text-ink">{range}</p>
               <span className="rounded-full bg-mint px-2.5 py-1 text-xs font-black text-moss">{label}</span>
@@ -597,7 +605,7 @@ function BodyFatColumn({ title, rows }: { title: string; rows: string[][] }) {
 
 function MacroContext({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[8px] border border-ink/10 bg-paper px-3 py-2">
+    <div className="rounded-[18px] border border-ink/10 bg-paper px-3 py-2">
       <p className="text-xs font-black uppercase tracking-[0.14em] text-ink/42">{label}</p>
       <p className="mt-1 text-sm font-black text-ink">{value}</p>
     </div>
@@ -620,7 +628,7 @@ function MacroMultiplierControl({
   const bounds = macroMultiplierBounds[macro];
 
   return (
-    <article className="rounded-[8px] border border-ink/10 bg-paper p-4">
+    <article className="rounded-[18px] border border-ink/10 bg-paper p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-lg font-black text-ink">{macroLabels[macro].label}</p>
@@ -649,7 +657,7 @@ function MacroMultiplierControl({
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3 rounded-[8px] bg-white/78 px-3 py-2">
+      <div className="mt-4 flex items-center justify-between gap-3 rounded-[18px] bg-white/78 px-3 py-2">
         <span className="text-xs font-bold text-ink/45">目标克数</span>
         <strong className="text-base text-ink">{macroGrams(weightKg, value)}g/天</strong>
       </div>
@@ -667,7 +675,7 @@ function FiberControl({
   onChange: (value: string) => void;
 }) {
   return (
-    <article className="rounded-[8px] border border-ink/10 bg-paper p-4">
+    <article className="rounded-[18px] border border-ink/10 bg-paper p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-lg font-black text-ink">{macroLabels.fiber.label}</p>
@@ -696,7 +704,7 @@ function FiberControl({
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3 rounded-[8px] bg-white/78 px-3 py-2">
+      <div className="mt-4 flex items-center justify-between gap-3 rounded-[18px] bg-white/78 px-3 py-2">
         <span className="text-xs font-bold text-ink/45">每日目标</span>
         <strong className="text-base text-ink">{value}g/天</strong>
       </div>
@@ -720,7 +728,7 @@ function CalorieEstimatePanel({
   const delta = macroCalories - calorieBudget;
 
   return (
-    <article className="rounded-[8px] border border-ink/10 bg-ink p-4 text-white">
+    <article className="rounded-[18px] border border-ink/10 bg-ink p-4 text-white">
       <p className="text-xs font-black uppercase tracking-[0.14em] text-citrus">Calorie Budget</p>
       <h3 className="mt-2 text-2xl font-black">{calorieBudget} kcal</h3>
       <p className="mt-2 text-sm font-semibold leading-6 text-white/72">
@@ -744,7 +752,7 @@ function formatCalorieDelta(delta: number) {
 
 function MacroFormula({ label, grams, kcal }: { label: string; grams: number; kcal: number }) {
   return (
-    <div className="rounded-[8px] bg-white/10 px-3 py-2">
+    <div className="rounded-[18px] bg-white/10 px-3 py-2">
       <p className="text-xs font-bold text-white/50">{label}</p>
       <p className="mt-1 text-sm font-black">{grams}g</p>
       <p className="mt-0.5 text-xs font-semibold text-white/55">{Math.round(kcal)} kcal</p>
@@ -757,7 +765,7 @@ function Field({ label, value, onChange }: { label: string; value: number; onCha
     <label className="grid gap-2 text-sm font-semibold text-ink">
       {label}
       <input
-        className="h-12 rounded-[8px] border border-ink/12 bg-paper px-3 text-ink"
+        className="h-12 rounded-[18px] border border-ink/12 bg-paper px-3 text-ink"
         type="number"
         min="0"
         value={formatNumberInputValue(value)}
