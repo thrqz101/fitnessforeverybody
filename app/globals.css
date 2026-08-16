@@ -817,3 +817,18 @@ html[data-language="en"] .food-vision-hero__content h1 {
   font-size: clamp(40px, 5vw, 72px);
   line-height: 0.98;
 }
+
+/* Chinese-only desktop size parity with the English layout. Font sizes stay unchanged. */
+@media (min-width: 1440px) {
+  html[data-language="zh"] .nutrition-console .food-vision-hero {
+    min-height: 653px;
+  }
+
+  html[data-language="zh"] .food-vision-hero__content h1 {
+    line-height: 1.47;
+  }
+
+  html[data-language="zh"] .attainment-card__copy h3 {
+    line-height: 1.8;
+  }
+}
