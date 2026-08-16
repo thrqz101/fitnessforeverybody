@@ -2,6 +2,8 @@
 
 import { Activity, ArrowLeft, ArrowRight, Check, HeartPulse, Maximize2, RotateCcw, Scale, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
+import { useI18n } from "@/lib/i18n";
+import type { Language } from "@/lib/i18n-utils";
 import {
   calculateCaloriesFromMacroMultipliers,
   calculateRecommendedMacroMultipliers,
@@ -118,6 +120,7 @@ export function Onboarding({
   onBack,
   submitLabel = "进入 Dashboard"
 }: OnboardingProps) {
+  const { t, language } = useI18n();
   const [profile, setProfile] = useState<UserProfile>(() => {
     const merged = { ...defaultProfile, ...initialProfile };
     return {
@@ -204,37 +207,37 @@ export function Onboarding({
       {onBack ? (
         <button type="button" className="settings-back-button" onClick={onBack}>
           <ArrowLeft size={18} aria-hidden="true" />
-          返回上一页
+          {t("返回上一页")}
         </button>
       ) : null}
       <form onSubmit={submit} className="relative z-10 mx-auto grid w-full max-w-7xl gap-5 lg:grid-cols-[0.92fr_1.08fr]">
         <section className="mesh-panel rounded-[32px] border border-ink/10 p-6 shadow-float sm:p-8">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-moss/20 bg-white/70 px-3 py-1.5 text-sm font-semibold text-moss">
             <Sparkles size={16} aria-hidden="true" />
-            本地系统设置
+            {t("本地系统设置")}
           </div>
           <h1 className="max-w-xl text-4xl font-black leading-tight text-ink sm:text-5xl">
-            你的身体参数，只填一次就好。
+            {t("你的身体参数，只填一次就好。")}
           </h1>
           <p className="mt-4 max-w-xl text-base leading-7 text-ink/68">
-            这些信息会保存在当前浏览器里。之后打开网页会直接进入今日任务，不需要每次重新输入。
+            {t("这些信息会保存在当前浏览器里。之后打开网页会直接进入今日任务，不需要每次重新输入。")}
           </p>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
             <div className="rounded-[18px] border border-ink/10 bg-white/72 p-4">
               <Activity className="mb-3 text-moss" size={22} aria-hidden="true" />
-              <p className="text-sm font-bold">目标驱动</p>
-              <p className="mt-1 text-xs leading-5 text-ink/58">增肌、减脂、减肥/减重和健康管理各自计算。</p>
+              <p className="text-sm font-bold">{t("目标驱动")}</p>
+              <p className="mt-1 text-xs leading-5 text-ink/58">{t("增肌、减脂、减肥/减重和健康管理各自计算。")}</p>
             </div>
             <div className="rounded-[18px] border border-ink/10 bg-white/72 p-4">
               <Scale className="mb-3 text-coral" size={22} aria-hidden="true" />
-              <p className="text-sm font-bold">估算即可</p>
-              <p className="mt-1 text-xs leading-5 text-ink/58">用小份、标准份、大份替代称重。</p>
+              <p className="text-sm font-bold">{t("估算即可")}</p>
+              <p className="mt-1 text-xs leading-5 text-ink/58">{t("用小份、标准份、大份替代称重。")}</p>
             </div>
             <div className="rounded-[18px] border border-ink/10 bg-white/72 p-4">
               <HeartPulse className="mb-3 text-ink" size={22} aria-hidden="true" />
-              <p className="text-sm font-bold">快乐补齐</p>
-              <p className="mt-1 text-xs leading-5 text-ink/58">今日状态在日历里设置，推荐会跟着变。</p>
+              <p className="text-sm font-bold">{t("快乐补齐")}</p>
+              <p className="mt-1 text-xs leading-5 text-ink/58">{t("今日状态在日历里设置，推荐会跟着变。")}</p>
             </div>
           </div>
         </section>
@@ -243,22 +246,22 @@ export function Onboarding({
           <div className="grid gap-5">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-moss">Settings</p>
-              <h2 className="mt-1 text-2xl font-black text-ink">系统设置</h2>
+              <h2 className="mt-1 text-2xl font-black text-ink">{t("系统设置")}</h2>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="身高 cm" value={profile.heightCm} onChange={(value) => updateNumber("heightCm", value)} />
-              <Field label="体重 kg" value={profile.weightKg} onChange={(value) => updateNumber("weightKg", value)} />
-              <Field label="年龄" value={profile.age} onChange={(value) => updateNumber("age", value)} />
+              <Field label={t("身高 cm")} value={profile.heightCm} onChange={(value) => updateNumber("heightCm", value)} />
+              <Field label={t("体重 kg")} value={profile.weightKg} onChange={(value) => updateNumber("weightKg", value)} />
+              <Field label={t("年龄")} value={profile.age} onChange={(value) => updateNumber("age", value)} />
               <label className="grid gap-2 text-sm font-semibold text-ink">
-                性别
+                {t("性别")}
                 <select
                   className="h-12 rounded-[18px] border border-ink/12 bg-paper px-3 text-ink"
                   value={profile.gender}
                   onChange={(event) => setProfile((current) => ({ ...current, gender: event.target.value as UserProfile["gender"] }))}
                 >
-                  <option value="male">男</option>
-                  <option value="female">女</option>
+                  <option value="male">{t("男")}</option>
+                  <option value="female">{t("女")}</option>
                 </select>
               </label>
             </div>
@@ -266,7 +269,7 @@ export function Onboarding({
             <div className="rounded-[18px] border border-moss/18 bg-mint/55 p-4">
               <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
                 <label className="grid gap-2 text-sm font-bold text-moss">
-                  基础代谢 BMR kcal
+                  {t("基础代谢 BMR kcal")}
                   <input
                     className="h-12 rounded-[18px] border border-moss/20 bg-white px-3 text-2xl font-black text-ink"
                     type="number"
@@ -280,15 +283,15 @@ export function Onboarding({
                   onClick={applyEstimatedBmr}
                   className="inline-flex min-h-12 items-center justify-center rounded-[18px] bg-moss px-4 py-2 text-center text-sm font-black leading-5 text-white"
                 >
-                  如果不记得，点击一键估算
+                  {t("如果不记得，点击一键估算")}
                 </button>
               </div>
-              <p className="mt-2 text-xs font-semibold text-ink/55">根据你当前信息估算约 {estimatedBmr} kcal，可手动覆盖。</p>
+              <p className="mt-2 text-xs font-semibold text-ink/55">{t("根据你当前信息估算约 {calories} kcal，可手动覆盖。", { calories: estimatedBmr })}</p>
             </div>
 
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-moss">Plan</p>
-              <h2 className="mt-1 text-2xl font-black text-ink">目标、训练结构和饮食结构</h2>
+              <h2 className="mt-1 text-2xl font-black text-ink">{t("目标、训练结构和饮食结构")}</h2>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
@@ -304,29 +307,29 @@ export function Onboarding({
                       : "border-ink/12 bg-paper text-ink hover:border-moss/50"
                   }`}
                 >
-                  <span className="text-base font-black">{goal.label}</span>
+                  <span className="text-base font-black">{t(goal.label)}</span>
                   <span className={`mt-1 block text-sm leading-5 ${profile.goal === goal.value ? "text-white/78" : "text-ink/58"}`}>
-                    {goal.detail}
+                    {t(goal.detail)}
                   </span>
                 </button>
               ))}
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label={`目标体重 kg (${goalLabels[profile.goal]})`} value={profile.targetWeightKg} onChange={(value) => updateNumber("targetWeightKg", value)} />
+              <Field label={t("目标体重 kg ({goal})", { goal: t(goalLabels[profile.goal]) })} value={profile.targetWeightKg} onChange={(value) => updateNumber("targetWeightKg", value)} />
               <div className="grid gap-2">
-                <Field label="当前体脂率 %（可选）" value={profile.bodyFat ?? 0} onChange={(value) => updateNumber("bodyFat", value)} />
-                <Field label="目标体脂率 %（可选）" value={profile.targetBodyFat ?? 0} onChange={(value) => updateNumber("targetBodyFat", value)} />
+                <Field label={t("当前体脂率 %（可选）")} value={profile.bodyFat ?? 0} onChange={(value) => updateNumber("bodyFat", value)} />
+                <Field label={t("目标体脂率 %（可选）")} value={profile.targetBodyFat ?? 0} onChange={(value) => updateNumber("targetBodyFat", value)} />
                 <button
                   type="button"
                   onClick={() => setBodyFatOpen(true)}
                   className="inline-flex min-h-10 items-center justify-center rounded-[18px] border border-moss/25 bg-mint/50 px-3 text-sm font-black text-moss"
                 >
-                  查看体脂率评判标准图
+                  {t("查看体脂率评判标准图")}
                 </button>
               </div>
               <label className="grid gap-2 text-sm font-semibold text-ink">
-                训练结构
+                {t("训练结构")}
                 <select
                   className="h-12 rounded-[18px] border border-ink/12 bg-paper px-3 text-ink"
                   value={profile.trainingStyle}
@@ -339,33 +342,33 @@ export function Onboarding({
                   }}
                 >
                   {trainingStyles.map((style) => (
-                    <option key={style}>{style}</option>
+                    <option key={style}>{t(style)}</option>
                   ))}
                 </select>
               </label>
               <label className="grid gap-2 text-sm font-semibold text-ink">
-                饮食结构
+                {t("饮食结构")}
                 <select
                   className="h-12 rounded-[18px] border border-ink/12 bg-paper px-3 text-ink"
                   value={profile.eatingPattern}
                   onChange={(event) => setProfile((current) => ({ ...current, eatingPattern: event.target.value }))}
                 >
                   {dietPatterns.map((pattern) => (
-                    <option key={pattern}>{pattern}</option>
+                    <option key={pattern}>{t(pattern)}</option>
                   ))}
                 </select>
               </label>
             </div>
             <div className="grid gap-3 rounded-[18px] border border-ink/10 bg-paper p-4 text-sm leading-6 text-ink/62">
-              <p><span className="font-black text-ink">目标逻辑：</span>{goalLogic[profile.goal]}</p>
-              <p><span className="font-black text-ink">训练结构：</span>{trainingDescriptions[profile.trainingStyle]}</p>
-              <p><span className="font-black text-ink">饮食结构：</span>{dietDescriptions[profile.eatingPattern]}</p>
+              <p><span className="font-black text-ink">{t("目标逻辑：")}</span>{t(goalLogic[profile.goal])}</p>
+              <p><span className="font-black text-ink">{t("训练结构：")}</span>{t(trainingDescriptions[profile.trainingStyle])}</p>
+              <p><span className="font-black text-ink">{t("饮食结构：")}</span>{t(dietDescriptions[profile.eatingPattern])}</p>
             </div>
             <button
               type="submit"
               className="inline-flex h-12 items-center justify-center gap-2 rounded-[18px] bg-coral px-5 text-sm font-black text-white shadow-soft transition hover:bg-coral/90"
             >
-              {submitLabel}
+              {t(submitLabel)}
               <ArrowRight size={18} aria-hidden="true" />
             </button>
           </div>
@@ -379,18 +382,25 @@ export function Onboarding({
                 <div>
                   <div className="inline-flex items-center gap-2 rounded-full border border-moss/20 bg-mint/65 px-3 py-1.5 text-sm font-black text-moss">
                     <SlidersHorizontal size={16} aria-hidden="true" />
-                    宏量倍数确认
+                    {t("宏量倍数确认")}
                   </div>
-                  <h2 className="mt-3 text-2xl font-black text-ink sm:text-3xl">保存前，确认你的每日营养倍数</h2>
+                  <h2 className="mt-3 text-2xl font-black text-ink sm:text-3xl">{t("保存前，确认你的每日营养倍数")}</h2>
                   <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-ink/62">
-                    根据你的身高 {profile.heightCm}cm、体重 {profile.weightKg}kg、基础代谢 {profile.bmrKcal || estimatedBmr}kcal、体脂率 {formatOptionalPercent(profile.bodyFat)}、{profile.trainingStyle} 和 {profile.eatingPattern}，系统推荐你先使用：
-                    蛋白质 {formatMultiplier(recommendedMultipliers.protein)}、碳水 {formatMultiplier(recommendedMultipliers.carbs)}、脂肪 {formatMultiplier(recommendedMultipliers.fat)}、膳食纤维 {recommendedFiberGrams}g/天。热量目标按系统预算计算：{calorieBudget} kcal。
+                    {t("根据你的身高 {height}cm、体重 {weight}kg、基础代谢 {bmr}kcal、体脂率 {bodyFat}、{trainingStyle} 和 {eatingPattern}，系统推荐你先使用：", {
+                      height: profile.heightCm,
+                      weight: profile.weightKg,
+                      bmr: profile.bmrKcal || estimatedBmr,
+                      bodyFat: formatOptionalPercent(profile.bodyFat, language),
+                      trainingStyle: t(profile.trainingStyle),
+                      eatingPattern: t(profile.eatingPattern)
+                    })}
+                    {t("蛋白质")} {formatMultiplier(recommendedMultipliers.protein, language)}、{t("碳水")} {formatMultiplier(recommendedMultipliers.carbs, language)}、{t("脂肪")} {formatMultiplier(recommendedMultipliers.fat, language)}、{t("膳食纤维")} {formatDailyGrams(recommendedFiberGrams, language)}。{t("热量目标按系统预算计算：{calories} kcal。", { calories: calorieBudget })}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMacroDialogOpen(false)}
-                  aria-label="关闭宏量倍数确认"
+                  aria-label={t("关闭宏量倍数确认")}
                   className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[18px] border border-ink/12 bg-paper text-ink"
                 >
                   <X size={18} aria-hidden="true" />
@@ -398,10 +408,10 @@ export function Onboarding({
               </div>
 
               <div className="mt-5 grid gap-3 md:grid-cols-4">
-                <MacroContext label="目标" value={goalLabels[profile.goal]} />
-                <MacroContext label="今日状态" value={day.isTrainingDay ? `${day.trainingPart}训练` : "休息"} />
-                <MacroContext label="饮食日" value={dietStatusLabels[day.dietStatus].label} />
-                <MacroContext label="体脂目标" value={formatOptionalPercent(profile.targetBodyFat)} />
+                <MacroContext label={t("目标")} value={t(goalLabels[profile.goal])} />
+                <MacroContext label={t("今日状态")} value={day.isTrainingDay ? `${t(day.trainingPart)}${t("训练")}` : t("休息")} />
+                <MacroContext label={t("饮食日")} value={t(dietStatusLabels[day.dietStatus].label)} />
+                <MacroContext label={t("体脂目标")} value={formatOptionalPercent(profile.targetBodyFat, language)} />
               </div>
 
               <div className="mt-5 grid gap-3 md:grid-cols-3">
@@ -433,25 +443,25 @@ export function Onboarding({
               </div>
 
               <div className="mt-5 rounded-[18px] border border-moss/15 bg-mint/45 p-4">
-                <p className="text-sm font-black text-moss">当前确认后会保存为：</p>
+                <p className="text-sm font-black text-moss">{t("当前确认后会保存为：")}</p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                   {macroMultiplierKeys.map((macro) => (
                     <div key={macro} className="rounded-[18px] bg-white/80 px-3 py-2">
-                      <p className="text-xs font-bold text-ink/48">{macroLabels[macro].label}</p>
+                      <p className="text-xs font-bold text-ink/48">{t(macroLabels[macro].label)}</p>
                       <p className="mt-1 text-lg font-black text-ink">
-                        {formatMultiplier(macroDraft[macro])}
-                        <span className="ml-2 text-sm text-ink/48">{macroGrams(profile.weightKg, macroDraft[macro])}g/天</span>
+                        {formatMultiplier(macroDraft[macro], language)}
+                        <span className="ml-2 text-sm text-ink/48">{formatDailyGrams(macroGrams(profile.weightKg, macroDraft[macro]), language)}</span>
                       </p>
                     </div>
                   ))}
                   <div className="rounded-[18px] bg-white/80 px-3 py-2">
-                    <p className="text-xs font-bold text-ink/48">{macroLabels.fiber.label}</p>
-                    <p className="mt-1 text-lg font-black text-ink">{fiberDraft}g/天</p>
+                    <p className="text-xs font-bold text-ink/48">{t(macroLabels.fiber.label)}</p>
+                    <p className="mt-1 text-lg font-black text-ink">{formatDailyGrams(fiberDraft, language)}</p>
                   </div>
                   <div className="rounded-[18px] bg-white/80 px-3 py-2">
-                    <p className="text-xs font-bold text-ink/48">{macroLabels.calories.label}</p>
+                    <p className="text-xs font-bold text-ink/48">{t(macroLabels.calories.label)}</p>
                     <p className="mt-1 text-lg font-black text-ink">{calorieBudget}kcal</p>
-                    <p className="mt-1 text-xs font-bold text-ink/42">系统预算</p>
+                    <p className="mt-1 text-xs font-bold text-ink/42">{t("系统预算")}</p>
                   </div>
                 </div>
               </div>
@@ -464,14 +474,14 @@ export function Onboarding({
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[18px] border border-moss/20 bg-paper px-4 text-sm font-black text-moss"
               >
                 <RotateCcw size={16} aria-hidden="true" />
-                使用系统推荐
+                {t("使用系统推荐")}
               </button>
               <button
                 type="button"
                 onClick={() => setMacroDialogOpen(false)}
                 className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-ink/12 bg-white px-4 text-sm font-black text-ink"
               >
-                返回修改设置
+                {t("返回修改设置")}
               </button>
               <button
                 type="button"
@@ -479,7 +489,7 @@ export function Onboarding({
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[18px] bg-coral px-5 text-sm font-black text-white shadow-soft transition hover:bg-coral/90"
               >
                 <Check size={17} aria-hidden="true" />
-                确认并保存
+                {t("确认并保存")}
               </button>
             </div>
           </section>
@@ -491,8 +501,8 @@ export function Onboarding({
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-moss">Body Fat Guide</p>
-                <h2 className="mt-1 text-2xl font-black text-ink">体脂率评判标准图</h2>
-                <p className="mt-2 text-sm leading-6 text-ink/58">用真人体脂对照图做视觉参考，再配合区间判断目标。不同身高、骨架和肌肉量会让观感有差异。</p>
+                <h2 className="mt-1 text-2xl font-black text-ink">{t("体脂率评判标准图")}</h2>
+                <p className="mt-2 text-sm leading-6 text-ink/58">{t("用真人体脂对照图做视觉参考，再配合区间判断目标。不同身高、骨架和肌肉量会让观感有差异。")}</p>
               </div>
               <button
                 type="button"
@@ -500,7 +510,7 @@ export function Onboarding({
                   setBodyFatOpen(false);
                   setExpandedBodyFat(null);
                 }}
-                aria-label="关闭体脂率参考"
+                aria-label={t("关闭体脂率参考")}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-[18px] border border-ink/12 bg-paper text-ink"
               >
                 <X size={18} aria-hidden="true" />
@@ -516,7 +526,7 @@ export function Onboarding({
               <BodyFatColumn title="女生参考" rows={bodyFatRanges.female} />
             </div>
             <p className="mt-4 text-xs leading-5 text-ink/48">
-              说明：体脂率视觉参考仅用于自我估算，不作为医学诊断；同样体脂率在不同肌肉量、骨架和水分状态下会有明显观感差异。
+              {t("说明：体脂率视觉参考仅用于自我估算，不作为医学诊断；同样体脂率在不同肌肉量、骨架和水分状态下会有明显观感差异。")}
             </p>
           </section>
         </div>
@@ -527,12 +537,12 @@ export function Onboarding({
             <div className="flex items-center justify-between gap-3 border-b border-ink/10 px-4 py-3">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-moss">Body Fat Guide</p>
-                <h3 className="text-lg font-black text-ink">{expandedBodyFat.title}</h3>
+                <h3 className="text-lg font-black text-ink">{t(expandedBodyFat.title)}</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setExpandedBodyFat(null)}
-                aria-label="关闭放大图"
+                aria-label={t("关闭放大图")}
                 className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[18px] border border-ink/12 bg-paper text-ink"
               >
                 <X size={18} aria-hidden="true" />
@@ -541,7 +551,7 @@ export function Onboarding({
             <div className="min-h-0 flex-1 overflow-auto bg-paper p-3 sm:p-5">
               <img
                 src={expandedBodyFat.src}
-                alt={`${expandedBodyFat.title}放大图`}
+                alt={`${t(expandedBodyFat.title)} ${t("放大图")}`}
                 className="mx-auto h-auto w-full max-w-6xl rounded-[18px] bg-white object-contain shadow-soft"
               />
             </div>
@@ -559,43 +569,45 @@ function BodyFatPhoto({
   photo: BodyFatPhotoRef;
   onExpand: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <article className="overflow-hidden rounded-[18px] border border-ink/10 bg-paper">
       <button
         type="button"
         onClick={onExpand}
-        aria-label={`放大查看${photo.title}`}
+        aria-label={`${t("放大查看")}${t(photo.title)}`}
         className="group relative block w-full cursor-zoom-in bg-white"
       >
-        <img src={photo.src} alt={photo.title} className="h-full max-h-[64vh] w-full object-contain" loading="lazy" />
+        <img src={photo.src} alt={t(photo.title)} className="h-full max-h-[64vh] w-full object-contain" loading="lazy" />
         <span className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-[18px] border border-ink/10 bg-white/90 text-moss shadow-soft transition group-hover:scale-105">
           <Maximize2 size={18} aria-hidden="true" />
         </span>
       </button>
       <div className="p-3">
-        <p className="text-sm font-black text-ink">{photo.title}</p>
+        <p className="text-sm font-black text-ink">{t(photo.title)}</p>
         <p className="mt-1 text-xs font-bold text-coral">{photo.range}</p>
-        <p className="mt-2 text-xs font-semibold text-ink/48">{photo.credit}</p>
+        <p className="mt-2 text-xs font-semibold text-ink/48">{t(photo.credit)}</p>
       </div>
     </article>
   );
 }
 
 function BodyFatColumn({ title, rows }: { title: string; rows: string[][] }) {
+  const { t } = useI18n();
   return (
     <div className="rounded-[18px] border border-ink/10 bg-paper p-4">
-      <h3 className="text-lg font-black text-ink">{title}</h3>
+      <h3 className="text-lg font-black text-ink">{t(title)}</h3>
       <div className="mt-4 grid gap-3">
         {rows.map(([range, label, detail], index) => (
           <div key={range} className="grid gap-2 rounded-[18px] border border-ink/8 bg-white p-3">
             <div className="flex items-center justify-between gap-3">
               <p className="font-black text-ink">{range}</p>
-              <span className="rounded-full bg-mint px-2.5 py-1 text-xs font-black text-moss">{label}</span>
+              <span className="rounded-full bg-mint px-2.5 py-1 text-xs font-black text-moss">{t(label)}</span>
             </div>
             <div className="h-2 rounded-full bg-ink/10">
               <div className="h-2 rounded-full bg-coral" style={{ width: `${24 + index * 16}%` }} />
             </div>
-            <p className="text-sm leading-5 text-ink/58">{detail}</p>
+            <p className="text-sm leading-5 text-ink/58">{t(detail)}</p>
           </div>
         ))}
       </div>
@@ -625,17 +637,18 @@ function MacroMultiplierControl({
   weightKg: number;
   onChange: (value: string) => void;
 }) {
+  const { t, language } = useI18n();
   const bounds = macroMultiplierBounds[macro];
 
   return (
     <article className="rounded-[18px] border border-ink/10 bg-paper p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-lg font-black text-ink">{macroLabels[macro].label}</p>
-          <p className="mt-1 text-xs font-bold text-ink/50">推荐 {formatMultiplier(recommended)} · {macroGrams(weightKg, recommended)}g/天</p>
+          <p className="text-lg font-black text-ink">{t(macroLabels[macro].label)}</p>
+          <p className="mt-1 text-xs font-bold text-ink/50">{t("推荐 {multiplier} · {grams}g/天", { multiplier: formatMultiplier(recommended, language), grams: macroGrams(weightKg, recommended) })}</p>
         </div>
         <span className={`rounded-full px-2.5 py-1 text-xs font-black ${macroPillClass[macro]}`}>
-          {formatMultiplier(value)}
+          {formatMultiplier(value, language)}
         </span>
       </div>
 
@@ -649,17 +662,17 @@ function MacroMultiplierControl({
           onChange={(event) => onChange(event.target.value)}
           className="h-2 w-full cursor-pointer"
           style={{ accentColor: macroAccentColor[macro] }}
-          aria-label={`${macroLabels[macro].label}体重倍数`}
+          aria-label={`${t(macroLabels[macro].label)} ${t("体重倍数")}`}
         />
         <div className="mt-2 flex items-center justify-between text-xs font-bold text-ink/42">
-          <span>{formatMultiplier(bounds.min)}</span>
-          <span>{formatMultiplier(bounds.max)}</span>
+          <span>{formatMultiplier(bounds.min, language)}</span>
+          <span>{formatMultiplier(bounds.max, language)}</span>
         </div>
       </div>
 
       <div className="mt-4 flex items-center justify-between gap-3 rounded-[18px] bg-white/78 px-3 py-2">
-        <span className="text-xs font-bold text-ink/45">目标克数</span>
-        <strong className="text-base text-ink">{macroGrams(weightKg, value)}g/天</strong>
+        <span className="text-xs font-bold text-ink/45">{t("目标克数")}</span>
+        <strong className="text-base text-ink">{formatDailyGrams(macroGrams(weightKg, value), language)}</strong>
       </div>
     </article>
   );
@@ -674,12 +687,13 @@ function FiberControl({
   recommended: number;
   onChange: (value: string) => void;
 }) {
+  const { t, language } = useI18n();
   return (
     <article className="rounded-[18px] border border-ink/10 bg-paper p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-lg font-black text-ink">{macroLabels.fiber.label}</p>
-          <p className="mt-1 text-xs font-bold text-ink/50">推荐 {recommended}g/天 · 可按肠胃耐受微调</p>
+          <p className="text-lg font-black text-ink">{t(macroLabels.fiber.label)}</p>
+          <p className="mt-1 text-xs font-bold text-ink/50">{t("推荐 {grams}g/天 · 可按肠胃耐受微调", { grams: recommended })}</p>
         </div>
         <span className="rounded-full bg-skyglass px-2.5 py-1 text-xs font-black text-ink">
           {value}g
@@ -696,7 +710,7 @@ function FiberControl({
           onChange={(event) => onChange(event.target.value)}
           className="h-2 w-full cursor-pointer"
           style={{ accentColor: "#4e8fa8" }}
-          aria-label="膳食纤维每日克数"
+          aria-label={t("膳食纤维每日克数")}
         />
         <div className="mt-2 flex items-center justify-between text-xs font-bold text-ink/42">
           <span>{fiberGramBounds.min}g</span>
@@ -705,8 +719,8 @@ function FiberControl({
       </div>
 
       <div className="mt-4 flex items-center justify-between gap-3 rounded-[18px] bg-white/78 px-3 py-2">
-        <span className="text-xs font-bold text-ink/45">每日目标</span>
-        <strong className="text-base text-ink">{value}g/天</strong>
+        <span className="text-xs font-bold text-ink/45">{t("每日目标")}</span>
+        <strong className="text-base text-ink">{formatDailyGrams(value, language)}</strong>
       </div>
     </article>
   );
@@ -725,6 +739,7 @@ function CalorieEstimatePanel({
   carbGrams: number;
   fatGrams: number;
 }) {
+  const { t, language } = useI18n();
   const delta = macroCalories - calorieBudget;
 
   return (
@@ -732,22 +747,27 @@ function CalorieEstimatePanel({
       <p className="text-xs font-black uppercase tracking-[0.14em] text-citrus">Calorie Budget</p>
       <h3 className="mt-2 text-2xl font-black">{calorieBudget} kcal</h3>
       <p className="mt-2 text-sm font-semibold leading-6 text-white/72">
-        系统热量目标按 BMR、训练计划和饮食目标估算。根据你当前调整后的蛋白质、碳水和脂肪，折算热量为 {macroCalories} kcal，{formatCalorieDelta(delta)}。
+        {t("系统热量目标按 BMR、训练计划和饮食目标估算。根据你当前调整后的蛋白质、碳水和脂肪，折算热量为 {macroCalories} kcal，{delta}。", {
+          macroCalories,
+          delta: formatCalorieDelta(delta, language)
+        })}
       </p>
       <div className="mt-4 grid gap-2 sm:grid-cols-3">
-        <MacroFormula label="蛋白质" grams={proteinGrams} kcal={proteinGrams * 4} />
-        <MacroFormula label="碳水" grams={carbGrams} kcal={carbGrams * 4} />
-        <MacroFormula label="脂肪" grams={fatGrams} kcal={fatGrams * 9} />
+        <MacroFormula label={t("蛋白质")} grams={proteinGrams} kcal={proteinGrams * 4} />
+        <MacroFormula label={t("碳水")} grams={carbGrams} kcal={carbGrams * 4} />
+        <MacroFormula label={t("脂肪")} grams={fatGrams} kcal={fatGrams * 9} />
       </div>
     </article>
   );
 }
 
-function formatCalorieDelta(delta: number) {
+function formatCalorieDelta(delta: number, language: Language) {
   const absDelta = Math.abs(delta);
 
-  if (absDelta <= 25) return "与系统预算基本贴合";
-  return delta > 0 ? `比系统预算高 ${absDelta} kcal` : `比系统预算低 ${absDelta} kcal`;
+  if (absDelta <= 25) return language === "en" ? "in line with the system budget" : "与系统预算基本贴合";
+  return delta > 0
+    ? language === "en" ? `${absDelta} kcal above the system budget` : `比系统预算高 ${absDelta} kcal`
+    : language === "en" ? `${absDelta} kcal below the system budget` : `比系统预算低 ${absDelta} kcal`;
 }
 
 function MacroFormula({ label, grams, kcal }: { label: string; grams: number; kcal: number }) {
@@ -780,13 +800,17 @@ function formatNumberInputValue(value: number) {
   return value;
 }
 
-function formatOptionalPercent(value?: number) {
-  if (!value || value <= 0) return "未填写";
+function formatOptionalPercent(value?: number, language: Language = "zh") {
+  if (!value || value <= 0) return language === "en" ? "Not set" : "未填写";
   return `${value}%`;
 }
 
-function formatMultiplier(value: number) {
-  return `${value.toFixed(2)} 倍`;
+function formatMultiplier(value: number, language: Language = "zh") {
+  return language === "en" ? value.toFixed(2) : `${value.toFixed(2)} 倍`;
+}
+
+function formatDailyGrams(grams: number, language: Language = "zh") {
+  return language === "en" ? `${grams}g/day` : `${grams}g/天`;
 }
 
 function macroGrams(weightKg: number, multiplier: number) {

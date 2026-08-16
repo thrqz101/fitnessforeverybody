@@ -58,7 +58,24 @@ export function shiftMonth(monthKey: string, offset: number) {
   return makeDateKey(next.getUTCFullYear(), next.getUTCMonth() + 1, 1).slice(0, 7);
 }
 
-export function formatDateKey(dateKey: string) {
+import type { Language } from "@/lib/i18n-utils";
+
+export function formatDateKey(dateKey: string, language: Language = "zh") {
   const { year, month, day } = getBeijingMonthParts(dateKey);
+  if (language === "en") {
+    return new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric" }).format(
+      new Date(Date.UTC(year, month - 1, day))
+    );
+  }
   return `${year}年${month}月${day}日`;
+}
+
+export function formatMonthKey(monthKey: string, language: Language = "zh") {
+  const [year, month] = monthKey.split("-").map(Number);
+  if (language === "en") {
+    return new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long" }).format(
+      new Date(Date.UTC(year, month - 1, 1))
+    );
+  }
+  return `${year}年${month}月`;
 }

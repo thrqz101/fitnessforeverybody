@@ -3,6 +3,9 @@
 import { Camera, Check, FolderOpen, ImagePlus, Images, Keyboard, Plus, RotateCcw, Shuffle, Trash2, Upload, X } from "lucide-react";
 import { ChangeEvent, DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import { foodCatalog, type FoodCatalogItem } from "@/lib/food-catalog";
+import { useI18n } from "@/lib/i18n";
+import { pick, type Language } from "@/lib/i18n-utils";
+import { getLocalizedFoodField, translateToEn } from "@/lib/translations";
 import { macroKeys, macroLabels, scaleMacros } from "@/lib/nutrition";
 import { portionOptions } from "@/lib/mock-data";
 import type { FoodLogItem, MacroKey, MacroTotals } from "@/lib/types";
@@ -13,6 +16,7 @@ type FoodCaptureProps = {
 };
 
 export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
+  const { t, language } = useI18n();
   const [files, setFiles] = useState<File[]>([]);
   const [stagedFoods, setStagedFoods] = useState<FoodLogItem[]>([]);
   const [notice, setNotice] = useState("");
@@ -24,7 +28,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
   const [cameraError, setCameraError] = useState("");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const cameraStreamRef = useRef<MediaStream | null>(null);
-  const manualExamples = useMemo(() => buildManualExamples(exampleSeed), [exampleSeed]);
+  const manualExamples = useMemo(() => buildManualExamples(exampleSeed, language), [exampleSeed, language]);
   const stagedTotals = useMemo(
     () =>
       stagedFoods.reduce<MacroTotals>(
@@ -75,38 +79,39 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
   }
 
   function showPhotoUnavailable() {
-    setNotice("拍照功能测试中，暂不可用。先用文字描述告诉我吃了什么，我来帮你估算营养素。");
+    setNotice(t("拍照功能测试中，暂不可用。先用文字描述告诉我吃了什么，我来帮你估算营养素。"));
   }
 
   async function runAiRecognition() {
     if (manualDescription.trim().length < 6) {
-      setNotice("先写一下你吃了什么喔，比如品牌、套餐、配菜、饮料和大概份量。");
+      setNotice(t("先写一下你吃了什么喔，比如品牌、套餐、配菜、饮料和大概份量。"));
       return;
     }
 
     const unsupportedFiles = files.filter((file) => !isSupportedFile(file));
     if (unsupportedFiles.length) {
-      setNotice(`这些文件暂时不支持：${unsupportedFiles.map((file) => file.name).join("、")}`);
+      setNotice(t("这些文件暂时不支持：{files}", { files: unsupportedFiles.map((file) => file.name).join(", ") }));
       return;
     }
 
     const form = new FormData();
     files.forEach((file) => form.append("files", file));
     form.append("description", manualDescription.trim());
+    form.append("lang", language);
     setIsRecognizing(true);
-    setNotice("正在让 AI 理解你的食物描述...");
+    setNotice(t("正在让 AI 理解你的食物描述..."));
 
     try {
-      let aiResult = await requestFoodAi(form);
+      let aiResult = await requestFoodAi(form, language);
 
       if (!aiResult.ok && aiResult.retryable) {
-        setNotice("第一次没接稳，正在自动重试一次...");
-        aiResult = await requestFoodAi(form);
+        setNotice(t("第一次没接稳，正在自动重试一次..."));
+        aiResult = await requestFoodAi(form, language);
       }
 
       if (!aiResult.ok || !aiResult.result?.ok) {
         setStagedFoods([]);
-        setNotice(withRetryHint(aiResult.message || aiResult.result?.message || "AI 这次没算准。"));
+        setNotice(withRetryHint(aiResult.message || aiResult.result?.message || t("AI 这次没算准。"), language));
         return;
       }
 
@@ -114,15 +119,15 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
 
       if (!result.isFoodRelated) {
         setStagedFoods([]);
-        setNotice("我没有测出这一餐，请输入正确的食物信息。");
+        setNotice(t("我没有测出这一餐，请输入正确的食物信息。"));
         return;
       }
 
       setStagedFoods(result.foods ?? []);
-      setNotice(result.message || "识别好了，右边每个数字都可以继续改。");
+      setNotice(result.message || t("识别好了，右边每个数字都可以继续改。"));
     } catch {
       setStagedFoods([]);
-      setNotice(withRetryHint("AI 这次没接住。"));
+      setNotice(withRetryHint(t("AI 这次没接住。"), language));
     } finally {
       setIsRecognizing(false);
     }
@@ -204,12 +209,12 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
     canvas.getContext("2d")?.drawImage(video, 0, 0, width, height);
     canvas.toBlob((blob) => {
       if (!blob) {
-        setCameraError("这张没有拍下来，再试一次。");
+        setCameraError(t("这张没有拍下来，再试一次。"));
         return;
       }
       const file = new File([blob], `camera-meal-${Date.now()}.jpg`, { type: "image/jpeg" });
       applyFiles([file], "append");
-      setNotice("拍好了。再在右侧写一下这餐内容，我会帮你估算。");
+      setNotice(t("拍好了。再在右侧写一下这餐内容，我会帮你估算。"));
       stopCamera();
     }, "image/jpeg", 0.92);
   }
@@ -218,9 +223,9 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
     <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
       <section className="rounded-[18px] border border-ink/10 bg-white/88 p-5 shadow-soft sm:p-6">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-moss">AI Food Log</p>
-        <h1 className="mt-1 text-3xl font-black text-ink">多图拍照记录</h1>
+        <h1 className="mt-1 text-3xl font-black text-ink">{t("多图拍照记录")}</h1>
         <div className="mt-4 rounded-[18px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
-          拍照功能测试中，暂不可用。当前先用文字描述，写“品牌 + 套餐 + 配料 + 份量”，AI 会按文字帮你估算。
+          {t("拍照功能测试中，暂不可用。当前先用文字描述，写“品牌 + 套餐 + 配料 + 份量”，AI 会按文字帮你估算。")}
         </div>
 
         <div
@@ -232,9 +237,9 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
           onDragLeave={() => setIsDragging(false)}
         >
           <ImagePlus className="text-moss" size={36} aria-hidden="true" />
-          <span className="mt-3 text-base font-black text-ink">图片导入测试中，暂不可用</span>
+          <span className="mt-3 text-base font-black text-ink">{t("图片导入测试中，暂不可用")}</span>
           <span className="mt-1 max-w-sm text-sm leading-6 text-ink/55">
-            当前版本先用文字识别。你可以在右侧参考示例，直接写今天吃了什么、点了几份、有没有主食和饮料。
+            {t("当前版本先用文字识别。你可以在右侧参考示例，直接写今天吃了什么、点了几份、有没有主食和饮料。")}
           </span>
           <div className="mt-5 grid w-full max-w-xl gap-2 sm:grid-cols-2">
             <button
@@ -243,7 +248,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
               className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-white px-3 text-sm font-black text-ink/45 shadow-soft"
             >
               <FolderOpen size={16} aria-hidden="true" />
-              从文件选择 · 测试中
+              {t("从文件选择 · 测试中")}
             </button>
             <button
               type="button"
@@ -251,7 +256,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
               className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-white px-3 text-sm font-black text-ink/45 shadow-soft"
             >
               <Images size={16} aria-hidden="true" />
-              从相册选择 · 测试中
+              {t("从相册选择 · 测试中")}
             </button>
             <button
               type="button"
@@ -259,7 +264,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
               className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-moss/45 px-3 text-sm font-black text-white shadow-soft"
             >
               <Camera size={16} aria-hidden="true" />
-              手机拍照上传 · 测试中
+              {t("手机拍照上传 · 测试中")}
             </button>
             <button
               type="button"
@@ -267,7 +272,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
               className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-coral/55 px-3 text-sm font-black text-white shadow-soft"
             >
               <Camera size={16} aria-hidden="true" />
-              打开电脑摄像头 · 测试中
+              {t("打开电脑摄像头 · 测试中")}
             </button>
           </div>
         </div>
@@ -281,11 +286,11 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
         {cameraOpen ? (
           <div className="mt-4 rounded-[18px] border border-ink/10 bg-ink p-3 text-white">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <p className="text-sm font-black">现场拍一张</p>
+              <p className="text-sm font-black">{t("现场拍一张")}</p>
               <button
                 type="button"
                 onClick={() => stopCamera()}
-                aria-label="关闭摄像头"
+                aria-label={t("关闭摄像头")}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-[18px] bg-white/10 text-white"
               >
                 <X size={16} aria-hidden="true" />
@@ -298,7 +303,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
               className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[18px] bg-citrus px-4 text-sm font-black text-ink"
             >
               <Camera size={17} aria-hidden="true" />
-              拍下这餐
+              {t("拍下这餐")}
             </button>
           </div>
         ) : null}
@@ -319,7 +324,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                   <button
                     type="button"
                     onClick={() => removeFile(file)}
-                    aria-label={`删除 ${file.name}`}
+                    aria-label={`${t("删除")} ${file.name}`}
                     className="inline-flex h-8 w-8 items-center justify-center rounded-[18px] text-ink/50 hover:bg-white hover:text-coral"
                   >
                     <Trash2 size={15} aria-hidden="true" />
@@ -338,7 +343,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             className="inline-flex h-12 items-center justify-center gap-2 rounded-[18px] bg-coral px-4 text-sm font-black text-white shadow-soft disabled:cursor-not-allowed disabled:opacity-65"
           >
             <Upload size={18} aria-hidden="true" />
-            {isRecognizing ? "AI 正在解析" : "根据描述估算"}
+            {isRecognizing ? t("AI 正在解析") : t("根据描述估算")}
           </button>
           <button
             type="button"
@@ -346,7 +351,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             className="inline-flex h-12 items-center justify-center gap-2 rounded-[18px] border border-ink/12 bg-white px-4 text-sm font-black text-ink"
           >
             <RotateCcw size={18} aria-hidden="true" />
-            返回
+            {t("返回")}
           </button>
         </div>
       </section>
@@ -355,7 +360,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
         <div className="mb-5 flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-moss">Food Detail</p>
-            <h2 className="mt-1 text-2xl font-black text-ink">确认识别结果</h2>
+            <h2 className="mt-1 text-2xl font-black text-ink">{t("确认识别结果")}</h2>
           </div>
           {stagedFoods.length ? (
             <button
@@ -364,7 +369,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
               className="inline-flex h-11 shrink-0 items-center gap-2 rounded-[18px] bg-moss px-4 text-sm font-black text-white"
             >
               <Check size={17} aria-hidden="true" />
-              加入今日
+              {t("加入今日")}
             </button>
           ) : null}
         </div>
@@ -373,9 +378,9 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
           <div className="flex items-start gap-3">
             <Keyboard className="mt-0.5 shrink-0 text-moss" size={20} aria-hidden="true" />
             <div>
-              <h3 className="text-base font-black text-ink">手动告诉我你今天吃了什么</h3>
+              <h3 className="text-base font-black text-ink">{t("手动告诉我你今天吃了什么")}</h3>
               <p className="mt-1 text-sm leading-6 text-ink/58">
-                有品牌就尽量写品牌和产品名，再写套餐、主食、配菜、饮料和大概份量。
+                {t("有品牌就尽量写品牌和产品名，再写套餐、主食、配菜、饮料和大概份量。")}
               </p>
             </div>
           </div>
@@ -383,17 +388,17 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             className="mt-4 min-h-28 w-full resize-y rounded-[18px] border border-ink/12 bg-white p-3 text-sm leading-6 text-ink outline-none focus:border-moss"
             value={manualDescription}
             onChange={(event) => setManualDescription(event.target.value)}
-            placeholder="比如：麦当劳巨无霸套餐，一个汉堡 + 中薯 + 大可乐；或者一碗麻辣烫，里面有宽粉、牛肉丸、青菜、金针菇、豆腐皮..."
+            placeholder={t("比如：麦当劳巨无霸套餐，一个汉堡 + 中薯 + 大可乐；或者一碗麻辣烫，里面有宽粉、牛肉丸、青菜、金针菇、豆腐皮...")}
           />
           <div className="mt-3 flex items-center justify-between gap-3">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-moss">可以这样写</p>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-moss">{t("可以这样写")}</p>
             <button
               type="button"
               onClick={() => setExampleSeed((current) => current + 1)}
               className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[18px] border border-moss/18 bg-white px-3 text-xs font-black text-moss"
             >
               <Shuffle size={14} aria-hidden="true" />
-              换一批示例
+              {t("换一批示例")}
             </button>
           </div>
           <div className="mt-3 grid gap-2">
@@ -415,14 +420,14 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
             className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[18px] bg-ink px-4 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-65"
           >
             <Upload size={17} aria-hidden="true" />
-            {isRecognizing ? "AI 正在解析" : "让 AI 根据描述估算"}
+            {isRecognizing ? t("AI 正在解析") : t("让 AI 根据描述估算")}
           </button>
         </section>
 
         {stagedFoods.length === 0 ? (
           <div className="rounded-[18px] border border-dashed border-ink/18 bg-paper p-8 text-center">
             <Plus className="mx-auto text-ink/35" size={34} aria-hidden="true" />
-            <p className="mt-3 text-sm font-semibold text-ink/58">写好描述并点击“让 AI 根据描述估算”后，这里会出现可编辑的食物条目。</p>
+            <p className="mt-3 text-sm font-semibold text-ink/58">{t("写好描述并点击“让 AI 根据描述估算”后，这里会出现可编辑的食物条目。")}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -430,16 +435,16 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
               <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-moss">This Input Total</p>
-                  <h3 className="mt-1 text-lg font-black text-ink">本次识别合计</h3>
+                  <h3 className="mt-1 text-lg font-black text-ink">{t("本次识别合计")}</h3>
                 </div>
                 <p className="text-sm font-bold text-ink/58">
-                  共 {stagedFoods.length} 个食物条目，编辑或删除后会自动更新。
+                  {t("共 {count} 个食物条目，编辑或删除后会自动更新。", { count: stagedFoods.length })}
                 </p>
               </div>
               <div className="mt-4 grid gap-2 sm:grid-cols-5">
                 {macroKeys.map((macro) => (
                   <div key={macro} className="rounded-[18px] border border-moss/12 bg-white/78 px-3 py-2">
-                    <p className="text-xs font-bold text-ink/50">{macroLabels[macro].short}</p>
+                    <p className="text-xs font-bold text-ink/50">{t(macroLabels[macro].short)}</p>
                     <p className="mt-1 text-lg font-black text-ink">
                       {Math.round(stagedTotals[macro])}
                       <span className="ml-0.5 text-xs font-bold text-ink/45">{macroLabels[macro].unit}</span>
@@ -457,44 +462,44 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                     className="inline-flex h-9 items-center gap-1.5 rounded-[18px] border border-ink/12 bg-white px-2.5 text-xs font-bold text-ink/62 hover:border-coral hover:text-coral"
                   >
                     <Trash2 size={14} aria-hidden="true" />
-                    删掉这个
+                    {t("删掉这个")}
                   </button>
                 </div>
                 <div className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_150px]">
                   <div className="min-w-0">
                     <div className="grid min-w-0 gap-3 sm:grid-cols-2">
                       <label className="grid min-w-0 gap-1.5 text-sm font-bold text-ink">
-                        品牌
+                        {t("品牌")}
                         <input
                           className="h-11 w-full min-w-0 rounded-[18px] border border-ink/12 bg-white px-3"
-                          value={food.brand ?? ""}
+                          value={getLocalizedFoodField(food, "brand", language)}
                           onChange={(event) => updateFood(food.id, { brand: event.target.value })}
                         />
                       </label>
                       <label className="grid min-w-0 gap-1.5 text-sm font-bold text-ink">
-                        食品类型
+                        {t("食品类型")}
                         <input
                           className="h-11 w-full min-w-0 rounded-[18px] border border-ink/12 bg-white px-3"
-                          value={food.foodType}
+                          value={getLocalizedFoodField(food, "foodType", language)}
                           onChange={(event) => updateFood(food.id, { foodType: event.target.value })}
                         />
                       </label>
                     </div>
                     <label className="mt-3 grid min-w-0 gap-1.5 text-sm font-bold text-ink">
-                      产品 / 食物名称
+                      {t("产品 / 食物名称")}
                       <input
                         className="h-11 w-full min-w-0 rounded-[18px] border border-ink/12 bg-white px-3"
-                        value={food.name}
+                        value={getLocalizedFoodField(food, "name", language)}
                         onChange={(event) => updateFood(food.id, { name: event.target.value })}
                       />
                     </label>
-                    <p className="mt-2 text-xs text-ink/48">来源：{food.imageName ?? "AI 识别"}</p>
+                    <p className="mt-2 text-xs text-ink/48">{t("来源")}：{getLocalizedFoodField(food, "imageName", language) || t("AI 识别")}</p>
                     <p className="mt-1 text-xs font-bold text-moss">
-                      {getRecognitionLabel(food)}
+                      {t(getRecognitionLabel(food))}
                     </p>
                   </div>
                   <label className="grid min-w-0 gap-1.5 text-sm font-bold text-ink">
-                    份量
+                    {t("份量")}
                     <select
                       className="h-11 w-full min-w-0 rounded-[18px] border border-ink/12 bg-white px-3"
                       value={food.portionScale}
@@ -502,7 +507,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                     >
                       {portionOptions.map((option) => (
                         <option key={option.label} value={option.scale}>
-                          {option.label}
+                          {t(option.label)}
                         </option>
                       ))}
                     </select>
@@ -512,7 +517,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                 <div className="mt-4 grid min-w-0 gap-3 sm:grid-cols-5">
                   {macroKeys.map((macro) => (
                     <label key={macro} className="grid min-w-0 gap-1.5 text-xs font-bold text-ink/70">
-                      {macroLabels[macro].short}
+                      {t(macroLabels[macro].short)}
                       <input
                         className="h-10 w-full min-w-0 rounded-[18px] border border-ink/12 bg-white px-2 text-sm text-ink"
                         type="number"
@@ -523,7 +528,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                     </label>
                   ))}
                 </div>
-                {food.warning ? <p className="mt-3 break-words text-sm font-semibold text-coral">{food.warning}</p> : null}
+                {getLocalizedFoodField(food, "warning", language) ? <p className="mt-3 break-words text-sm font-semibold text-coral">{getLocalizedFoodField(food, "warning", language)}</p> : null}
               </article>
             ))}
           </div>
@@ -541,7 +546,7 @@ type FoodAiResult = {
   foods?: FoodLogItem[];
 };
 
-async function requestFoodAi(form: FormData): Promise<{
+async function requestFoodAi(form: FormData, language: Language): Promise<{
   ok: boolean;
   retryable: boolean;
   message?: string;
@@ -561,7 +566,9 @@ async function requestFoodAi(form: FormData): Promise<{
       return {
         ok: false,
         retryable,
-        message: retryable ? "AI 第一次响应有点慢，正在再试一次。" : "AI 返回内容有点乱，可以再点一次试试。"
+        message: retryable
+          ? pick(language, "AI 第一次响应有点慢，正在再试一次。", "The AI response is a bit slow. Retrying...")
+          : pick(language, "AI 返回内容有点乱，可以再点一次试试。", "The AI response was garbled. Try again.")
       };
     }
 
@@ -569,7 +576,9 @@ async function requestFoodAi(form: FormData): Promise<{
       return {
         ok: false,
         retryable: !result.needsConfig && retryable,
-        message: result.message || (retryable ? "AI 第一次没接稳，正在再试一次。" : "AI 这次没算准，可以再点一次试试。"),
+        message: result.message || (retryable
+          ? pick(language, "AI 第一次没接稳，正在再试一次。", "The first attempt failed. Retrying...")
+          : pick(language, "AI 这次没算准，可以再点一次试试。", "The AI couldn't calculate this time. Try again.")),
         result
       };
     }
@@ -579,16 +588,18 @@ async function requestFoodAi(form: FormData): Promise<{
     return {
       ok: false,
       retryable: true,
-      message: "AI 第一次没接稳，正在再试一次。"
+      message: pick(language, "AI 第一次没接稳，正在再试一次。", "The first attempt failed. Retrying...")
     };
   }
 }
 
-function withRetryHint(message: string) {
+function withRetryHint(message: string, language: Language) {
   const trimmed = message.trim().replace(/[。,.，\s]+$/, "");
-  if (!trimmed) return "AI 这次没接住（请再试一次）";
-  if (trimmed.endsWith("（请再试一次）")) return trimmed;
-  return `${trimmed}（请再试一次）`;
+  if (!trimmed) return pick(language, "AI 这次没接住（请再试一次）", "The AI missed that. (Please try again)");
+  const suffix = pick(language, "（请再试一次）", " (try again)");
+  if (language === "zh" && trimmed.endsWith("（请再试一次）")) return trimmed;
+  if (language === "en" && trimmed.toLowerCase().endsWith("(try again)")) return trimmed;
+  return `${trimmed}${suffix}`;
 }
 
 function isSupportedFile(file: File) {
@@ -607,7 +618,7 @@ const exampleBuckets: Array<{ name: string; match: (item: FoodCatalogItem) => bo
   { name: "轻补", match: (item) => item.category !== "meal" || /水果|酸奶|蛋白|奶茶|咖啡|便利店/.test(getCatalogText(item)) }
 ];
 
-function buildManualExamples(seed: number) {
+function buildManualExamples(seed: number, language: Language) {
   const examples: string[] = [];
   const usedIds = new Set<string>();
   const bucketOffset = positiveModulo(seed, exampleBuckets.length);
@@ -620,7 +631,7 @@ function buildManualExamples(seed: number) {
     const item = candidates[positiveModulo(seed * 7 + step * 5, candidates.length)];
     if (usedIds.has(item.id)) continue;
     usedIds.add(item.id);
-    examples.push(formatManualExample(item, bucket.name));
+    examples.push(formatManualExample(item, bucket.name, language));
   }
 
   if (examples.length >= 3) return examples;
@@ -629,46 +640,60 @@ function buildManualExamples(seed: number) {
     if (examples.length >= 3) break;
     if (usedIds.has(item.id)) continue;
     usedIds.add(item.id);
-    examples.push(formatManualExample(item, item.foodType));
+    examples.push(formatManualExample(item, item.foodType, language));
   }
 
   return examples;
 }
 
-function formatManualExample(item: FoodCatalogItem, bucketName: string) {
+function formatManualExample(item: FoodCatalogItem, bucketName: string, language: Language) {
   const items = item.items.slice(0, 6).map(cleanExampleItem);
-  const itemText = joinChineseList(items);
+  const itemText = joinList(items, language);
   const text = getCatalogText(item);
+  const brand = translateToEn(item.brand);
+  const title = translateToEn(item.title);
+  const bucket = translateToEn(bucketName);
+
+  if (language === "en") {
+    if (/火锅|海底捞|巴奴|呷哺|锅/.test(text)) return `Today I had hot pot from ${brand}: I ordered ${title}, including ${itemText}; assume light oil and light sesame sauce, and mention rice or noodles if ordered.`;
+    if (/韩式烤肉|烤肉/.test(text)) return `Today I had Korean BBQ at ${brand}: I ordered ${title}, mainly ${itemText}; add rice, cold noodles, kimchi, or drinks if included.`;
+    if (/麻辣烫|冒菜/.test(text)) return `Today I had ${title} from ${brand}: roughly ${itemText}; assume normal spice, and mention sesame sauce, rice, or drinks if included.`;
+    if (/盖饭|盖浇饭|鸡腿饭|猪脚饭|黄焖鸡|快餐饭/.test(text)) return `Today I had ${title} from ${brand}: served with one portion of rice and ${itemText}; mention any extra egg, meat, or drinks.`;
+    if (/早餐|包子|馒头|胡辣汤|豆浆|油条|肠粉|热干面/.test(text)) return `For breakfast I had ${title} from ${brand}: it includes ${itemText}; assume a normal breakfast portion and note whether soy milk is sweetened.`;
+    if (/奶茶|咖啡|茶饮|瑞幸|星巴克|喜茶|奈雪|霸王茶姬|蜜雪/.test(text)) return `Today I drank ${title} from ${brand}: configured as ${itemText}; include sugar level, milk cap, toppings, and cup size.`;
+    if (/川菜|湘菜|粤菜|赣菜|江浙|本帮|东北|西北|小炒|炒菜/.test(text)) return `Today I had ${bucket} from ${brand}: I ordered ${title}, mainly ${itemText}; mention how many bowls of rice, plus any soup or drinks.`;
+    return `Today I had ${title} from ${brand}: it includes ${itemText}; estimate a normal portion, and mention if it was larger or smaller.`;
+  }
 
   if (/火锅|海底捞|巴奴|呷哺|锅/.test(text)) {
-    return `今天吃了${item.brand}：点了${item.title}，里面有${itemText}；蘸料按少油少麻酱算，主食如果点了米饭或捞面也写上。`;
+    return `今天吃了${brand}：点了${title}，里面有${itemText}；蘸料按少油少麻酱算，主食如果点了米饭或捞面也写上。`;
   }
 
   if (/韩式烤肉|烤肉/.test(text)) {
-    return `今天吃了${item.brand}的烤肉：点了${item.title}，主要有${itemText}；如果还吃了米饭、冷面、泡菜或饮料，也一起写进去。`;
+    return `今天吃了${brand}的烤肉：点了${title}，主要有${itemText}；如果还吃了米饭、冷面、泡菜或饮料，也一起写进去。`;
   }
 
   if (/麻辣烫|冒菜/.test(text)) {
-    return `今天吃了${item.brand}的${item.title}：大概有${itemText}；汤底按正常辣度算，麻酱、米饭和饮料按实际有没有补充。`;
+    return `今天吃了${brand}的${title}：大概有${itemText}；汤底按正常辣度算，麻酱、米饭和饮料按实际有没有补充。`;
   }
 
   if (/盖饭|盖浇饭|鸡腿饭|猪脚饭|黄焖鸡|快餐饭/.test(text)) {
-    return `今天吃了${item.brand}的一份${item.title}：主食按一份米饭算，配了${itemText}；如果加蛋、加肉或喝了饮料，也写出来。`;
+    return `今天吃了${brand}的一份${title}：主食按一份米饭算，配了${itemText}；如果加蛋、加肉或喝了饮料，也写出来。`;
   }
 
   if (/早餐|包子|馒头|胡辣汤|豆浆|油条|肠粉|热干面/.test(text)) {
-    return `今天早餐吃了${item.brand}的${item.title}：包含${itemText}；份量按正常早餐一份算，豆浆甜不甜也可以写。`;
+    return `今天早餐吃了${brand}的${title}：包含${itemText}；份量按正常早餐一份算，豆浆甜不甜也可以写。`;
   }
 
   if (/奶茶|咖啡|茶饮|瑞幸|星巴克|喜茶|奈雪|霸王茶姬|蜜雪/.test(text)) {
-    return `今天喝了${item.brand}的${item.title}：配置是${itemText}；糖度、奶盖、小料和杯型按实际写，AI 会一起估算。`;
+    return `今天喝了${brand}的${title}：配置是${itemText}；糖度、奶盖、小料和杯型按实际写，AI 会一起估算。`;
   }
 
   if (/川菜|湘菜|粤菜|赣菜|江浙|本帮|东北|西北|小炒|炒菜/.test(text)) {
-    return `今天吃了${item.brand}的${bucketName}：点了${item.title}，主要有${itemText}；米饭几碗、有没有汤和饮料也一起告诉我。`;
+    return `今天吃了${brand}的${bucket}：点了${title}，主要有${itemText}；米饭几碗、有没有汤和饮料也一起告诉我。`;
   }
 
-  return `今天吃了${item.brand}的${item.title}：大概包含${itemText}；按正常份量估算，如果份量偏大或偏小可以直接补一句。`;
+  return `今天吃了${brand}的${title}：大概包含${itemText}；按正常份量估算，如果份量偏大或偏小可以直接补一句。`;
 }
 
 function getCatalogText(item: FoodCatalogItem) {
@@ -684,10 +709,12 @@ function cleanExampleItem(item: string) {
     .trim();
 }
 
-function joinChineseList(items: string[]) {
-  if (!items.length) return "常见配菜";
+function joinList(items: string[], language: Language) {
+  if (!items.length) return translateToEn("常见配菜");
   if (items.length === 1) return items[0];
-  return `${items.slice(0, -1).join("、")}和${items[items.length - 1]}`;
+  const translated = items.map((item) => translateToEn(item));
+  if (language === "en") return `${translated.slice(0, -1).join(", ")} and ${translated[translated.length - 1]}`;
+  return `${translated.slice(0, -1).join("、")}和${translated[translated.length - 1]}`;
 }
 
 function getRecognitionLabel(food: FoodLogItem) {

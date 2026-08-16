@@ -13,6 +13,9 @@ import {
   Utensils
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useI18n } from "@/lib/i18n";
+import { getLocalizedFoodField } from "@/lib/translations";
+import { pick, type Language } from "@/lib/i18n-utils";
 import { completion, dietStatusLabels, estimateBmr, goalLabels, macroKeys, macroLabels } from "@/lib/nutrition";
 import type { DayState, FoodLogItem, MacroKey, MacroTotals, UserProfile } from "@/lib/types";
 
@@ -31,6 +34,10 @@ type DashboardProps = {
   onSaveFood: (id: string) => void;
   onClearDrafts: () => void;
 };
+
+type RecognitionNoticeState =
+  | { key: string; vars?: Record<string, string | number> }
+  | { text: string };
 
 const quickExamples = [
   "一份鸡胸肉沙拉和拿铁",
@@ -62,8 +69,9 @@ export function Dashboard({
   onSaveFood,
   onClearDrafts
 }: DashboardProps) {
+  const { t, language } = useI18n();
   const [mealDescription, setMealDescription] = useState("");
-  const [recognitionNotice, setRecognitionNotice] = useState("");
+  const [recognitionNotice, setRecognitionNotice] = useState<RecognitionNoticeState | null>(null);
   const [isRecognizing, setIsRecognizing] = useState(false);
   const [selectedMacro, setSelectedMacro] = useState<MacroKey>("protein");
   const draftFoods = foods.filter((food) => !food.savedToCalendar);
@@ -95,31 +103,32 @@ export function Dashboard({
   async function recognizeMeal() {
     const description = mealDescription.trim();
     if (!description) {
-      setRecognitionNotice("先告诉我你吃了什么，品牌、份量和配菜越具体越好。");
+      setRecognitionNotice({ key: "先告诉我你吃了什么，品牌、份量和配菜越具体越好。" });
       return;
     }
 
     const form = new FormData();
     form.append("description", description);
+    form.append("lang", language);
     setIsRecognizing(true);
-    setRecognitionNotice("AI 正在拆解食材、份量和营养结构…");
+    setRecognitionNotice({ key: "AI 正在拆解食材、份量和营养结构…" });
 
     try {
-      const aiResult = await requestFoodAi(form);
+      const aiResult = await requestFoodAi(form, language);
       if (!aiResult.ok || !aiResult.result?.ok) {
-        setRecognitionNotice(withRetryHint(aiResult.message || aiResult.result?.message || "AI 这次没算准。"));
+        setRecognitionNotice({ text: withRetryHint(aiResult.message || aiResult.result?.message || t("AI 这次没算准。"), language) });
         return;
       }
       const recognizedFoods = aiResult.result.foods ?? [];
       if (!aiResult.result.isFoodRelated || !recognizedFoods.length) {
-        setRecognitionNotice("这段描述里没有识别到明确食物，请补充菜名或份量。");
+        setRecognitionNotice({ key: "这段描述里没有识别到明确食物，请补充菜名或份量。" });
         return;
       }
       onAddFoods(recognizedFoods);
       setMealDescription("");
-      setRecognitionNotice(`识别完成：${recognizedFoods.length} 个食物已进入确认区，营养变化正在计算。`);
+      setRecognitionNotice({ key: "识别完成：{count} 个食物已进入确认区，营养变化正在计算。", vars: { count: recognizedFoods.length } });
     } catch {
-      setRecognitionNotice(withRetryHint("AI 连接暂时没有响应。"));
+      setRecognitionNotice({ text: withRetryHint(t("AI 连接暂时没有响应。"), language) });
     } finally {
       setIsRecognizing(false);
     }
@@ -127,11 +136,11 @@ export function Dashboard({
 
   return (
     <div className="nutrition-experience">
-      <section className="nutrition-console" aria-label="AI 饮食识别与营养进度">
+      <section className="nutrition-console" aria-label={t("AI 饮食识别与营养进度")}>
       <section className="food-vision-hero">
         <img
           src="/images/wellness-hero-v2.png"
-          alt="摆放着三文鱼、牛油果、蔬菜和谷物的均衡餐"
+          alt={t("摆放着三文鱼、牛油果、蔬菜和谷物的均衡餐")}
           className="food-vision-hero__image"
         />
         <div className="food-vision-hero__veil" />
@@ -142,8 +151,8 @@ export function Dashboard({
               {todayLabel}
             </span>
           </div>
-          <h1>记录生活，<br />看懂每一餐。</h1>
-          <p>输入食物、品牌和份量，AI 会识别食材并估算这一餐的营养。</p>
+          <h1>{t("记录生活，")}<br />{t("看懂每一餐。")}</h1>
+          <p>{t("输入食物、品牌和份量，AI 会识别食材并估算这一餐的营养。")}</p>
 
           <div className="food-composer">
             <div className="food-composer__field">
@@ -151,23 +160,23 @@ export function Dashboard({
               <textarea
                 value={mealDescription}
                 onChange={(event) => setMealDescription(event.target.value)}
-                placeholder="比如：一碗牛肉麻辣烫，加宽粉、豆腐皮和青菜…"
-                aria-label="描述你吃的食物"
+                placeholder={t("比如：一碗牛肉麻辣烫，加宽粉、豆腐皮和青菜…")}
+                aria-label={t("描述你吃的食物")}
               />
             </div>
             <button type="button" onClick={recognizeMeal} disabled={isRecognizing} className="food-composer__submit">
               {isRecognizing ? <Loader2 className="animate-spin" size={20} /> : <ScanLine size={20} />}
-              <span>{isRecognizing ? "正在识别" : "分析这一餐"}</span>
+              <span>{isRecognizing ? t("正在识别") : t("分析这一餐")}</span>
               {!isRecognizing ? <ArrowRight size={18} /> : null}
             </button>
           </div>
 
-          <div className="food-examples" aria-label="食物描述示例">
+          <div className="food-examples" aria-label={t("食物描述示例")}>
             {quickExamples.map((example) => (
-              <button key={example} type="button" onClick={() => setMealDescription(example)}>{example}</button>
+              <button key={example} type="button" onClick={() => setMealDescription(example)}>{t(example)}</button>
             ))}
           </div>
-          {recognitionNotice ? <div className="recognition-toast">{recognitionNotice}</div> : null}
+          {recognitionNotice ? <div className="recognition-toast">{"key" in recognitionNotice ? t(recognitionNotice.key, recognitionNotice.vars) : recognitionNotice.text}</div> : null}
         </div>
       </section>
 
@@ -175,43 +184,43 @@ export function Dashboard({
         <div className="section-heading">
           <div>
             <span className="experience-kicker">Today&apos;s journal</span>
-            <h2>今日饮食记录</h2>
+            <h2>{t("今日饮食记录")}</h2>
           </div>
           <div className="meal-timeline__summary">
-            <span><strong>{foods.length}</strong> 今日输入</span>
-            <span><strong>{savedFoods.length}</strong> 已计入</span>
-            {draftFoods.length ? <button type="button" className="text-action text-coral" onClick={onClearDrafts}><Trash2 size={15} /> 清空待确认</button> : null}
+            <span><strong>{foods.length}</strong> {t("今日输入")}</span>
+            <span><strong>{savedFoods.length}</strong> {t("已计入")}</span>
+            {draftFoods.length ? <button type="button" className="text-action text-coral" onClick={onClearDrafts}><Trash2 size={15} /> {t("清空待确认")}</button> : null}
           </div>
         </div>
 
         {!foods.length ? (
           <div className="empty-meal-state">
             <div className="empty-meal-state__icon"><Utensils size={30} /></div>
-            <h3>还没有饮食记录</h3>
-            <p>在页面上方输入食物，识别结果和营养变化会显示在这里。</p>
+            <h3>{t("还没有饮食记录")}</h3>
+            <p>{t("在页面上方输入食物，识别结果和营养变化会显示在这里。")}</p>
           </div>
         ) : (
           <div className="meal-rail horizontal-card-flow">
             {draftFoods.map((food) => (
               <article key={food.id} className="meal-entry meal-entry--draft">
                 <div className="meal-entry__top">
-                  <span>待确认</span>
-                  <button type="button" onClick={() => onRemoveFood(food.id)} aria-label={`删除${food.name}`}><Trash2 size={15} /></button>
+                  <span>{t("待确认")}</span>
+                  <button type="button" onClick={() => onRemoveFood(food.id)} aria-label={`${t("删除")}${getLocalizedFoodField(food, "name", language)}`}><Trash2 size={15} /></button>
                 </div>
-                <h3>{food.name}</h3>
-                <p>{food.brand ?? "AI 估算"} · {food.portionLabel}</p>
+                <h3>{getLocalizedFoodField(food, "name", language)}</h3>
+                <p>{food.brand ? getLocalizedFoodField(food, "brand", language) : t("AI 估算")} · {getLocalizedFoodField(food, "portionLabel", language)}</p>
                 <MealMacroGrid food={food} />
-                {getFoodHealthTip(food) ? <p className="meal-entry__tip"><Sparkles size={14} /> {getFoodHealthTip(food)}</p> : null}
-                <button type="button" className="meal-entry__save" onClick={() => onSaveFood(food.id)}><Check size={16} /> 计入今天</button>
+                {getFoodHealthTip(food) ? <p className="meal-entry__tip"><Sparkles size={14} /> {t(getFoodHealthTip(food) ?? "")}</p> : null}
+                <button type="button" className="meal-entry__save" onClick={() => onSaveFood(food.id)}><Check size={16} /> {t("计入今天")}</button>
               </article>
             ))}
             {savedFoods.map((food) => (
               <article key={food.id} className="meal-entry meal-entry--saved">
-                <div className="meal-entry__top"><span><Check size={13} /> 已记录</span></div>
-                <h3>{food.name}</h3>
-                <p>{food.brand ?? "日常饮食"} · {food.portionLabel}</p>
+                <div className="meal-entry__top"><span><Check size={13} /> {t("已记录")}</span></div>
+                <h3>{getLocalizedFoodField(food, "name", language)}</h3>
+                <p>{food.brand ? getLocalizedFoodField(food, "brand", language) : t("日常饮食")} · {getLocalizedFoodField(food, "portionLabel", language)}</p>
                 <MealMacroGrid food={food} />
-                {getFoodHealthTip(food) ? <p className="meal-entry__tip"><Sparkles size={14} /> {getFoodHealthTip(food)}</p> : null}
+                {getFoodHealthTip(food) ? <p className="meal-entry__tip"><Sparkles size={14} /> {t(getFoodHealthTip(food) ?? "")}</p> : null}
               </article>
             ))}
           </div>
@@ -222,32 +231,32 @@ export function Dashboard({
         <div className="section-heading">
           <div>
             <span className="experience-kicker">Live nutrition dashboard</span>
-            <h2>今日营养进度</h2>
+            <h2>{t("今日营养进度")}</h2>
           </div>
           <button type="button" className="text-action" onClick={() => onNavigate("calendar")}>
-            查看完整进度 <ChevronRight size={17} />
+            {t("查看完整进度")} <ChevronRight size={17} />
           </button>
         </div>
 
         <div className="nutrition-dashboard">
-          <section className="attainment-card" aria-label="今日营养达标率">
+          <section className="attainment-card" aria-label={t("今日营养达标率")}>
             <NutritionOrbit percent={overallProgress} />
             <div className="attainment-card__copy">
               <span className="experience-kicker">Daily attainment</span>
-              <h3>今日营养达标率</h3>
-              <p>{goalLabels[profile.goal]}目标 · BMR {bmr} kcal · {dietStatusLabels[day.dietStatus].label}</p>
+              <h3>{t("今日营养达标率")}</h3>
+              <p>{t(goalLabels[profile.goal])}{t("目标")} · BMR {bmr} kcal · {t(dietStatusLabels[day.dietStatus].label)}</p>
               <div className="attainment-card__facts">
-                <span><strong>{savedFoods.length}</strong> 已计入食物</span>
-                <span><strong>{Math.max(0, Math.round(gaps.calories))}</strong> kcal 余量</span>
+                <span><strong>{savedFoods.length}</strong> {t("已计入食物")}</span>
+                <span><strong>{Math.max(0, Math.round(gaps.calories))}</strong> kcal {t("余量")}</span>
               </div>
-              <div className="mode-switch" aria-label="今日模式">
-                <button type="button" aria-pressed={day.isTrainingDay} onClick={() => onDayChange({ ...day, isTrainingDay: true })} className={day.isTrainingDay ? "is-active" : ""}>训练日</button>
-                <button type="button" aria-pressed={!day.isTrainingDay} onClick={() => onDayChange({ ...day, isTrainingDay: false })} className={!day.isTrainingDay ? "is-active" : ""}>恢复日</button>
+              <div className="mode-switch" aria-label={t("今日模式")}>
+                <button type="button" aria-pressed={day.isTrainingDay} onClick={() => onDayChange({ ...day, isTrainingDay: true })} className={day.isTrainingDay ? "is-active" : ""}>{t("训练日")}</button>
+                <button type="button" aria-pressed={!day.isTrainingDay} onClick={() => onDayChange({ ...day, isTrainingDay: false })} className={!day.isTrainingDay ? "is-active" : ""}>{t("恢复日")}</button>
               </div>
             </div>
           </section>
 
-          <section className="nutrient-lanes" aria-label="选择营养指标">
+          <section className="nutrient-lanes" aria-label={t("选择营养指标")}>
             {macroKeys.map((macro) => (
               <button
                 key={macro}
@@ -260,7 +269,7 @@ export function Dashboard({
                   <i>{completion(animatedTotals[macro], targets[macro])}%</i>
                 </span>
                 <span className="nutrient-lane__copy">
-                  <strong>{macroLabels[macro].label}</strong>
+                  <strong>{t(macroLabels[macro].label)}</strong>
                   <small>{Math.round(animatedTotals[macro])} / {Math.round(targets[macro])}{macroLabels[macro].unit}</small>
                 </span>
                 <span className="nutrient-lane__bar" aria-hidden="true"><i style={{ width: `${Math.min(completion(animatedTotals[macro], targets[macro]), 100)}%`, background: ringTone[macro] }} /></span>
@@ -271,25 +280,25 @@ export function Dashboard({
 
           <section className="nutrient-focus" aria-live="polite">
             <div className="nutrient-focus__heading">
-              <span>当前查看</span>
-              <strong>{macroLabels[selectedMacro].label}</strong>
+              <span>{t("当前查看")}</span>
+              <strong>{t(macroLabels[selectedMacro].label)}</strong>
             </div>
             <div className="nutrient-focus__metric">
               <strong>{Math.round(animatedTotals[selectedMacro])}<small>{macroLabels[selectedMacro].unit}</small></strong>
-              <span>目标 {Math.round(targets[selectedMacro])}{macroLabels[selectedMacro].unit}</span>
+              <span>{t("目标")} {Math.round(targets[selectedMacro])}{macroLabels[selectedMacro].unit}</span>
             </div>
             <div className="nutrient-focus__status">
-              <span>{getMacroStatus(selectedMacroPercent)}</span>
-              <strong>{selectedMacroGap > 0 ? `还差 ${Math.round(selectedMacroGap)}${macroLabels[selectedMacro].unit}` : "今日目标已达到"}</strong>
+              <span>{t(getMacroStatus(selectedMacroPercent))}</span>
+              <strong>{selectedMacroGap > 0 ? t("还差 {count}{unit}", { count: Math.round(selectedMacroGap), unit: macroLabels[selectedMacro].unit }) : t("今日目标已达到")}</strong>
             </div>
             <div className="nutrient-contributors">
-              <span>主要食物贡献</span>
+              <span>{t("主要食物贡献")}</span>
               {selectedContributors.length ? selectedContributors.map((food) => (
                 <div key={food.id}>
-                  <strong>{food.name}</strong>
+                  <strong>{getLocalizedFoodField(food, "name", language)}</strong>
                   <span>{Math.round(food.macros[selectedMacro])}{macroLabels[selectedMacro].unit}</span>
                 </div>
-              )) : <p>计入食物后，这里会显示贡献最大的来源。</p>}
+              )) : <p>{t("计入食物后，这里会显示贡献最大的来源。")}</p>}
             </div>
           </section>
         </div>
@@ -297,17 +306,17 @@ export function Dashboard({
       </section>
 
       <section className="next-bite-feature">
-        <img src="/images/recommendation-rail-v2.png" alt="三种适合作为下一餐的健康食物" />
+        <img src="/images/recommendation-rail-v2.png" alt={t("三种适合作为下一餐的健康食物")} />
         <div className="next-bite-feature__overlay" />
         <div className="next-bite-feature__content">
           <span className="experience-kicker experience-kicker--light"><Flame size={14} /> Smart recommendation</span>
-          <h2>智能推荐下一餐</h2>
-          <p>根据当前营养缺口、训练状态和已有记录生成推荐方案。</p>
+          <h2>{t("智能推荐下一餐")}</h2>
+          <p>{t("根据当前营养缺口、训练状态和已有记录生成推荐方案。")}</p>
           <div className="gap-summary">
-            <span>蛋白还差 <strong>{Math.max(0, Math.round(gaps.protein))}g</strong></span>
-            <span>热量余量 <strong>{Math.max(0, Math.round(gaps.calories))} kcal</strong></span>
+            <span>{t("蛋白还差")} <strong>{Math.max(0, Math.round(gaps.protein))}g</strong></span>
+            <span>{t("热量余量")} <strong>{Math.max(0, Math.round(gaps.calories))} kcal</strong></span>
           </div>
-          <button type="button" onClick={() => onNavigate("recommend")} className="feature-cta">看看下一餐 <ArrowRight size={18} /></button>
+          <button type="button" onClick={() => onNavigate("recommend")} className="feature-cta">{t("看看下一餐")} <ArrowRight size={18} /></button>
         </div>
       </section>
     </div>
@@ -315,9 +324,10 @@ export function Dashboard({
 }
 
 function NutritionOrbit({ percent }: { percent: number }) {
+  const { t } = useI18n();
   return (
     <div className="master-orbit" style={{ background: `conic-gradient(#f2ce67 ${Math.min(percent, 100)}%, rgba(255,255,255,.16) 0)` }}>
-      <div><strong>{percent}%</strong><span>营养达标率</span></div>
+      <div><strong>{percent}%</strong><span>{t("营养达标率")}</span></div>
     </div>
   );
 }
@@ -330,12 +340,13 @@ function getMacroStatus(percent: number) {
 }
 
 function MealMacroGrid({ food }: { food: FoodLogItem }) {
+  const { t, language } = useI18n();
   return (
-    <div className="meal-entry__macros" aria-label={`${food.name}的营养含量`}>
+    <div className="meal-entry__macros" aria-label={`${getLocalizedFoodField(food, "name", language)} ${t("的营养含量")}`}>
       {macroKeys.map((macro) => (
         <span key={macro}>
           <strong>{Math.round(food.macros[macro])}{macroLabels[macro].unit}</strong>
-          {macroLabels[macro].short}
+          {t(macroLabels[macro].short)}
         </span>
       ))}
     </div>
@@ -393,7 +404,7 @@ type FoodAiResult = {
   foods?: FoodLogItem[];
 };
 
-async function requestFoodAi(form: FormData): Promise<{ ok: boolean; retryable: boolean; message?: string; result?: FoodAiResult }> {
+async function requestFoodAi(form: FormData, language: Language): Promise<{ ok: boolean; retryable: boolean; message?: string; result?: FoodAiResult }> {
   try {
     const response = await fetch("/api/food-ai", { method: "POST", body: form });
     const retryable = response.status === 408 || response.status === 429 || response.status >= 500;
@@ -401,20 +412,22 @@ async function requestFoodAi(form: FormData): Promise<{ ok: boolean; retryable: 
     try {
       result = await response.json();
     } catch {
-      return { ok: false, retryable, message: retryable ? "AI 服务响应太慢或暂时不可用。" : "AI 返回内容无法读取。" };
+      return { ok: false, retryable, message: retryable ? pick(language, "AI 服务响应太慢或暂时不可用。", "The AI service is slow or temporarily unavailable.") : pick(language, "AI 返回内容无法读取。", "The AI response could not be read.") };
     }
     if (!response.ok || !result.ok) {
-      return { ok: false, retryable: !result.needsConfig && retryable, message: result.message || "AI 这次没有识别成功。", result };
+      return { ok: false, retryable: !result.needsConfig && retryable, message: result.message || pick(language, "AI 这次没有识别成功。", "The AI couldn't recognize it this time."), result };
     }
     return { ok: true, retryable: false, result };
   } catch {
-    return { ok: false, retryable: true, message: "AI 服务连接失败。" };
+    return { ok: false, retryable: true, message: pick(language, "AI 服务连接失败。", "The AI service connection failed.") };
   }
 }
 
-function withRetryHint(message: string) {
+function withRetryHint(message: string, language: Language) {
   const trimmed = message.trim().replace(/[。,.，\s]+$/, "");
-  if (!trimmed) return "AI 这次没接住（请再试一次）";
-  if (trimmed.endsWith("（请再试一次）")) return trimmed;
-  return `${trimmed}（请再试一次）`;
+  if (!trimmed) return pick(language, "AI 这次没接住（请再试一次）", "The AI missed that. (Please try again)");
+  const suffix = pick(language, "（请再试一次）", " (try again)");
+  if (language === "zh" && trimmed.endsWith("（请再试一次）")) return trimmed;
+  if (language === "en" && trimmed.toLowerCase().endsWith("(try again)")) return trimmed;
+  return `${trimmed}${suffix}`;
 }

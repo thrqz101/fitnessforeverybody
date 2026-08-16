@@ -55,6 +55,18 @@ export type FoodLogItem = {
   imageName?: string;
   loggedAt: string;
   savedToCalendar?: boolean;
+  nameZh?: string;
+  nameEn?: string;
+  brandZh?: string;
+  brandEn?: string;
+  foodTypeZh?: string;
+  foodTypeEn?: string;
+  portionLabelZh?: string;
+  portionLabelEn?: string;
+  warningZh?: string;
+  warningEn?: string;
+  imageNameZh?: string;
+  imageNameEn?: string;
 };
 
 export type Recommendation = {

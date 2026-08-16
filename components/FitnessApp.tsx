@@ -4,10 +4,12 @@ import { Activity, BarChart3, Camera, ChefHat, Settings, Sparkles } from "lucide
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Dashboard } from "@/components/Dashboard";
+import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { ProfilePanel } from "@/components/ProfilePanel";
 import { Recommendations } from "@/components/Recommendations";
 import { TrainingCalendar } from "@/components/TrainingCalendar";
 import { getBeijingDateKey } from "@/lib/dates";
+import { useI18n } from "@/lib/i18n";
 import { calculateRecommendedFiberGrams, calculateRecommendedMacroMultipliers, calculateTargets, defaultDayState, defaultProfile, goalLabels, hasMeaningfulGap, normalizeFiberGrams, normalizeMacroMultipliers, remainingMacros, sumFoods } from "@/lib/nutrition";
 import type { DayRecord, DayState, FoodLogItem, UserProfile } from "@/lib/types";
 
@@ -20,6 +22,7 @@ const foodsKey = "ffe-foods";
 const recordsKey = "ffe-day-records";
 
 export function FitnessApp() {
+  const { t, language } = useI18n();
   const [profile, setProfile] = useState<UserProfile>(defaultProfile);
   const [day, setDay] = useState<DayState>(defaultDayState);
   const [foods, setFoods] = useState<FoodLogItem[]>([]);
@@ -125,8 +128,8 @@ export function FitnessApp() {
   const selectedTargets = useMemo(() => calculateTargets(profile, selectedDay), [profile, selectedDay]);
   const selectedTotals = useMemo(() => sumFoods(selectedFoods), [selectedFoods]);
   const todayLabel = useMemo(
-    () => new Intl.DateTimeFormat("zh-CN", { weekday: "long", month: "long", day: "numeric" }).format(new Date()),
-    []
+    () => new Intl.DateTimeFormat(language === "en" ? "en-US" : "zh-CN", { weekday: "long", month: "long", day: "numeric" }).format(new Date()),
+    [language]
   );
 
   function completeProfile(nextProfile: UserProfile, nextDay: DayState) {
@@ -174,7 +177,7 @@ export function FitnessApp() {
           <div className="brand-mark mx-auto">
             <Activity className="animate-pulse" size={24} aria-hidden="true" />
           </div>
-          <p className="mt-4 text-sm font-black text-ink/65">正在准备你的健康空间</p>
+          <p className="mt-4 text-sm font-black text-ink/65">{t("正在准备你的健康空间")}</p>
         </div>
       </main>
     );
@@ -192,22 +195,26 @@ export function FitnessApp() {
           <div className="wellness-brand__copy"><strong>Fitness for Everybody</strong><span>AI nutrition guide</span></div>
         </div>
 
-        <nav className="wellness-nav" aria-label="主要导航">
-          <NavButton active={view === "dashboard"} icon={<Camera size={19} aria-hidden="true" />} label="今天" hint="识别与记录" onClick={() => setView("dashboard")} />
-          <NavButton active={view === "calendar"} icon={<BarChart3 size={19} aria-hidden="true" />} label="进度" hint="趋势与日历" onClick={() => setView("calendar")} />
-          <NavButton active={view === "recommend"} icon={<ChefHat size={19} aria-hidden="true" />} label="灵感" hint="聪明吃什么" onClick={() => setView("recommend")} />
-          <NavButton active={false} icon={<Settings size={19} aria-hidden="true" />} label="设置" hint="调整目标" onClick={openSettings} />
+        <nav className="wellness-nav" aria-label={t("主要导航")}>
+          <NavButton active={view === "dashboard"} icon={<Camera size={19} aria-hidden="true" />} label={t("今天")} hint={t("识别与记录")} onClick={() => setView("dashboard")} />
+          <NavButton active={view === "calendar"} icon={<BarChart3 size={19} aria-hidden="true" />} label={t("进度")} hint={t("趋势与日历")} onClick={() => setView("calendar")} />
+          <NavButton active={view === "recommend"} icon={<ChefHat size={19} aria-hidden="true" />} label={t("灵感")} hint={t("聪明吃什么")} onClick={() => setView("recommend")} />
+          <NavButton active={false} icon={<Settings size={19} aria-hidden="true" />} label={t("设置")} hint={t("调整目标")} onClick={openSettings} />
         </nav>
 
         <div className="sidebar-insight">
-          <span><Sparkles size={14} /> 今日节奏</span>
-          <strong>{day.isTrainingDay ? "训练日" : "恢复日"}</strong>
-          <p>{goalLabels[profile.goal]} · 还可摄入 {Math.max(0, Math.round(gaps.calories))} kcal</p>
+          <span><Sparkles size={14} /> {t("今日节奏")}</span>
+          <strong>{day.isTrainingDay ? t("训练日") : t("恢复日")}</strong>
+          <p>{t(goalLabels[profile.goal])} · {t("还可摄入 {count} kcal", { count: Math.max(0, Math.round(gaps.calories)) })}</p>
         </div>
 
         <div className="sidebar-profile">
           <div>N</div>
-          <span><strong>你的健康计划</strong><small>{profile.trainingStyle}</small></span>
+          <span><strong>{t("你的健康计划")}</strong><small>{t(profile.trainingStyle)}</small></span>
+        </div>
+
+        <div className="px-4 pb-4">
+          <LanguageSwitch />
         </div>
       </aside>
 
@@ -217,7 +224,8 @@ export function FitnessApp() {
             <div className="wellness-brand__mark"><BrandLogo /></div>
             <div className="wellness-brand__copy"><strong>Fitness for Everybody</strong><span>AI nutrition guide</span></div>
           </div>
-          <button type="button" onClick={openSettings} aria-label="打开设置"><Settings size={20} /></button>
+          <LanguageSwitch compact />
+          <button type="button" onClick={openSettings} aria-label={t("打开设置")}><Settings size={20} /></button>
         </header>
 
         <div key={view} className="view-stage">
@@ -273,9 +281,9 @@ export function FitnessApp() {
           <div className="fixed inset-0 z-50 grid place-items-center bg-ink/45 px-4 backdrop-blur-sm">
             <section className="wellness-card w-full max-w-lg p-5 sm:p-6">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-moss">Snack Check</p>
-              <h2 className="mt-2 text-2xl font-black text-ink">今天距离营养达标还差一点噢</h2>
+              <h2 className="mt-2 text-2xl font-black text-ink">{t("今天距离营养达标还差一点噢")}</h2>
               <p className="mt-3 text-sm leading-6 text-ink/62">
-                要不要加个餐补一补？我可以推荐水果、零食、健身补剂或者夜宵，就看你有多饿了～
+                {t("要不要加个餐补一补？我可以推荐水果、零食、健身补剂或者夜宵，就看你有多饿了～")}
               </p>
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
                 <button
@@ -286,7 +294,7 @@ export function FitnessApp() {
                   }}
                   className="inline-flex min-h-11 items-center justify-center rounded-[18px] bg-moss px-3 text-sm font-black text-white"
                 >
-                  看加餐推荐
+                  {t("看加餐推荐")}
                 </button>
                 <button
                   type="button"
@@ -296,14 +304,14 @@ export function FitnessApp() {
                   }}
                   className="inline-flex min-h-11 items-center justify-center rounded-[18px] bg-coral px-3 text-sm font-black text-white"
                 >
-                  再识别一餐
+                  {t("再识别一餐")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setTopUpPromptOpen(false)}
                   className="inline-flex min-h-11 items-center justify-center rounded-[18px] border border-ink/12 bg-paper px-3 text-sm font-black text-ink"
                 >
-                  今天先这样
+                  {t("今天先这样")}
                 </button>
               </div>
             </section>

@@ -1,4 +1,7 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
+import { useI18n } from "@/lib/i18n";
 import { completion, macroLabels } from "@/lib/nutrition";
 import type { MacroKey } from "@/lib/types";
 
@@ -18,6 +21,7 @@ const toneByMacro: Record<MacroKey, string> = {
 };
 
 export function MacroProgress({ macro, value, target, compact = false }: MacroProgressProps) {
+  const { t } = useI18n();
   const percent = completion(value, target);
   const animated = useAnimatedProgress(value, percent);
   const width = Math.min(animated.percent, 125);
@@ -30,7 +34,7 @@ export function MacroProgress({ macro, value, target, compact = false }: MacroPr
         <div className="min-w-0">
           <p className="flex items-center gap-2 text-sm font-black text-ink">
             <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${toneByMacro[macro]}`} />
-            {meta.label}
+            {t(meta.label)}
           </p>
           {!compact ? (
             <p className="text-xs text-ink/55">

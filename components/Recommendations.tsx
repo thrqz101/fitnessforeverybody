@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { catalogItemToRecommendation, foodCatalog, type FoodCatalogItem } from "@/lib/food-catalog";
 import { addMacros, completion, dietStatusLabels, macroKeys, macroLabels, recommendationCoverage, scaleMacros } from "@/lib/nutrition";
 import { recommendationToFood, recommendations } from "@/lib/mock-data";
+import { useI18n } from "@/lib/i18n";
 import type { DayState, FoodLogItem, MacroTotals, Recommendation, UserProfile } from "@/lib/types";
 
 const AI_RECOMMENDATION_COUNT = 30;
@@ -76,6 +77,7 @@ type RecommendationsProps = {
 };
 
 export function Recommendations({ profile, day, gaps, targets, totals, foods, onChoose, onRecognizeRequested }: RecommendationsProps) {
+  const { t, language } = useI18n();
   const [aiRecommendations, setAiRecommendations] = useState<Recommendation[]>([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiNotice, setAiNotice] = useState("");
@@ -178,13 +180,14 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
 
   async function requestAiRecommendations() {
     setIsAiLoading(true);
-    setAiNotice(`AI 正在从系统食物库里帮你补 ${AI_RECOMMENDATION_COUNT} 种候选...`);
+    setAiNotice(t("AI 正在从系统食物库里帮你补 {count} 种候选...", { count: AI_RECOMMENDATION_COUNT }));
 
     try {
       const response = await fetch("/api/recommend-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          lang: language,
           profile,
           day,
           gaps,
@@ -199,15 +202,15 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
       const result = await response.json();
 
       if (!response.ok || !result.ok) {
-        setAiNotice(result.message || "AI 推荐暂时没有生成成功，先用本地推荐池。");
+        setAiNotice(result.message || t("AI 推荐暂时没有生成成功，先用本地推荐池。"));
         return;
       }
 
       const next = (result.recommendations ?? []) as Recommendation[];
       setAiRecommendations((current) => uniqueRecommendations([...next, ...current]).slice(0, AI_RECOMMENDATION_COUNT));
-      setAiNotice(next.length ? `AI 新增了 ${next.length} 个候选，已经混进推荐池。` : "AI 暂时没有给出新候选，先用本地推荐池。");
+      setAiNotice(next.length ? t("AI 新增了 {count} 个候选，已经混进推荐池。", { count: next.length }) : t("AI 暂时没有给出新候选，先用本地推荐池。"));
     } catch {
-      setAiNotice("AI 推荐请求失败了，先用本地推荐池。");
+      setAiNotice(t("AI 推荐请求失败了，先用本地推荐池。"));
     } finally {
       setIsAiLoading(false);
     }
@@ -216,23 +219,23 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
   return (
     <div className="recommend-experience">
       <section className="recommend-hero">
-        <img src="/images/recommendation-rail-v2.png" alt="为今天推荐的三种均衡餐食" />
+        <img src="/images/recommendation-rail-v2.png" alt={t("为今天推荐的三种均衡餐食")} />
         <div className="recommend-hero__veil" />
         <div className="recommend-hero__content">
           <span className="experience-kicker experience-kicker--light"><Sparkles size={14} /> For your next bite</span>
-          <h1><span>下一餐，</span><span>不靠猜。</span></h1>
-          <p>{shouldLightOnly ? "当前营养完成度较高，优先推荐水果、酸奶或轻量加餐。" : "根据已有饮食记录、训练状态和营养缺口生成推荐。"}</p>
+          <h1><span>{t("下一餐，")}</span>{language === "en" ? " " : ""}<span>{t("不靠猜。")}</span></h1>
+          <p>{shouldLightOnly ? t("当前营养完成度较高，优先推荐水果、酸奶或轻量加餐。") : t("根据已有饮食记录、训练状态和营养缺口生成推荐。")}</p>
           <div className="recommend-hero__metrics">
-            <div><span>今日完成</span><strong>{currentPercentages.average}%</strong></div>
-            <div><span>蛋白缺口</span><strong>{Math.max(0, Math.round(gaps.protein))}g</strong></div>
-            <div><span>已记录</span><strong>{mainMealCount} 餐</strong></div>
+            <div><span>{t("今日完成")}</span><strong>{currentPercentages.average}%</strong></div>
+            <div><span>{t("蛋白缺口")}</span><strong>{Math.max(0, Math.round(gaps.protein))}g</strong></div>
+            <div><span>{t("已记录")}</span><strong>{mainMealCount} {t("餐")}</strong></div>
           </div>
           <div className="recommend-hero__actions">
-            <button type="button" onClick={startShuffle}><Dice5 size={18} /> 帮我选一个</button>
+            <button type="button" onClick={startShuffle}><Dice5 size={18} /> {t("帮我选一个")}</button>
             <button type="button" onClick={requestAiRecommendations} disabled={isAiLoading}>
-              {isAiLoading ? <Loader2 className="animate-spin" size={17} /> : <Sparkles size={17} />} AI 生成更多
+              {isAiLoading ? <Loader2 className="animate-spin" size={17} /> : <Sparkles size={17} />} {t("AI 生成更多")}
             </button>
-            <button type="button" onClick={onRecognizeRequested}>重新识别食物</button>
+            <button type="button" onClick={onRecognizeRequested}>{t("重新识别食物")}</button>
           </div>
           {aiNotice ? <p className="recommend-hero__notice">{aiNotice}</p> : null}
         </div>
@@ -240,52 +243,52 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
 
       {picked ? (
         <section className="picked-meal">
-          <div><span><Flame size={15} /> 此刻最合适</span><h2>{picked.title}</h2><p>{picked.brand} · {dietStatusLabels[day.dietStatus].label}</p></div>
+          <div><span><Flame size={15} /> {t("此刻最合适")}</span><h2>{localizeRecommendationTitle(picked.title, t)}</h2><p>{t(picked.brand)} · {t(dietStatusLabels[day.dietStatus].label)}</p></div>
           <div className="picked-meal__macros">
-            <span><strong>{Math.round(picked.macros.protein)}g</strong> 蛋白</span>
+            <span><strong>{Math.round(picked.macros.protein)}g</strong> {t("蛋白")}</span>
             <span><strong>{Math.round(picked.macros.calories)}</strong> kcal</span>
           </div>
-          <button type="button" onClick={() => onChoose(recommendationToFood(picked))}><Check size={17} /> 就吃这个</button>
+          <button type="button" onClick={() => onChoose(recommendationToFood(picked))}><Check size={17} /> {t("就吃这个")}</button>
         </section>
       ) : null}
 
       <section className="recommendation-library">
         <div className="section-heading">
-          <div><span className="experience-kicker">Curated for you</span><h2>推荐方案</h2></div>
-          <p>{filteredRanked.length} 个匹配方案 · {shouldLightOnly ? "轻补模式" : "平衡正餐模式"}</p>
+          <div><span className="experience-kicker">Curated for you</span><h2>{t("推荐方案")}</h2></div>
+          <p>{t("{count} 个匹配方案", { count: filteredRanked.length })} · {shouldLightOnly ? t("轻补模式") : t("平衡正餐模式")}</p>
         </div>
 
         <div className="recommend-filters">
-          <FilterGroup label="餐饮地域">
+          <FilterGroup label={t("餐饮地域")}>
             {regionFilters.map((filter) => (
               <FilterButton
                 key={filter.value}
                 active={regionFilter === filter.value}
                 onClick={() => setRegionFilter(filter.value)}
               >
-                {filter.label}
+                {t(filter.label)}
               </FilterButton>
             ))}
           </FilterGroup>
-          <FilterGroup label="餐别">
+          <FilterGroup label={t("餐别")}>
             {mealSlotFilters.map((filter) => (
               <FilterButton
                 key={filter.value}
                 active={mealSlotFilter === filter.value}
                 onClick={() => setMealSlotFilter(filter.value)}
               >
-                {filter.label}
+                {t(filter.label)}
               </FilterButton>
             ))}
           </FilterGroup>
-          <FilterGroup label="品类">
+          <FilterGroup label={t("品类")}>
             {availableStyleFilters.map((filter) => (
               <FilterButton
                 key={filter.value}
                 active={styleFilter === filter.value}
                 onClick={() => setStyleFilter(filter.value)}
               >
-                {filter.label}
+                {t(filter.label)}
               </FilterButton>
             ))}
           </FilterGroup>
@@ -306,24 +309,24 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
         </div>
         {!filteredRanked.length ? (
           <div className="empty-recommendations">
-            <p className="text-lg font-black text-ink">这个筛选组合暂时没有候选</p>
-            <p className="mt-2 text-sm font-semibold leading-6 text-ink/55">可以放宽一个筛选项，或者点 AI 再推荐 30 种。</p>
+            <p className="text-lg font-black text-ink">{t("这个筛选组合暂时没有候选")}</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-ink/55">{t("可以放宽一个筛选项，或者点 AI 再推荐 30 种。")}</p>
           </div>
         ) : null}
       </section>
 
       {shuffleOpen && shuffleCandidate ? createPortal(
         <div className="shuffle-overlay">
-          <section className={`shuffle-flashcard ${shuffleDone ? "is-complete" : "is-shuffling"}`} role="dialog" aria-modal="true" aria-label="随机推荐结果">
+          <section className={`shuffle-flashcard ${shuffleDone ? "is-complete" : "is-shuffling"}`} role="dialog" aria-modal="true" aria-label={t("随机推荐结果")}>
             <div className="shuffle-flashcard__header">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-coral">Random Pick</p>
-                <h2 className="mt-1 text-2xl font-black text-ink">随机推荐</h2>
+                <h2 className="mt-1 text-2xl font-black text-ink">{t("随机推荐")}</h2>
               </div>
               <button
                 type="button"
                 onClick={() => setShuffleOpen(false)}
-                aria-label="关闭随机推荐"
+                aria-label={t("关闭随机推荐")}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-[18px] border border-ink/12 bg-paper text-ink"
               >
                 <X size={18} aria-hidden="true" />
@@ -331,28 +334,28 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
             </div>
             <div className="shuffle-flashcard__stage">
               <p className="text-xs font-black uppercase tracking-[0.16em] text-moss">
-                {shuffleDone ? "摇到了" : "正在为你翻牌"}
+                {shuffleDone ? t("摇到了") : t("正在为你翻牌")}
               </p>
-              <h3 className="mt-3 text-3xl font-black leading-tight text-ink">{shuffleCandidate.title}</h3>
-              <p className="mt-2 text-sm font-bold text-ink/58">{shuffleCandidate.brand}</p>
+              <h3 className="mt-3 text-3xl font-black leading-tight text-ink">{localizeRecommendationTitle(shuffleCandidate.title, t)}</h3>
+              <p className="mt-2 text-sm font-bold text-ink/58">{t(shuffleCandidate.brand)}</p>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 {shuffleCandidate.items.map((item) => (
                   <span key={item} className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-ink/62">
-                    {item}
+                    {t(item)}
                   </span>
                 ))}
               </div>
               <p className="mt-4 text-sm font-semibold text-ink/62">
-                蛋白 {Math.round(shuffleCandidate.macros.protein)}g · 碳水 {Math.round(shuffleCandidate.macros.carbs)}g · 脂肪 {Math.round(shuffleCandidate.macros.fat)}g
+                {t("蛋白")} {Math.round(shuffleCandidate.macros.protein)}g · {t("碳水")} {Math.round(shuffleCandidate.macros.carbs)}g · {t("脂肪")} {Math.round(shuffleCandidate.macros.fat)}g
               </p>
               {shuffleDone ? (
                 <div className="mt-4 rounded-[18px] border border-white bg-white/80 p-3">
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-coral">吃完预计达成</p>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-coral">{t("吃完预计达成")}</p>
                   <p className="mt-1 text-3xl font-black text-ink">{shuffleCompletion.average}%</p>
                   <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
                     {macroKeys.map((macro) => (
                       <div key={macro} className="rounded-[18px] bg-paper px-2 py-2">
-                        <p className="text-[11px] font-bold text-ink/45">{macroLabels[macro].short}</p>
+                        <p className="text-[11px] font-bold text-ink/45">{t(macroLabels[macro].short)}</p>
                         <p className="mt-1 text-sm font-black text-moss">{shuffleCompletion[macro]}%</p>
                       </div>
                     ))}
@@ -371,7 +374,7 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-moss px-4 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Check size={17} aria-hidden="true" />
-                就吃摇到的
+                {t("就吃摇到的")}
               </button>
               <button
                 type="button"
@@ -379,7 +382,7 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] border border-ink/12 bg-paper px-4 text-sm font-black text-ink"
               >
                 <Dice5 size={17} aria-hidden="true" />
-                再摇一次
+                {t("再摇一次")}
               </button>
             </div>
           </section>
@@ -397,6 +400,18 @@ function FilterGroup({ label, children }: { label: string; children: ReactNode }
       <div className="flex flex-wrap gap-2">{children}</div>
     </div>
   );
+}
+
+function localizeRecommendationTitle(title: string, translate: (text: string) => string) {
+  const composed = title.match(/^(.+?)（(.+)）$/);
+  if (!composed) return translate(title);
+  return `${translate(composed[1])} (${translate(composed[2])})`;
+}
+
+function localizeRecommendationNote(note: string, translate: (text: string) => string) {
+  const composed = note.match(/^(.+?)（(知识库估算，可按实际份量微调。)）$/);
+  if (!composed) return translate(note);
+  return `${translate(composed[1])} (${translate(composed[2])})`;
 }
 
 function FilterButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
@@ -431,6 +446,7 @@ function RecommendationCard({
   onPick: () => void;
   onChoose: () => void;
 }) {
+  const { t } = useI18n();
   const afterCompletion = getCompletionSnapshot(addMacros(totals, recommendation.macros), targets);
   const suggestedMeal = inferSuggestedMeal(recommendation);
 
@@ -439,11 +455,11 @@ function RecommendationCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold uppercase tracking-[0.16em] text-moss">
-            <span>{categoryLabels[recommendation.category]}</span>
-            {suggestedMeal ? <span>{suggestedMeal}</span> : null}
+            <span>{t(categoryLabels[recommendation.category])}</span>
+            {suggestedMeal ? <span>{t(suggestedMeal)}</span> : null}
           </p>
-          <h3 className="mt-1 truncate text-xl font-black leading-tight text-ink">{recommendation.brand}</h3>
-          <p className="mt-1 text-sm font-semibold leading-5 text-ink/58">{recommendation.title}</p>
+          <h3 className="mt-1 truncate text-xl font-black leading-tight text-ink">{t(recommendation.brand)}</h3>
+          <p className="mt-1 text-sm font-semibold leading-5 text-ink/58">{t(recommendation.title)}</p>
         </div>
         <Utensils className="shrink-0 text-ink/35" size={22} aria-hidden="true" />
       </div>
@@ -451,7 +467,7 @@ function RecommendationCard({
       <div className="mt-4 flex flex-wrap gap-2">
         {recommendation.items.map((item) => (
           <span key={item} className="rounded-full border border-ink/10 bg-white px-2.5 py-1 text-xs font-bold text-ink/68">
-            {item}
+            {t(item)}
           </span>
         ))}
       </div>
@@ -462,7 +478,7 @@ function RecommendationCard({
           const over = percent > 115;
           return (
             <div key={macro} className="rounded-[18px] bg-white p-3">
-              <p className="text-xs text-ink/48">{macroLabels[macro].label}</p>
+              <p className="text-xs text-ink/48">{t(macroLabels[macro].label)}</p>
               <p className="mt-1 text-base font-black text-ink">
                 {Math.round(recommendation.macros[macro])}{macroLabels[macro].unit}
               </p>
@@ -472,11 +488,11 @@ function RecommendationCard({
         })}
       </div>
 
-      <p className="mt-4 text-sm leading-6 text-ink/62">{recommendation.note}</p>
-      {recommendation.caution ? <p className="mt-2 text-sm font-semibold text-coral">{recommendation.caution}</p> : null}
+      <p className="mt-4 text-sm leading-6 text-ink/62">{localizeRecommendationNote(recommendation.note, t)}</p>
+      {recommendation.caution ? <p className="mt-2 text-sm font-semibold text-coral">{t(recommendation.caution)}</p> : null}
       <div className="mt-3 rounded-[18px] border border-moss/12 bg-mint/45 px-3 py-2">
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-moss">吃完预计达成</p>
-        <p className="mt-1 text-sm font-black text-ink">平均 {afterCompletion.average}% · 热量 {afterCompletion.calories}% · 蛋白 {afterCompletion.protein}%</p>
+        <p className="text-xs font-black uppercase tracking-[0.14em] text-moss">{t("吃完预计达成")}</p>
+        <p className="mt-1 text-sm font-black text-ink">{t("平均")} {afterCompletion.average}% · {t("热量")} {afterCompletion.calories}% · {t("蛋白")} {afterCompletion.protein}%</p>
       </div>
 
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -485,7 +501,7 @@ function RecommendationCard({
           onClick={onPick}
           className="inline-flex h-10 items-center justify-center rounded-[18px] border border-ink/12 bg-white px-3 text-sm font-black text-ink"
         >
-          先看这个
+          {t("先看这个")}
         </button>
         <button
           type="button"
@@ -493,7 +509,7 @@ function RecommendationCard({
           className="inline-flex h-10 items-center justify-center gap-2 rounded-[18px] bg-moss px-3 text-sm font-black text-white"
         >
           <Check size={16} aria-hidden="true" />
-          选择这个
+          {t("选择这个")}
         </button>
       </div>
     </article>

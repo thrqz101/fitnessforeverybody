@@ -1,5 +1,6 @@
 import type { DayState, MacroTotals, Recommendation, UserProfile } from "@/lib/types";
 import { getFoodCatalogPromptSummary } from "@/lib/food-catalog";
+import { normalizeLanguage, normalizeMacroTotals, pick, type Language } from "@/lib/i18n-utils";
 
 export const runtime = "nodejs";
 
@@ -21,10 +22,22 @@ type RecommendPayload = {
   message?: string;
 };
 
+function outputLanguageInstruction(language: Language) {
+  return language === "en"
+    ? "All user-facing text fields (message, title, brand, items, note, caution) must be written in English. Keep macro JSON keys as protein, carbs, fat, calories, fiber."
+    : "所有面向用户的字段 message、title、brand、items、note、caution 必须使用中文；macros 的 JSON key 始终使用 protein、carbs、fat、calories、fiber。";
+}
+
+function localized(language: Language, zh: string, en: string) {
+  return pick(language, zh, en);
+}
+
 const categories: Recommendation["category"][] = ["meal", "topup", "protein", "snack"];
 const MAX_AI_RECOMMENDATIONS = 30;
 
 export async function POST(request: Request) {
+  let language: Language = "zh";
+
   try {
     const provider = getProviderConfig();
 
@@ -36,14 +49,17 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+    language = normalizeLanguage(body?.lang);
     const desiredCount = getDesiredCount(body?.desiredCount);
-    const prompt = buildRecommendationPrompt(body);
+    const prompt = buildRecommendationPrompt(body, language);
     const { response, errorText } = await requestChatCompletion(
       provider,
       buildChatCompletionBody(provider, 3600, [
         {
           role: "system",
-          content: "你是中国市场的健身饮食推荐助手，只返回可被 JSON.parse 解析的严格 JSON 对象。同一输入保持稳定推荐逻辑。"
+          content: language === "en"
+            ? "You are a fitness nutrition recommendation assistant for global users. Return only strict JSON that can be parsed by JSON.parse. Keep recommendation logic stable for the same input."
+            : "你是中国市场的健身饮食推荐助手，只返回可被 JSON.parse 解析的严格 JSON 对象。同一输入保持稳定推荐逻辑。"
         },
         {
           role: "user",
@@ -54,24 +70,24 @@ export async function POST(request: Request) {
 
     if (!response?.ok) {
       return Response.json(
-        { ok: false, message: `AI 推荐暂时失败：${response?.status ?? 502} ${errorText.slice(0, 160)}` },
+        { ok: false, message: localized(language, `AI 推荐暂时失败：${response?.status ?? 502} ${errorText.slice(0, 160)}`, `AI recommendations failed temporarily: ${response?.status ?? 502} ${errorText.slice(0, 160)}`) },
         { status: response?.status ?? 502 }
       );
     }
 
     const json = await response.json();
     const parsed = parseRecommendPayload(extractAssistantContent(json));
-    const recommendations = normalizeRecommendations(parsed.recommendations ?? [], Boolean(body?.shouldLightOnly), desiredCount);
+    const recommendations = normalizeRecommendations(parsed.recommendations ?? [], Boolean(body?.shouldLightOnly), desiredCount, language);
 
     return Response.json({
       ok: true,
       provider: "ai",
-      message: parsed.message || "AI 已补充推荐。",
+      message: parsed.message || localized(language, "AI 已补充推荐。", "AI added new recommendations."),
       recommendations
     });
   } catch (error) {
     return Response.json(
-      { ok: false, message: error instanceof Error ? error.message : "AI 推荐遇到未知错误。" },
+      { ok: false, message: error instanceof Error ? error.message : localized(language, "AI 推荐遇到未知错误。", "AI recommendations hit an unknown error.") },
       { status: 500 }
     );
   }
@@ -87,7 +103,7 @@ function buildRecommendationPrompt(body: {
   shouldLightOnly?: boolean;
   desiredCount?: number;
   existingOptions?: string[];
-}) {
+}, language: Language) {
   const profile = body.profile;
   const day = body.day;
   const gaps = body.gaps;
@@ -100,8 +116,35 @@ function buildRecommendationPrompt(body: {
   });
   const desiredCount = getDesiredCount(body.desiredCount);
 
+  if (language === "en") {
+    return [
+      `Based on the user's remaining nutrition gap today, generate ${desiredCount} food recommendations that are easy to buy or order.`,
+      outputLanguageInstruction(language),
+      "All user-facing fields must be written in English, including message, title, brand, items, note, and caution. The catalog below may contain Chinese names; translate any reused item into natural English.",
+      "Cover a wide range of brands and categories: breakfast, sandwiches, salads, fast food, convenience stores, coffee/tea, fruit, snacks, yogurt, protein powder, and light meals.",
+      body.shouldLightOnly
+        ? "Important: the user has already met over 80% of today's average nutrition target, so only recommend light top-ups such as fruit, snacks, yogurt, protein powder, convenience-store snacks, or light drinks. Do not recommend full hot-pot dinners, barbecue, large rice meals, or heavy late-night dinners."
+        : "Important: the user has not yet reached 80% of today's average nutrition target, so prioritize a full meal or fourth meal. Breakfast, lunch, dinner, hot pot, barbecue, stir-fried dishes, noodles, and fast food are all allowed.",
+      "Make each recommendation actionable. Do not write generic advice like \"eat a healthy meal\". For restaurant dishes, specify the concrete food or combination.",
+      "Do not duplicate recommendations. Different recommendations must use different food combinations.",
+      "For weight-loss or fat-loss users, avoid sugary drinks, hot pot, and barbecue unless clearly justified; if recommending a milk tea, specify less sugar, fewer toppings, and no cream cap.",
+      "Return strict JSON only, with no Markdown. Format:",
+      '{"message":"one English sentence","recommendations":[{"id":"ai-rec-xxx","title":"English title","brand":"Brand","category":"meal|topup|protein|snack","items":["specific food 1","specific food 2"],"macros":{"protein":20,"carbs":30,"fat":10,"calories":300,"fiber":5},"note":"why it fits","caution":"optional reminder"}]}',
+      `User goal: ${profile?.goal ?? "unknown"}, training structure: ${profile?.trainingStyle ?? "unknown"}, eating pattern: ${profile?.eatingPattern ?? "unknown"}`,
+      `Today's training: ${day?.isTrainingDay ? "training day" : "rest day"}, training body part: ${day?.trainingPart ?? "none"}, diet status: ${day?.dietStatus ?? "normal"}`,
+      `Main meals logged: ${body.mainMealCount ?? 0}`,
+      `Today's target: ${stringifyForPrompt(targets)}`,
+      `Already eaten today: ${stringifyForPrompt(totals)}`,
+      `Remaining gap today: ${stringifyForPrompt(gaps)}`,
+      "Prefer selecting, combining, or lightly rewriting items from the food knowledge base below. If the knowledge base has no match, use a same-category industry average. Knowledge base format: brand | title | type | category | food items | protein P / carbs C / fat F / calories K / fiber | notes.",
+      catalogSummary,
+      `Existing local candidates to avoid if possible: ${(body.existingOptions ?? []).join("; ")}`
+    ].join("\n");
+  }
+
   return [
     `请基于用户今天的营养缺口，生成 ${desiredCount} 个中国用户容易买到/点到的饮食推荐。`,
+    outputLanguageInstruction(language),
     "必须覆盖更多品牌和品类，例如早餐店、包子馒头、胡辣汤、面条馄饨、火锅、烤肉、炒菜、快餐、便利店、奶茶咖啡、轻食、水果、零食、蛋白粉等。",
     body.shouldLightOnly
       ? "重要：用户今日整体营养平均达成已经超过 80%，本次只能推荐水果、零食、酸奶、蛋白粉、便利店轻加餐、轻饮品等；不要推荐火锅正餐、烧烤、大份米饭、夜宵正餐。"
@@ -331,7 +374,7 @@ function parseRecommendPayload(content: unknown): RecommendPayload {
   }
 }
 
-function normalizeRecommendations(items: Partial<Recommendation>[], shouldLightOnly: boolean, desiredCount: number): Recommendation[] {
+function normalizeRecommendations(items: Partial<Recommendation>[], shouldLightOnly: boolean, desiredCount: number, language: Language): Recommendation[] {
   const seen = new Set<string>();
 
   return items
@@ -345,12 +388,12 @@ function normalizeRecommendations(items: Partial<Recommendation>[], shouldLightO
 
       return {
         id: item.id?.startsWith("ai-rec-") ? item.id : `ai-rec-${Date.now()}-${index}`,
-        title: item.title?.trim() || "AI 推荐",
-        brand: item.brand?.trim() || "AI 推荐",
+        title: item.title?.trim() || localized(language, "AI 推荐", "AI recommendation"),
+        brand: item.brand?.trim() || localized(language, "AI 推荐", "AI recommendation"),
         category,
-        items: Array.isArray(item.items) && item.items.length ? item.items.slice(0, 8).map(String) : ["按描述估算组合"],
+        items: Array.isArray(item.items) && item.items.length ? item.items.slice(0, 8).map(String) : [localized(language, "按描述估算组合", "Estimated from your description")],
         macros,
-        note: item.note?.trim() || "根据今日缺口生成的推荐，可以按实际份量微调。",
+        note: item.note?.trim() || localized(language, "根据今日缺口生成的推荐，可以按实际份量微调。", "Generated from today's nutrient gaps. Adjust portions to match what you actually eat."),
         caution: item.caution?.trim()
       };
     })
@@ -372,18 +415,7 @@ function getDesiredCount(value: unknown) {
 }
 
 function normalizeMacros(macros?: Partial<MacroTotals>): MacroTotals {
-  return {
-    protein: safeNumber(macros?.protein),
-    carbs: safeNumber(macros?.carbs),
-    fat: safeNumber(macros?.fat),
-    calories: safeNumber(macros?.calories),
-    fiber: safeNumber(macros?.fiber)
-  };
-}
-
-function safeNumber(value: unknown) {
-  const numberValue = Number(value ?? 0);
-  return Number.isFinite(numberValue) ? Math.max(0, Math.round(numberValue)) : 0;
+  return normalizeMacroTotals(macros as Record<string, unknown> | null | undefined);
 }
 
 function stringifyForPrompt(value: unknown) {
