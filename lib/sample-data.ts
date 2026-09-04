@@ -434,22 +434,6 @@ export const recommendations: Recommendation[] = [
   }
 ];
 
-export function generateMockFoods(files: File[]): FoodLogItem[] {
-  const source = files.length ? files : [new File([""], "sample-meal.jpg")];
-
-  return source.flatMap((file, index) => {
-    const templates = pickScenario(file.name, index);
-    return templates.map((template) => ({
-      ...template,
-      id: id("food"),
-      macros: scaleMacros(template.baseMacros, template.portionScale),
-      source: "mock-vision" as const,
-      imageName: file.name,
-      loggedAt: now()
-    }));
-  });
-}
-
 export function estimateManualFoods(description: string): FoodLogItem[] {
   const normalized = description.toLowerCase();
   const foods: FoodTemplate[] = [];
@@ -542,34 +526,6 @@ export function estimateManualFoods(description: string): FoodLogItem[] {
     imageName: "手动描述",
     loggedAt: now()
   }));
-}
-
-function pickScenario(fileName: string, index: number) {
-  const normalized = fileName.toLowerCase();
-
-  if (normalized.includes("mcd") || normalized.includes("burger") || normalized.includes("hamburger") || normalized.includes("combo")) {
-    return [foodTemplates[0], foodTemplates[3], foodTemplates[4]];
-  }
-
-  if (normalized.includes("weijia") || normalized.includes("wei")) {
-    return [foodTemplates[1], foodTemplates[3]];
-  }
-
-  if (normalized.includes("noodle") || normalized.includes("面")) {
-    return [foodTemplates[6]];
-  }
-
-  if (normalized.includes("milk") || normalized.includes("tea") || normalized.includes("奶茶")) {
-    return [foodTemplates[8]];
-  }
-
-  if (normalized.includes("711") || normalized.includes("convenience")) {
-    return [foodTemplates[7]];
-  }
-
-  const scenarioSize = index % 3 === 0 ? 3 : index % 3 === 1 ? 2 : 1;
-  const start = (index * 2) % foodTemplates.length;
-  return Array.from({ length: scenarioSize }, (_, itemIndex) => foodTemplates[(start + itemIndex) % foodTemplates.length]);
 }
 
 function makeManualTemplate({

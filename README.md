@@ -21,7 +21,7 @@
 
 - **Next.js App Router + Server Components**：`app/api` 作为 HTTP 边界，`lib` 承载领域逻辑、agent、工具、换算与 i18n，`components` 只做 UI，`data` 存放数据与本地库。
 - **服务端隔离**：LLM 客户端、工具、本地库加载仅被 API 路由（`runtime = "nodejs"`）引用，`node:fs` 等 Node 能力不会进入客户端包。
-- **后端**：EdgeSpark（Cloudflare D1 + Drizzle + 内置 auth）负责用户登录、本地库与用户录入的持久化，脚手架在 `server/`。
+- **后端**：一个独立的 EdgeSpark 后端模块（Cloudflare D1 + Drizzle + auth），位于 `server/`，单独维护，不进入 Next 构建。
 - **类型集中**：`lib/types.ts` 统一 `MacroTotals`、`FoodLogItem`、`UserProfile`、`Recommendation` 等，跨层复用。
 
 ---
@@ -47,7 +47,7 @@ fitnessforeverybody/
 │  ├─ tools/                  # 三个 agent 工具
 │  │  ├─ food-nutrition.ts    # query_local_food_db（本地每100g库）
 │  │  ├─ web-search.ts        # exa_web_search（Exa 联网）
-│  │  └─ llm-fallback.ts      # ask_llm_fallback（LLM 估算）
+│  │  └─ llm-estimate.ts      # ask_llm_estimate（LLM 估算）
 │  ├─ nutrition-db.ts         # 本地库加载 + 模糊匹配 + 克数换算
 │  ├─ food-catalog.ts         # 整份套餐知识库（召回 / 推荐）
 │  ├─ brand-catalog.ts        # 品牌 / 门店匹配 + 搜索词构造
@@ -70,7 +70,7 @@ fitnessforeverybody/
 | --- | --- |
 | `app/layout.tsx` | 根布局，挂载语言 Provider |
 | `app/page.tsx` | 渲染主应用 `FitnessApp` |
-| `app/api/food-ai/route.ts` | `POST` 食物识别（文本 / 图片），`GET` 健康探测 |
+| `app/api/food-ai/route.ts` | `POST` 食物识别（文本），`GET` 健康探测 |
 | `app/api/recommend-ai/route.ts` | `POST` 饮食推荐 |
 | `app/api/nutrition-agent/route.ts` | `POST` function-calling 营养 agent |
 | `components/FitnessApp.tsx` | 页面组装（Onboarding → Dashboard / FoodCapture / Recommendations / Calendar） |
@@ -85,7 +85,7 @@ fitnessforeverybody/
 Onboarding 收集身高、体重、性别、年龄、BMR、目标、训练结构、饮食结构、体脂率。`lib/nutrition.ts` 据此计算当日宏量目标，并随训练日 / 饮食状态（高碳、低碳、高蛋白、放纵日等）动态调整。
 
 ### 2. 食物记录 → 营养估算
-`FoodCapture` 把文字描述（或图片）POST 到 `/api/food-ai`：
+`FoodCapture` 把文字描述 POST 到 `/api/food-ai`：
 - 路由 LLM 先分类：`local_exact`（本地组合完整覆盖）/ `brand_search`（品牌 + 产品 → 联网）/ `ai_estimate`（自然语言 → LLM）/ `not_food`。
 - `local_exact` 命中时用 `lib/food-catalog.ts` 整份套餐数值；品牌命中用 Tavily 搜官方营养来源；都不能确定时用 LLM 按中国餐饮常见份量估算。
 - 服务端做严格本地候选复核与合并，避免重复或漏算。
@@ -98,9 +98,9 @@ Onboarding 收集身高、体重、性别、年龄、BMR、目标、训练结构
 这是本产品的 **AI Agent 核心**。模型依据用户输入，通过 tool calling 自主选择调用哪个工具，每次调用都回填结果并继续推理，直到给出最终回答：
 - `query_local_food_db` → 查本地「每 100g → 营养素」库。
 - `exa_web_search` → 联网检索品牌 / 门店 / 包装食品的官方营养来源。
-- `ask_llm_fallback` → 用 LLM 估算罕见菜、自制菜、组合餐等场景。
+- `ask_llm_estimate` → 用 LLM 估算罕见菜、自制菜、组合餐等场景。
 
-`run-agent.ts` 循环最多 5 轮：发 `tools` 定义 → 若返回 `tool_calls` 就执行并把结果回填为 `role:"tool"` 消息 → 直到模型给出最终回答。返回值带 `provenance`（`local_db` / `exa_search` / `llm_fallback`）与 `dbMeta`（版本 / 条目数），前端据此显示“已查询本地食品库（共 N 条）”。
+`run-agent.ts` 循环最多 5 轮：发 `tools` 定义 → 若返回 `tool_calls` 就执行并把结果回填为 `role:"tool"` 消息 → 直到模型给出最终回答。返回值带 `provenance`（`local_db` / `exa_search` / `llm_estimate`）与 `dbMeta`（版本 / 条目数），前端据此显示“已查询本地食品库（共 N 条）”。
 
 ---
 
@@ -112,12 +112,12 @@ Onboarding 收集身高、体重、性别、年龄、BMR、目标、训练结构
 - 每个工具结果带 `source`，agent 汇总进 `provenance` 与 `dbMeta`，可证明“agent 查过本地库”，但数据文件不进 GitHub。
 - 匹配采用 CJK 友好算法：归一化 + exact / alias / 字符重叠评分（中文无空格，按字符重叠）。
 
-### EdgeSpark 后端（登录 / 本地库 / 用户录入）
-- 后端基于 EdgeSpark（Cloudflare D1 + Drizzle + 内置 auth），脚手架在 `server/`：
+### EdgeSpark 后端模块（登录 / 本地库 / 用户录入）
+- 独立的 EdgeSpark 后端（Cloudflare D1 + Drizzle + Hono + auth）在 `server/`，与 Next 应用分开维护：
   - `server/src/defs/db_schema.ts`：`users` / `foods` / `user_entries` 三张表；`foods` 存每 100g 营养素并带 `embedding` 向量列。
-  - `server/src/routes/api.ts`（Hono）：`/api/auth/me`（登录态）、`/api/foods`（本地库检索）、`/api/entries`（用户录入写进 `user_entries`，用 `auth.user.id` 归属用户）、联表查询。
+  - `server/src/routes/api.ts`（Hono）：`/api/auth/me`（当前用户）、`/api/foods`（本地库检索）、`/api/entries`（用户录入写进 `user_entries`）、联表查询。
   - `server/src/lib/search.ts`：D1 关键词检索第一层 + `embedding` 向量余弦召回（混合检索）。
-- 前端提供快速的本地体验；用户与每日记录的持久化由该 EdgeSpark 后端承载；`server/` 独立于 Next 应用（`tsconfig` 已排除，不影响 Next 构建）。
+- `server/` 是独立 package（`server/package.json`），需在目录内安装依赖后运行；`tsconfig` 已排除，不影响 Next 构建。
 
 ### 提供方抽象 + function calling
 - `lib/agent/llm.ts` 统一 provider（`ccswitch` / `deepseek` / `minimax` / `dashscope`）由环境变量驱动，兼容 OpenAI 与 Anthropic 请求格式。

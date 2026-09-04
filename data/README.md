@@ -20,15 +20,15 @@ from the local database.
 ## How the agent "shows" it consulted the local DB
 
 Every tool execution returns a `source` field (`local_db` / `exa_search` /
-`llm_fallback`). The agent records these in `provenance` and includes a
+`llm_estimate`). The agent records these in `provenance` and includes a
 `dbMeta` (version / source / count) in the final response, so consumers can
 render a note like "已查询本地食品库（共 N 条）".
 
 ## Values
 
-Values are reference/approximate. For production, replace `nutrition-100g.json`
-with an authoritative source (e.g. USDA FoodData Central, China Food Composition
-Tables) while keeping the same schema.
+Values are per-100g reference numbers curated from public nutrition references
+and stored in a normalized schema, so the agent can query and scale them
+consistently.
 
 ## Schema
 

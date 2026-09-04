@@ -50,7 +50,7 @@ export type FoodLogItem = {
   macros: MacroTotals;
   meal: MealType;
   warning?: string;
-  source: "mock-vision" | "ai-vision" | "ai-text" | "manual" | "recommendation";
+  source: "ai-vision" | "ai-text" | "manual" | "recommendation";
   recognitionMode?: "brand-product" | "industry-average";
   imageName?: string;
   loggedAt: string;

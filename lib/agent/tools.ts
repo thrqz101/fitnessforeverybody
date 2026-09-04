@@ -1,7 +1,7 @@
 import type { AgentTool } from "@/lib/agent/llm";
 import { queryLocalFoodDb } from "@/lib/tools/food-nutrition";
 import { exaWebSearch } from "@/lib/tools/web-search";
-import { askLlmFallback } from "@/lib/tools/llm-fallback";
+import { askLlmEstimate } from "@/lib/tools/llm-estimate";
 
 type Executor = (args: Record<string, unknown>) => Promise<unknown>;
 
@@ -17,7 +17,7 @@ export const localFoodDbTool: AgentTool = {
   function: {
     name: "query_local_food_db",
     description:
-      "查询本地「每100克营养素」食品数据库，返回某食物每100g的蛋白质/碳水/脂肪/热量/纤维。优先用它获取可靠数值；可选 grams 换算成实际份量。",
+      "查询本地「每100克营养素」食品数据库，返回某食物每100g的蛋白质/碳水/脂肪/热量/纤维；可选 grams 换算成实际份量。",
     parameters: {
       type: "object",
       properties: {
@@ -35,7 +35,7 @@ export const exaSearchTool: AgentTool = {
   function: {
     name: "exa_web_search",
     description:
-      "用 Exa 联网搜索最新/品牌/门店/包装食品营养信息。本地库没有、或用户提到具体品牌或门店时调用。",
+      "用 Exa 联网检索品牌/门店/包装食品等官方或公开营养信息，覆盖本地库口径之外的场景。",
     parameters: {
       type: "object",
       properties: {
@@ -48,12 +48,12 @@ export const exaSearchTool: AgentTool = {
   }
 };
 
-export const llmFallbackTool: AgentTool = {
+export const llmEstimateTool: AgentTool = {
   type: "function",
   function: {
-    name: "ask_llm_fallback",
+    name: "ask_llm_estimate",
     description:
-      "本地库与联网搜索都不足时，用提示工程 LLM 估算某食物/某餐的宏量营养素，返回近似每份数值。",
+      "对罕见菜、自制菜、组合餐等场景，用 LLM 估算某食物或一餐的宏量营养素，返回近似每份数值。",
     parameters: {
       type: "object",
       properties: {
@@ -85,10 +85,10 @@ register({
   label: "Exa 联网搜索"
 });
 register({
-  def: llmFallbackTool,
-  execute: (a) => askLlmFallback(a as { description: string; portion?: string }),
-  source: "llm_fallback",
-  label: "LLM 兜底估算"
+  def: llmEstimateTool,
+  execute: (a) => askLlmEstimate(a as { description: string; portion?: string }),
+  source: "llm_estimate",
+  label: "LLM 估算"
 });
 
 export function getToolDefinitions(): AgentTool[] {

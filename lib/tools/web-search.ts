@@ -16,7 +16,7 @@ export async function exaWebSearch(args: ExaWebSearchArgs) {
     return {
       ok: false,
       source: "exa_search",
-      message: "未配置 EXA_API_KEY，无法联网搜索。请改用本地库或 LLM 兜底。"
+      message: "未配置 EXA_API_KEY，无法联网搜索。请改用本地库或 LLM 估算。"
     };
   }
 

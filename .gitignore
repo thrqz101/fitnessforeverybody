@@ -13,3 +13,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 *.tsbuildinfo
+
+output/
+HANDOFF.md
+.vscode/

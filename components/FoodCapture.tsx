@@ -1,7 +1,7 @@
 "use client";
 
-import { Camera, Check, FolderOpen, ImagePlus, Images, Keyboard, Plus, RotateCcw, Shuffle, Trash2, Upload, X } from "lucide-react";
-import { ChangeEvent, DragEvent, useEffect, useMemo, useRef, useState } from "react";
+import { Check, Keyboard, Plus, RotateCcw, Shuffle, Trash2, Upload } from "lucide-react";
+import { useMemo, useState } from "react";
 import { foodCatalog, type FoodCatalogItem } from "@/lib/food-catalog";
 import { useI18n } from "@/lib/i18n";
 import { pick, type Language } from "@/lib/i18n-utils";
@@ -17,17 +17,11 @@ type FoodCaptureProps = {
 
 export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
   const { t, language } = useI18n();
-  const [files, setFiles] = useState<File[]>([]);
   const [stagedFoods, setStagedFoods] = useState<FoodLogItem[]>([]);
   const [notice, setNotice] = useState("");
-  const [isDragging, setIsDragging] = useState(false);
   const [manualDescription, setManualDescription] = useState("");
   const [exampleSeed, setExampleSeed] = useState(0);
   const [isRecognizing, setIsRecognizing] = useState(false);
-  const [cameraOpen, setCameraOpen] = useState(false);
-  const [cameraError, setCameraError] = useState("");
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const cameraStreamRef = useRef<MediaStream | null>(null);
   const manualExamples = useMemo(() => buildManualExamples(exampleSeed, language), [exampleSeed, language]);
   const stagedTotals = useMemo(
     () =>
@@ -44,58 +38,12 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
     [stagedFoods]
   );
 
-  useEffect(() => {
-    if (cameraOpen && videoRef.current && cameraStreamRef.current) {
-      videoRef.current.srcObject = cameraStreamRef.current;
-    }
-  }, [cameraOpen]);
-
-  useEffect(() => () => {
-    cameraStreamRef.current?.getTracks().forEach((track) => track.stop());
-    cameraStreamRef.current = null;
-  }, []);
-
-  function handleFiles(event: ChangeEvent<HTMLInputElement>) {
-    showPhotoUnavailable();
-    event.target.value = "";
-  }
-
-  function applyFiles(picked: File[], mode: "replace" | "append" = "replace") {
-    if (!picked.length) return;
-    setFiles((current) => (mode === "append" ? [...picked, ...current] : picked));
-    setStagedFoods([]);
-    setNotice("");
-  }
-
-  function handleDrop(event: DragEvent<HTMLDivElement>) {
-    event.preventDefault();
-    setIsDragging(false);
-    showPhotoUnavailable();
-  }
-
-  function handleDragOver(event: DragEvent<HTMLDivElement>) {
-    event.preventDefault();
-    setIsDragging(false);
-  }
-
-  function showPhotoUnavailable() {
-    setNotice(t("拍照功能测试中，暂不可用。先用文字描述告诉我吃了什么，我来帮你估算营养素。"));
-  }
-
   async function runAiRecognition() {
     if (manualDescription.trim().length < 6) {
       setNotice(t("先写一下你吃了什么喔，比如品牌、套餐、配菜、饮料和大概份量。"));
       return;
     }
-
-    const unsupportedFiles = files.filter((file) => !isSupportedFile(file));
-    if (unsupportedFiles.length) {
-      setNotice(t("这些文件暂时不支持：{files}", { files: unsupportedFiles.map((file) => file.name).join(", ") }));
-      return;
-    }
-
     const form = new FormData();
-    files.forEach((file) => form.append("files", file));
     form.append("description", manualDescription.trim());
     form.append("lang", language);
     setIsRecognizing(true);
@@ -169,186 +117,37 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
     setStagedFoods((current) => current.map((food) => (food.id === foodId ? { ...food, ...patch } : food)));
   }
 
-  function removeFile(fileToRemove: File) {
-    setFiles((current) => current.filter((file) => file !== fileToRemove));
-    setStagedFoods([]);
-    setNotice("");
-  }
-
   function removeStagedFood(foodId: string) {
     setStagedFoods((current) => current.filter((food) => food.id !== foodId));
   }
 
   function addToLog() {
     onAddFoods(stagedFoods);
-    setFiles([]);
     setStagedFoods([]);
     setManualDescription("");
   }
 
-  async function openCamera() {
-    setCameraError("");
-    showPhotoUnavailable();
-  }
-
-  function stopCamera(updateState = true) {
-    cameraStreamRef.current?.getTracks().forEach((track) => track.stop());
-    cameraStreamRef.current = null;
-    if (updateState) setCameraOpen(false);
-  }
-
-  function capturePhoto() {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const width = video.videoWidth || 1280;
-    const height = video.videoHeight || 720;
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    canvas.getContext("2d")?.drawImage(video, 0, 0, width, height);
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        setCameraError(t("这张没有拍下来，再试一次。"));
-        return;
-      }
-      const file = new File([blob], `camera-meal-${Date.now()}.jpg`, { type: "image/jpeg" });
-      applyFiles([file], "append");
-      setNotice(t("拍好了。再在右侧写一下这餐内容，我会帮你估算。"));
-      stopCamera();
-    }, "image/jpeg", 0.92);
-  }
-
   return (
     <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
-      <section className="rounded-[18px] border border-ink/10 bg-white/88 p-5 shadow-soft sm:p-6">
+            <section className="rounded-[18px] border border-ink/10 bg-white/88 p-5 shadow-soft sm:p-6">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-moss">AI Food Log</p>
-        <h1 className="mt-1 text-3xl font-black text-ink">{t("多图拍照记录")}</h1>
-        <div className="mt-4 rounded-[18px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
-          {t("拍照功能测试中，暂不可用。当前先用文字描述，写“品牌 + 套餐 + 配料 + 份量”，AI 会按文字帮你估算。")}
+        <h1 className="mt-1 text-3xl font-black text-ink">{t("记录今天的饮食")}</h1>
+        <div className="mt-5 space-y-3 text-sm leading-6 text-ink/60">
+          <p>{t("用一句话描述你今天吃了什么，AI 会拆成多个食品条目，逐项估算营养素，并按份量汇总。")}</p>
+          <p className="font-bold text-ink">{t("写清楚品牌、套餐、主食、配菜、饮料和大概份量，估算会更准。")}</p>
         </div>
-
-        <div
-          className={`mt-6 flex min-h-60 flex-col items-center justify-center rounded-[18px] border border-dashed p-6 text-center transition ${
-            isDragging ? "border-coral bg-coral/10" : "border-moss/35 bg-mint/45"
-          }`}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={() => setIsDragging(false)}
-        >
-          <ImagePlus className="text-moss" size={36} aria-hidden="true" />
-          <span className="mt-3 text-base font-black text-ink">{t("图片导入测试中，暂不可用")}</span>
-          <span className="mt-1 max-w-sm text-sm leading-6 text-ink/55">
-            {t("当前版本先用文字识别。你可以在右侧参考示例，直接写今天吃了什么、点了几份、有没有主食和饮料。")}
-          </span>
-          <div className="mt-5 grid w-full max-w-xl gap-2 sm:grid-cols-2">
-            <button
-              type="button"
-              onClick={showPhotoUnavailable}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-white px-3 text-sm font-black text-ink/45 shadow-soft"
-            >
-              <FolderOpen size={16} aria-hidden="true" />
-              {t("从文件选择 · 测试中")}
-            </button>
-            <button
-              type="button"
-              onClick={showPhotoUnavailable}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-white px-3 text-sm font-black text-ink/45 shadow-soft"
-            >
-              <Images size={16} aria-hidden="true" />
-              {t("从相册选择 · 测试中")}
-            </button>
-            <button
-              type="button"
-              onClick={showPhotoUnavailable}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-moss/45 px-3 text-sm font-black text-white shadow-soft"
-            >
-              <Camera size={16} aria-hidden="true" />
-              {t("手机拍照上传 · 测试中")}
-            </button>
-            <button
-              type="button"
-              onClick={openCamera}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[18px] bg-coral/55 px-3 text-sm font-black text-white shadow-soft"
-            >
-              <Camera size={16} aria-hidden="true" />
-              {t("打开电脑摄像头 · 测试中")}
-            </button>
-          </div>
-        </div>
-
-        {cameraError ? (
-          <div className="mt-4 rounded-[18px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
-            {cameraError}
-          </div>
-        ) : null}
-
-        {cameraOpen ? (
-          <div className="mt-4 rounded-[18px] border border-ink/10 bg-ink p-3 text-white">
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <p className="text-sm font-black">{t("现场拍一张")}</p>
-              <button
-                type="button"
-                onClick={() => stopCamera()}
-                aria-label={t("关闭摄像头")}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-[18px] bg-white/10 text-white"
-              >
-                <X size={16} aria-hidden="true" />
-              </button>
-            </div>
-            <video ref={videoRef} autoPlay playsInline muted className="aspect-video w-full rounded-[18px] bg-black object-cover" />
-            <button
-              type="button"
-              onClick={capturePhoto}
-              className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[18px] bg-citrus px-4 text-sm font-black text-ink"
-            >
-              <Camera size={17} aria-hidden="true" />
-              {t("拍下这餐")}
-            </button>
-          </div>
-        ) : null}
 
         {notice ? (
-          <div className="mt-4 rounded-[18px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
+          <div className="mt-5 rounded-[18px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
             {notice}
           </div>
         ) : null}
 
-        {files.length ? (
-          <div className="mt-4 grid gap-2">
-            {files.map((file) => (
-              <div key={`${file.name}-${file.size}`} className="flex items-center justify-between rounded-[18px] border border-ink/10 bg-paper px-3 py-2 text-sm">
-                <span className="truncate font-semibold text-ink">{file.name}</span>
-                <div className="flex shrink-0 items-center gap-2">
-                  <span className="text-xs text-ink/48">{Math.max(1, Math.round(file.size / 1024))} KB</span>
-                  <button
-                    type="button"
-                    onClick={() => removeFile(file)}
-                    aria-label={`${t("删除")} ${file.name}`}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-[18px] text-ink/50 hover:bg-white hover:text-coral"
-                  >
-                    <Trash2 size={15} aria-hidden="true" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : null}
-
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <button
-            type="button"
-            onClick={runAiRecognition}
-            disabled={isRecognizing}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[18px] bg-coral px-4 text-sm font-black text-white shadow-soft disabled:cursor-not-allowed disabled:opacity-65"
-          >
-            <Upload size={18} aria-hidden="true" />
-            {isRecognizing ? t("AI 正在解析") : t("根据描述估算")}
-          </button>
+        <div className="mt-5">
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-[18px] border border-ink/12 bg-white px-4 text-sm font-black text-ink"
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-[18px] border border-ink/12 bg-white px-4 text-sm font-black text-ink"
           >
             <RotateCcw size={18} aria-hidden="true" />
             {t("返回")}
@@ -600,11 +399,6 @@ function withRetryHint(message: string, language: Language) {
   if (language === "zh" && trimmed.endsWith("（请再试一次）")) return trimmed;
   if (language === "en" && trimmed.toLowerCase().endsWith("(try again)")) return trimmed;
   return `${trimmed}${suffix}`;
-}
-
-function isSupportedFile(file: File) {
-  const name = file.name.toLowerCase();
-  return /\.(jpe?g|png|webp|heic|heif|pdf)$/i.test(name) || file.type.startsWith("image/") || file.type === "application/pdf";
 }
 
 const exampleBuckets: Array<{ name: string; match: (item: FoodCatalogItem) => boolean }> = [
