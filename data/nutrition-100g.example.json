@@ -1,0 +1,64 @@
+{
+  "version": "1.0.0",
+  "source": "curated_reference",
+  "unit": "per_100g",
+  "note": "已提交的极小示例库，用于仓库开箱可跑。真实与完整数据放在 data/nutrition-100g.json（已 gitignore），不会进入 GitHub。数值为参考近似值，生产环境请用权威来源（如 USDA FoodData Central / 中国食物成分表）替换。",
+  "foods": [
+    {
+      "name": "米饭（熟）",
+      "nameEn": "Cooked white rice",
+      "category": "staple",
+      "aliases": ["米饭", "白米饭", "大米饭", "熟米饭", "rice", "white rice"],
+      "per100g": { "protein": 2.7, "carbs": 28.2, "fat": 0.3, "calories": 130, "fiber": 0.4 }
+    },
+    {
+      "name": "鸡胸肉（熟）",
+      "nameEn": "Cooked chicken breast",
+      "category": "protein",
+      "aliases": ["鸡胸肉", "鸡胸", "chicken breast", "chicken"],
+      "per100g": { "protein": 31, "carbs": 0, "fat": 3.7, "calories": 165, "fiber": 0 }
+    },
+    {
+      "name": "鸡蛋（熟）",
+      "nameEn": "Cooked egg",
+      "category": "protein",
+      "aliases": ["鸡蛋", "蛋", "egg", "boiled egg"],
+      "per100g": { "protein": 13, "carbs": 1.1, "fat": 11, "calories": 155, "fiber": 0 }
+    },
+    {
+      "name": "全脂牛奶",
+      "nameEn": "Whole milk",
+      "category": "dairy",
+      "aliases": ["牛奶", "全脂奶", "milk", "whole milk"],
+      "per100g": { "protein": 3.3, "carbs": 4.8, "fat": 3.3, "calories": 61, "fiber": 0 }
+    },
+    {
+      "name": "香蕉",
+      "nameEn": "Banana",
+      "category": "fruit",
+      "aliases": ["香蕉", "banana"],
+      "per100g": { "protein": 1.1, "carbs": 23, "fat": 0.3, "calories": 89, "fiber": 2.6 }
+    },
+    {
+      "name": "西兰花",
+      "nameEn": "Broccoli",
+      "category": "vegetable",
+      "aliases": ["西兰花", "broccoli"],
+      "per100g": { "protein": 2.8, "carbs": 7, "fat": 0.4, "calories": 34, "fiber": 2.6 }
+    },
+    {
+      "name": "无糖可乐",
+      "nameEn": "Diet cola",
+      "category": "beverage",
+      "aliases": ["无糖可乐", "零度可乐", "diet coke", "zero cola"],
+      "per100g": { "protein": 0, "carbs": 0, "fat": 0, "calories": 0, "fiber": 0 }
+    },
+    {
+      "name": "中薯条",
+      "nameEn": "Medium fries",
+      "category": "fast_food",
+      "aliases": ["薯条", "中薯", "fries", "french fries"],
+      "per100g": { "protein": 2.8, "carbs": 30, "fat": 13, "calories": 250, "fiber": 2.5 }
+    }
+  ]
+}

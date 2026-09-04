@@ -3,6 +3,11 @@ node_modules
 out
 .vercel
 .env*.local
+.env
+.env.*
+!.env.example
+# Real per-100g food nutrition DB stays local; only the example is committed.
+data/nutrition-100g.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
