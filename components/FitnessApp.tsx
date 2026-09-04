@@ -392,11 +392,11 @@ function normalizeFoods(foods: Partial<FoodLogItem>[]): FoodLogItem[] {
     macros: food.macros ?? { protein: 0, carbs: 0, fat: 0, calories: 0, fiber: 0 },
     meal: food.meal ?? "snack",
     warning: food.warning,
-    source: ["ai-vision", "ai-text", "manual", "recommendation"].includes(food.source ?? "")
+    source: ["ai-text", "manual", "recommendation"].includes(food.source ?? "")
       ? (food.source as FoodLogItem["source"])
       : "manual",
     recognitionMode: food.recognitionMode,
-    imageName: food.imageName,
+    sourceLabel: food.sourceLabel,
     loggedAt: food.loggedAt ?? new Date().toISOString(),
     savedToCalendar: food.savedToCalendar ?? true
   }));

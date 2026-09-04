@@ -217,7 +217,7 @@ export function translateToZh(text: string, vars?: Record<string, string | numbe
   return translated;
 }
 
-type FoodTextField = "name" | "brand" | "foodType" | "portionLabel" | "warning" | "imageName";
+type FoodTextField = "name" | "brand" | "foodType" | "portionLabel" | "warning" | "sourceLabel";
 
 export function getLocalizedFoodField(food: FoodLogItem, field: FoodTextField, language: Language) {
   const record = food as unknown as Record<string, string | undefined>;

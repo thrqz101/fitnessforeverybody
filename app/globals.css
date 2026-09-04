@@ -393,16 +393,16 @@ textarea:focus-visible {
 .text-action { display: inline-flex; align-items: center; gap: 5px; padding: 0; border: 0; color: #3f7354; font-size: 13px; font-weight: 900; background: transparent; }
 
 /* AI food recognition hero */
-.food-vision-hero { position: relative; min-height: min(720px, calc(100vh - 48px)); overflow: hidden; border-radius: 34px; background: #24392b; box-shadow: 0 30px 80px rgba(31,51,39,.2); }
-.nutrition-console .food-vision-hero { grid-area: capture; min-height: 540px; box-shadow: 0 24px 62px rgba(31,51,39,.17); }
-.nutrition-console .food-vision-hero__content { max-width: 690px; padding: clamp(34px, 4.5vw, 66px); }
-.nutrition-console .food-vision-hero__content h1 { font-size: clamp(47px, 5vw, 72px); }
-.food-vision-hero__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s cubic-bezier(.2,.8,.2,1); }
-.food-vision-hero:hover .food-vision-hero__image { transform: scale(1.025); }
-.food-vision-hero__veil { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(20,36,26,.92) 0%, rgba(20,36,26,.68) 43%, rgba(20,36,26,.12) 76%), linear-gradient(0deg, rgba(14,29,19,.34), transparent 55%); }
-.food-vision-hero__content { position: relative; z-index: 2; display: flex; min-height: inherit; max-width: 800px; flex-direction: column; justify-content: center; padding: clamp(35px, 6vw, 88px); }
-.food-vision-hero__content h1 { margin: 22px 0 14px; color: white; font-size: clamp(48px, 6.3vw, 92px); line-height: .96; letter-spacing: -.065em; }
-.food-vision-hero__content > p { max-width: 590px; margin: 0; color: rgba(255,255,255,.7); font-size: clamp(15px, 1.35vw, 19px); line-height: 1.75; }
+.food-hero { position: relative; min-height: min(720px, calc(100vh - 48px)); overflow: hidden; border-radius: 34px; background: #24392b; box-shadow: 0 30px 80px rgba(31,51,39,.2); }
+.nutrition-console .food-hero { grid-area: capture; min-height: 540px; box-shadow: 0 24px 62px rgba(31,51,39,.17); }
+.nutrition-console .food-hero__content { max-width: 690px; padding: clamp(34px, 4.5vw, 66px); }
+.nutrition-console .food-hero__content h1 { font-size: clamp(47px, 5vw, 72px); }
+.food-hero__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s cubic-bezier(.2,.8,.2,1); }
+.food-hero:hover .food-hero__image { transform: scale(1.025); }
+.food-hero__veil { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(20,36,26,.92) 0%, rgba(20,36,26,.68) 43%, rgba(20,36,26,.12) 76%), linear-gradient(0deg, rgba(14,29,19,.34), transparent 55%); }
+.food-hero__content { position: relative; z-index: 2; display: flex; min-height: inherit; max-width: 800px; flex-direction: column; justify-content: center; padding: clamp(35px, 6vw, 88px); }
+.food-hero__content h1 { margin: 22px 0 14px; color: white; font-size: clamp(48px, 6.3vw, 92px); line-height: .96; letter-spacing: -.065em; }
+.food-hero__content > p { max-width: 590px; margin: 0; color: rgba(255,255,255,.7); font-size: clamp(15px, 1.35vw, 19px); line-height: 1.75; }
 .food-composer { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 32px; padding: 9px; border: 1px solid rgba(255,255,255,.16); border-radius: 23px; background: rgba(255,255,255,.94); box-shadow: 0 20px 50px rgba(7,22,12,.28); }
 .food-composer__field { display: flex; min-width: 0; align-items: center; gap: 10px; padding: 2px 8px; color: #3f7354; }
 .food-composer textarea { width: 100%; min-height: 48px; max-height: 110px; resize: none; border: 0; outline: 0; color: #1d2a22; font-size: 14px; line-height: 1.5; background: transparent; }
@@ -699,16 +699,16 @@ textarea:focus-visible {
   .mobile-wellness-header { display: flex; align-items: center; justify-content: space-between; padding: 6px 4px 14px; }
   .mobile-wellness-header .wellness-brand span { color: rgba(24,36,44,.45); }
   .mobile-wellness-header > button { display: grid; width: 40px; height: 40px; place-items: center; border: 0; border-radius: 14px; color: #284b35; background: #dff1db; }
-  .food-vision-hero { min-height: 680px; border-radius: 26px; }
-  .food-vision-hero__image { object-position: 62% center; }
-  .food-vision-hero__veil { background: linear-gradient(0deg, rgba(18,34,23,.96), rgba(18,34,23,.35) 75%, rgba(18,34,23,.05)); }
-  .food-vision-hero__content { justify-content: flex-end; padding: 30px 22px; }
-  .food-vision-hero__content h1 { font-size: 49px; }
+  .food-hero { min-height: 680px; border-radius: 26px; }
+  .food-hero__image { object-position: 62% center; }
+  .food-hero__veil { background: linear-gradient(0deg, rgba(18,34,23,.96), rgba(18,34,23,.35) 75%, rgba(18,34,23,.05)); }
+  .food-hero__content { justify-content: flex-end; padding: 30px 22px; }
+  .food-hero__content h1 { font-size: 49px; }
   .food-composer { grid-template-columns: 1fr; }
   .food-composer__submit { min-height: 48px; }
   .section-heading { align-items: flex-start; flex-direction: column; }
   .nutrition-console { gap: 12px; }
-  .nutrition-console .food-vision-hero { min-height: 640px; }
+  .nutrition-console .food-hero { min-height: 640px; }
   .nutrition-console .meal-timeline, .nutrition-console .nutrition-story { padding: 20px; border-radius: 26px; }
   .nutrition-dashboard { grid-template-columns: 1fr; }
   .attainment-card { align-items: flex-start; flex-direction: column; }
@@ -813,18 +813,18 @@ html[data-language="en"] .next-bite-feature h2 {
   overflow-wrap: break-word;
 }
 
-html[data-language="en"] .food-vision-hero__content h1 {
+html[data-language="en"] .food-hero__content h1 {
   font-size: clamp(40px, 5vw, 72px);
   line-height: 0.98;
 }
 
 /* Chinese-only desktop size parity with the English layout. Font sizes stay unchanged. */
 @media (min-width: 1440px) {
-  html[data-language="zh"] .nutrition-console .food-vision-hero {
+  html[data-language="zh"] .nutrition-console .food-hero {
     min-height: 653px;
   }
 
-  html[data-language="zh"] .food-vision-hero__content h1 {
+  html[data-language="zh"] .food-hero__content h1 {
     line-height: 1.47;
   }
 

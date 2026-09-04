@@ -137,16 +137,16 @@ export function Dashboard({
   return (
     <div className="nutrition-experience">
       <section className="nutrition-console" aria-label={t("AI 饮食识别与营养进度")}>
-      <section className="food-vision-hero">
+      <section className="food-hero">
         <img
           src="/images/wellness-hero-v2.png"
           alt={t("摆放着三文鱼、牛油果、蔬菜和谷物的均衡餐")}
-          className="food-vision-hero__image"
+          className="food-hero__image"
         />
-        <div className="food-vision-hero__veil" />
-        <div className="food-vision-hero__content">
+        <div className="food-hero__veil" />
+        <div className="food-hero__content">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="experience-kicker experience-kicker--light"><Sparkles size={14} /> AI Food Vision</span>
+            <span className="experience-kicker experience-kicker--light"><Sparkles size={14} /> AI Nutrition</span>
             <span className="rounded-full border border-white/35 bg-white/15 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
               {todayLabel}
             </span>

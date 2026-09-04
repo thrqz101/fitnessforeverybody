@@ -50,9 +50,9 @@ export type FoodLogItem = {
   macros: MacroTotals;
   meal: MealType;
   warning?: string;
-  source: "ai-vision" | "ai-text" | "manual" | "recommendation";
+  source: "ai-text" | "manual" | "recommendation";
   recognitionMode?: "brand-product" | "industry-average";
-  imageName?: string;
+  sourceLabel?: string;
   loggedAt: string;
   savedToCalendar?: boolean;
   nameZh?: string;
@@ -65,8 +65,8 @@ export type FoodLogItem = {
   portionLabelEn?: string;
   warningZh?: string;
   warningEn?: string;
-  imageNameZh?: string;
-  imageNameEn?: string;
+  sourceLabelZh?: string;
+  sourceLabelEn?: string;
 };
 
 export type Recommendation = {

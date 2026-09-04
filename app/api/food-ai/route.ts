@@ -30,8 +30,8 @@ type AiFood = {
   portionLabelEn?: string;
   warningZh?: string;
   warningEn?: string;
-  imageNameZh?: string;
-  imageNameEn?: string;
+  sourceLabelZh?: string;
+  sourceLabelEn?: string;
 };
 
 type AiPayload = {
@@ -74,7 +74,6 @@ type ProviderConfig = {
   apiKey: string;
   baseUrl: string;
   model: string;
-  supportsImages: boolean;
   apiStyle: "anthropic" | "openai";
 };
 
@@ -94,7 +93,7 @@ function outputLanguageInstruction(language: Language) {
       ? "All user-facing text fields (name, brand, foodType, portionLabel, warning, message) must be written in English."
       : "所有面向用户的字段 name、brand、foodType、portionLabel、warning、message 必须使用中文。";
 
-  return `${targetInstruction} Also include bilingual mirror fields for every food: nameZh, nameEn, brandZh, brandEn, foodTypeZh, foodTypeEn, portionLabelZh, portionLabelEn, warningZh, warningEn, imageNameZh, imageNameEn. The Zh fields must always be Chinese; the En fields must always be English. Keep macro JSON keys as protein, carbs, fat, calories, fiber.`;
+  return `${targetInstruction} Also include bilingual mirror fields for every food: nameZh, nameEn, brandZh, brandEn, foodTypeZh, foodTypeEn, portionLabelZh, portionLabelEn, warningZh, warningEn, sourceLabelZh, sourceLabelEn. The Zh fields must always be Chinese; the En fields must always be English. Keep macro JSON keys as protein, carbs, fat, calories, fiber.`;
 }
 
 function localized(language: Language, zh: string, en: string) {
@@ -135,10 +134,9 @@ export async function POST(request: Request) {
   try {
     const form = await request.formData();
     const description = String(form.get("description") ?? "").trim();
-    const files = form.getAll("files").filter((item): item is File => item instanceof File);
     language = normalizeLanguage(form.get("lang"));
 
-    if (!files.length && isVagueFoodDescription(description)) {
+    if (isVagueFoodDescription(description)) {
       return Response.json({
         ok: true,
         isFoodRelated: false,
@@ -147,7 +145,7 @@ export async function POST(request: Request) {
       });
     }
 
-    if (!files.length && exceedsExplicitFoodItemLimit(description)) {
+    if (exceedsExplicitFoodItemLimit(description)) {
       return buildTooManyFoodsResponse(language);
     }
 
@@ -169,12 +167,11 @@ export async function POST(request: Request) {
     const routeDecision = normalizeRouteDecision(
       routingResult.ok
         ? routingResult.decision
-        : buildFallbackRouteDecision(description, strictLocalMatches, Boolean(files.length), language),
+        : buildFallbackRouteDecision(description, strictLocalMatches, false, language),
       description
     );
     const hasOnlyStrictLocalMatches =
       strictLocalMatches.length > 0 &&
-      !files.length &&
       !hasMeaningfulResidualAfterLocal(description, strictLocalMatches);
 
     if (isTooManyFoodDecision(routeDecision)) {
@@ -214,7 +211,7 @@ export async function POST(request: Request) {
       }
     }
 
-    if (routeDecision.route === "ai_estimate" && !files.length && routeDecision.foods?.length) {
+    if (routeDecision.route === "ai_estimate" && routeDecision.foods?.length) {
       const cleanedFoods = cleanAiFoodsForDescription(routeDecision.foods, description);
       const foods = mergeStrictLocalAndAiFoods(strictLocalMatches, cleanedFoods, description, "ai-text", language);
       if (foods.length) {
@@ -231,40 +228,16 @@ export async function POST(request: Request) {
       }
     }
 
-    const imageFiles = files.filter((file) => file.type.startsWith("image/")).slice(0, 6);
-
-    if (!provider.supportsImages && imageFiles.length && !description) {
-      return Response.json({
-        ok: true,
-        isFoodRelated: false,
-        foods: [],
-        message: localized(language, "先在右侧写一下这餐吃了什么喔，我会按你的描述帮你估算。", "Describe what you ate first and I'll estimate the nutrients for you.")
-      });
-    }
-
-    const imageParts = provider.supportsImages
-      ? await Promise.all(
-          imageFiles.map(async (file) => ({
-            type: "image_url",
-            image_url: { url: await fileToDataUrl(file) }
-          }))
-        )
-      : [];
-
-    if (!imageParts.length && !description) {
+    if (!description) {
       return Response.json(
         { ok: false, message: localized(language, "先写一下你吃了什么，我再帮你把营养素估出来。", "Tell me what you ate first so I can estimate the nutrients.") },
         { status: 400 }
       );
     }
-
-    const skippedFiles = files
-      .filter((file) => !file.type.startsWith("image/") || !provider.supportsImages)
-      .map((file) => file.name);
     const prompt = [
       "你是中国餐饮场景的自然语言营养估算助手。只返回严格 JSON 对象，不要 Markdown，不要解释。",
       outputLanguageInstruction(language),
-      "任务：根据用户本次文字描述和/或图片，把每个食物拆成 foods，并估算营养素。",
+      "任务：根据用户本次文字描述，把每个食物拆成 foods，并估算营养素。",
       "如果用户没有说具体食物、品牌、菜品、套餐、配料或份量，例如只说“我今天吃什么”，返回 isFoodRelated=false 和空 foods，不要硬猜。",
       "品牌+产品优先；识别不出品牌时，用同品类行业平均估算，recognitionMode=industry-average。",
       "如果用户文字里出现疑似品牌名或门店名，不要把 brand 留空；brand 填用户写出的品牌/门店，warning 说明是否查到公开资料。",
@@ -283,16 +256,9 @@ export async function POST(request: Request) {
       "warning 最多 24 个中文字，不写说教或疾病判断。",
       "校验：calories 应大致等于 protein*4 + carbs*4 + fat*9，误差超过 25% 时先修正宏量营养素或热量。",
       "返回 JSON 字段：isFoodRelated、message、foods；food 字段同上。",
-      `用户手动描述：${description || "无"}`,
-      provider.supportsImages ? "" : "当前接入的是文本模型，不支持直接读取图片。请只根据用户文字描述解析食物。",
-      skippedFiles.length ? `这些文件暂未送入视觉模型：${skippedFiles.join("、")}` : ""
+      `用户手动描述：${description || "无"}`
     ].filter(Boolean).join("\n");
-    const userContent = provider.supportsImages
-      ? [
-          { type: "text", text: prompt },
-          ...imageParts
-        ]
-      : prompt;
+    const userContent = prompt;
 
     const requestBody = buildChatCompletionBody(provider, 1400, [
       {
@@ -332,14 +298,12 @@ export async function POST(request: Request) {
       return Response.json({
         ok: true,
         isFoodRelated: false,
-        message: imageParts.length && !description
-          ? parsed.message || localized(language, "这张不像食物喔，给我看看你今天都吃了些什么？", "This doesn't look like food. Show me what you ate today.")
-          : parsed.message || localized(language, "我没算准这餐，可以再补充品牌、主食、配菜或份量。", "I couldn't estimate this meal. Try adding the brand, main item, side, or portion."),
+        message: parsed.message || localized(language, "我没算准这餐，可以再补充品牌、主食、配菜或份量。", "I couldn't estimate this meal. Try adding the brand, main item, side, or portion."),
         foods: []
       });
     }
 
-    const source = provider.supportsImages && imageParts.length ? "ai-vision" : "ai-text";
+    const source = "ai-text";
     const cleanedFoods = cleanAiFoodsForDescription(parsed.foods, description);
     const foods = mergeStrictLocalAndAiFoods(strictLocalMatches, cleanedFoods, description, source, language);
     const tooManyResponse = buildTooManyFoodsResponseIfNeeded(foods, language);
@@ -377,7 +341,6 @@ function getProviderConfig(): ProviderConfig | null {
       apiKey: deepseekApiKey,
       baseUrl: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
       model: process.env.DEEPSEEK_MODEL || "deepseek-v4-flash",
-      supportsImages: false,
       apiStyle: "openai"
     };
   }
@@ -388,7 +351,6 @@ function getProviderConfig(): ProviderConfig | null {
       apiKey: ccswitchApiKey,
       baseUrl: process.env.CCSWITCH_BASE_URL || process.env.ANTHROPIC_BASE_URL || "https://v2.aicodee.com",
       model: process.env.CCSWITCH_MODEL || process.env.ANTHROPIC_MODEL || process.env.MINIMAX_MODEL || process.env.AI_MODEL || "MiniMax-M2.7-highspeed",
-      supportsImages: false,
       apiStyle: "openai"
     };
   }
@@ -399,7 +361,6 @@ function getProviderConfig(): ProviderConfig | null {
       apiKey: minimaxApiKey,
       baseUrl: process.env.MINIMAX_BASE_URL || process.env.AI_BASE_URL || (isMiniMaxBaseUrl(openAiBaseUrl) ? openAiBaseUrl : undefined) || "https://api.minimax.io/v1",
       model: process.env.MINIMAX_MODEL || process.env.AI_MODEL || "MiniMax-M2.7-highspeed",
-      supportsImages: false,
       apiStyle: "openai"
     };
   }
@@ -410,7 +371,6 @@ function getProviderConfig(): ProviderConfig | null {
       apiKey: process.env.DASHSCOPE_API_KEY,
       baseUrl: process.env.AI_BASE_URL || "https://dashscope.aliyuncs.com/compatible-mode/v1",
       model: process.env.AI_MODEL || "qwen3-vl-plus",
-      supportsImages: true,
       apiStyle: "openai"
     };
   }
@@ -849,7 +809,7 @@ function mergeStrictLocalAndAiFoods(
   localMatches: StrictLocalFoodMatch[],
   aiFoods: AiFood[],
   description: string,
-  source: "ai-vision" | "ai-text" = "ai-text",
+  source: "ai-text" = "ai-text",
   language: Language = "zh"
 ) {
   const localFoods = localMatches.map((match) => normalizeFood(match.food, "ai-text", language));
@@ -1564,16 +1524,6 @@ function getAnthropicMessageUrls(baseUrl: string) {
   return Array.from(new Set(urls));
 }
 
-async function fileToDataUrl(file: File) {
-  if (file.size > 8 * 1024 * 1024) {
-    throw new Error(`${file.name} 超过 8MB，先压缩一下再上传。`);
-  }
-
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const mime = file.type || "image/jpeg";
-  return `data:${mime};base64,${buffer.toString("base64")}`;
-}
-
 function parseAiPayload(content: unknown): AiPayload {
   if (content && typeof content === "object" && !Array.isArray(content)) return content as AiPayload;
   if (typeof content !== "string") return {};
@@ -1600,14 +1550,13 @@ function chineseOrDefault(value: string | undefined, fallback: string) {
   return value && isChineseText(value) ? value : fallback;
 }
 
-function normalizeFood(food: AiFood, source: "ai-vision" | "ai-text", language: Language = "zh"): FoodLogItem {
+function normalizeFood(food: AiFood, source: "ai-text", language: Language = "zh"): FoodLogItem {
   const macros = normalizeMacros(food.macros);
 
   const baseName = food.name?.trim() || localized(language, "AI 识别食物", "AI recognized food");
   const baseBrand = food.brand?.trim() || localized(language, "未识别品牌", "Unknown brand");
   const baseFoodType = food.foodType?.trim() || localized(language, "食品", "Food");
   const basePortionLabel = food.portionLabel?.trim() || localized(language, "AI 估算份量", "AI estimated portion");
-  const baseImageName = localized(language, "AI 识别", "AI recognition");
   const warning = food.warning?.trim() || "";
 
   const nameZh = chineseOrDefault(food.nameZh?.trim(), language === "zh" ? baseName : translateToZh(baseName));
@@ -1620,8 +1569,8 @@ function normalizeFood(food: AiFood, source: "ai-vision" | "ai-text", language: 
   const portionLabelEn = food.portionLabelEn?.trim() || (language === "en" ? basePortionLabel : translateToEn(portionLabelZh));
   const warningZh = warning ? chineseOrDefault(food.warningZh?.trim(), language === "zh" ? warning : translateToZh(warning)) : "";
   const warningEn = food.warningEn?.trim() || (warning ? (language === "en" ? warning : translateToEn(warningZh)) : "");
-  const imageNameZh = localized("zh", "AI 识别", "AI recognition");
-  const imageNameEn = localized("en", "AI 识别", "AI recognition");
+  const sourceLabelZh = localized("zh", "AI 识别", "AI recognition");
+  const sourceLabelEn = localized("en", "AI 识别", "AI recognition");
 
   return {
     id: id("ai-food"),
@@ -1636,7 +1585,7 @@ function normalizeFood(food: AiFood, source: "ai-vision" | "ai-text", language: 
     warning: language === "en" ? warningEn : warningZh,
     source,
     recognitionMode: food.recognitionMode === "industry-average" ? "industry-average" : "brand-product",
-    imageName: language === "en" ? imageNameEn : imageNameZh,
+    sourceLabel: language === "en" ? sourceLabelEn : sourceLabelZh,
     loggedAt: new Date().toISOString(),
     nameZh,
     nameEn,
@@ -1648,8 +1597,8 @@ function normalizeFood(food: AiFood, source: "ai-vision" | "ai-text", language: 
     portionLabelEn,
     warningZh,
     warningEn,
-    imageNameZh,
-    imageNameEn
+    sourceLabelZh,
+    sourceLabelEn
   };
 }
 

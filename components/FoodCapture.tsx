@@ -292,7 +292,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                         onChange={(event) => updateFood(food.id, { name: event.target.value })}
                       />
                     </label>
-                    <p className="mt-2 text-xs text-ink/48">{t("来源")}：{getLocalizedFoodField(food, "imageName", language) || t("AI 识别")}</p>
+                    <p className="mt-2 text-xs text-ink/48">{t("来源")}：{getLocalizedFoodField(food, "sourceLabel", language) || t("AI 识别")}</p>
                     <p className="mt-1 text-xs font-bold text-moss">
                       {t(getRecognitionLabel(food))}
                     </p>

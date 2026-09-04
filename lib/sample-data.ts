@@ -5,7 +5,7 @@ import { catalogRecommendations } from "@/lib/food-catalog";
 const now = () => new Date().toISOString();
 const id = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-type FoodTemplate = Omit<FoodLogItem, "id" | "macros" | "loggedAt" | "source" | "imageName">;
+type FoodTemplate = Omit<FoodLogItem, "id" | "macros" | "loggedAt" | "source" | "sourceLabel">;
 
 export const portionOptions = [
   { label: "小份", scale: 0.75 },
@@ -523,7 +523,7 @@ export function estimateManualFoods(description: string): FoodLogItem[] {
     id: id("manual-food"),
     macros: scaleMacros(template.baseMacros, template.portionScale),
     source: "manual" as const,
-    imageName: "手动描述",
+    sourceLabel: "手动描述",
     loggedAt: now()
   }));
 }
