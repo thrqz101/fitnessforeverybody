@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { catalogItemToRecommendation, foodCatalog, type FoodCatalogItem } from "@/lib/food-catalog";
 import { addMacros, completion, dietStatusLabels, macroKeys, macroLabels, recommendationCoverage, scaleMacros } from "@/lib/nutrition";
-import { recommendationToFood, recommendations } from "@/lib/mock-data";
+import { recommendationToFood, recommendations } from "@/lib/sample-data";
 import { useI18n } from "@/lib/i18n";
 import type { DayState, FoodLogItem, MacroTotals, Recommendation, UserProfile } from "@/lib/types";
 

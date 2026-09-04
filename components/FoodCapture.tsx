@@ -7,7 +7,7 @@ import { useI18n } from "@/lib/i18n";
 import { pick, type Language } from "@/lib/i18n-utils";
 import { getLocalizedFoodField, translateToEn } from "@/lib/translations";
 import { macroKeys, macroLabels, scaleMacros } from "@/lib/nutrition";
-import { portionOptions } from "@/lib/mock-data";
+import { portionOptions } from "@/lib/sample-data";
 import type { FoodLogItem, MacroKey, MacroTotals } from "@/lib/types";
 
 type FoodCaptureProps = {
