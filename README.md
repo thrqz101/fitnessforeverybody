@@ -37,6 +37,7 @@ fitnessforeverybody/
    ├─ nutrition-100g.example.json  # 已提交的示例库（8 条）
    ├─ nutrition-100g.json          # 本地全量库（gitignore，不进 GitHub，39 条）
    └─ README.md                    # 本地库策略说明
+└─ server/                         # EdgeSpark 后端（D1 + auth + 用户录入）
 ```
 
 ---
@@ -88,6 +89,13 @@ Onboarding 收集身高、体重、性别、年龄、BMR、目标、训练结构
 - `lib/nutrition-db.ts` 运行时先读磁盘上的全量库，缺失才回退示例库，保证开箱可跑。
 - 每个工具结果带 `source`，agent 汇总进 `provenance` 与 `dbMeta`，从结果里即可证明“agent 查过本地库”，但数据文件不进 GitHub。
 - 匹配用 CJK 友好算法：归一化 + exact/alias/字符重叠评分（中文无空格，按字符重叠）。
+
+### EdgeSpark 后端（登录 / 本地库 / 用户录入）
+- 后端基于 EdgeSpark（Cloudflare D1 + Drizzle + 内置 auth），脚手架在 `server/`：
+  - `db_schema.ts`：`users` / `foods` / `user_entries` 三张表；`foods` 存每 100g 营养素并带 `embedding` 向量列。
+  - `routes/api.ts`（Hono）：`/api/auth/me`（登录态）、`/api/foods`（本地库检索）、`/api/entries`（把用户录入写进 `user_entries`，用 `auth.user.id` 归属用户）。
+  - `lib/search.ts`：D1 关键词检索第一层 + `embedding` 向量余弦召回（混合检索）。
+- 前端 MVP 以浏览器本地存储为主，用户/每日记录等持久化由该 EdgeSpark 后端承载；`server/` 独立于 Next 应用（`tsconfig` 已排除，不影响 `npm run typecheck`）。
 
 ### 提供方抽象 + function calling
 - `lib/agent/llm.ts` 统一 provider（`ccswitch`/`deepseek`/`minimax`/`dashscope`）由环境变量驱动，兼容 OpenAI 与 Anthropic 请求格式。

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@defs": ["./src/defs/index.ts"],
+      "@defs/*": ["./src/defs/*"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

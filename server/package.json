@@ -1,0 +1,15 @@
+{
+  "name": "fitness-everybody-edgespark-backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "edgespark dev",
+    "migrate": "edgespark db generate && edgespark db migrate",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.36.4",
+    "edgespark": "latest",
+    "hono": "^4.6.14"
+  }
+}
