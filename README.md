@@ -1,6 +1,6 @@
 # Fitness for Everybody
 
-面向中国用户的**智能饮食管理 Web 应用**。用户只需用一句自然语言描述“今天吃了什么”，系统就会把它拆解成可记录的食品条目，估算每项的营养素（蛋白质 / 碳水 / 脂肪 / 热量 / 膳食纤维），并把每日总量与基于身体信息、训练计划、饮食方法计算的**个性化目标**进行对比，给出下一顿的推荐和可执行的营养建议。
+面向中国用户的 **AI Agent 驱动的智能饮食管理 Web 应用**。用户只需用一句自然语言描述“今天吃了什么”，内置的营养 Agent 就会把它拆解成可记录的食品条目，估算每项的营养素（蛋白质 / 碳水 / 脂肪 / 热量 / 膳食纤维），并把每日总量与基于身体信息、训练计划、饮食方法计算的**个性化目标**进行对比，给出下一顿的推荐和可执行的营养建议。
 
 核心目标：让用户不称重、不查表，也能低成本地知道自己有没有吃够 / 吃多，以及今天的营养结构是否匹配自己的计划。
 
@@ -9,8 +9,8 @@
 ## 核心能力
 
 - **自然语言食物识别**：任意描述 → 拆成多个食品项 → 逐项估算 → 按份量汇总。
-- **三层解析链路**：本地食品库（优先）→ 联网检索（品牌 / 门店 / 包装食品）→ LLM 估算（兜底），可解释、可溯源。
-- **Function-calling 营养 agent**：模型通过 tool calling 自主决定调用「本地库 / Exa 联网 / LLM 兜底」中的哪个，并把调用痕迹（`provenance`）与数据库信息（`dbMeta`）返回给前端。
+- **AI Agent 三层工具链**：本地食品库 / 联网检索（品牌、门店、包装食品）/ LLM 估算三个工具统一交给 agent 自主选择调用，可解释、可溯源。
+- **Function-calling 营养 agent**：模型通过 tool calling 自主决定调用「本地库 / Exa 联网 / LLM 估算」中的哪个，并把调用痕迹（`provenance`）与数据库信息（`dbMeta`）返回给前端。
 - **个性化每日目标**：按 BMR、目标、训练结构、饮食结构、训练日 / 饮食状态动态计算宏量目标。
 - **食物级即时建议**：每条识别结果带 `warning` 行动建议（去皮少油、换无糖饮料、部分主食换杂粮等），帮用户越用越懂营养。
 - **双语（中 / 英）**。
@@ -94,11 +94,11 @@ Onboarding 收集身高、体重、性别、年龄、BMR、目标、训练结构
 ### 3. 推荐
 `Recommendations` 从 `lib/food-catalog.ts` 按场景与 goal 过滤，再由 `/api/recommend-ai` 结合训练日、饮食状态、目标排序与调整。
 
-### 4. Function-calling 营养 agent（`/api/nutrition-agent`）
-模型通过 tool calling 自主决定调用哪个工具：
-1. `query_local_food_db` → 查本地「每 100g → 营养素」库（优先，数值可靠）。
-2. `exa_web_search` → 本地库没有，或用户点名品牌 / 门店 / 包装食品时联网搜索。
-3. `ask_llm_fallback` → 前两者都不足（罕见菜、自制菜、组合餐）时用 LLM 估算。
+### 4. AI Agent 营养助手（`/api/nutrition-agent`）
+这是本产品的 **AI Agent 核心**。模型依据用户输入，通过 tool calling 自主选择调用哪个工具，每次调用都回填结果并继续推理，直到给出最终回答：
+- `query_local_food_db` → 查本地「每 100g → 营养素」库。
+- `exa_web_search` → 联网检索品牌 / 门店 / 包装食品的官方营养来源。
+- `ask_llm_fallback` → 用 LLM 估算罕见菜、自制菜、组合餐等场景。
 
 `run-agent.ts` 循环最多 5 轮：发 `tools` 定义 → 若返回 `tool_calls` 就执行并把结果回填为 `role:"tool"` 消息 → 直到模型给出最终回答。返回值带 `provenance`（`local_db` / `exa_search` / `llm_fallback`）与 `dbMeta`（版本 / 条目数），前端据此显示“已查询本地食品库（共 N 条）”。
 
@@ -125,7 +125,7 @@ Onboarding 收集身高、体重、性别、年龄、BMR、目标、训练结构
 - 工具以 JSON Schema 注册在 `lib/agent/tools.ts`，`executeTool` 按名分发到 `lib/tools/*`。
 
 ### 主食物识别管线
-- `lib/food-catalog.ts`（整份套餐库）+ `lib/brand-catalog.ts`（品牌 / 门店匹配）+ Tavily 搜索 + LLM，形成可解释的「本地 → 联网 → LLM」降级链路。
+- `lib/food-catalog.ts`（整份套餐库）+ `lib/brand-catalog.ts`（品牌 / 门店匹配）+ Tavily 搜索 + LLM，构成 agent 可自主调用的「本地库 / 联网 / LLM」多工具链路。
 - 严格本地匹配（`strictLocalMatches`）与 AI 结果合并、去重，并对热量做一致性校验（`calories ≈ P*4 + C*4 + F*9`）。
 
 ### 双语
