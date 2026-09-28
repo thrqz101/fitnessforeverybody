@@ -55,6 +55,7 @@ export type FoodLogItem = {
   sourceLabel?: string;
   loggedAt: string;
   savedToCalendar?: boolean;
+  recognitionBatchId?: string;
   nameZh?: string;
   nameEn?: string;
   brandZh?: string;

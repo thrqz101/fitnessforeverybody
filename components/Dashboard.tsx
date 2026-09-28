@@ -20,6 +20,7 @@ import { completion, dietStatusLabels, estimateBmr, goalLabels, macroKeys, macro
 import type { DayState, FoodLogItem, MacroKey, MacroTotals, UserProfile } from "@/lib/types";
 
 type DashboardProps = {
+  presentation?: "legacy" | "workspace";
   profile: UserProfile;
   day: DayState;
   targets: MacroTotals;
@@ -55,6 +56,7 @@ const ringTone: Record<MacroKey, string> = {
 };
 
 export function Dashboard({
+  presentation = "legacy",
   profile,
   day,
   targets,
@@ -126,7 +128,10 @@ export function Dashboard({
       }
       onAddFoods(recognizedFoods);
       setMealDescription("");
-      setRecognitionNotice({ key: "识别完成：{count} 个食物已进入确认区，营养变化正在计算。", vars: { count: recognizedFoods.length } });
+      setRecognitionNotice({ text: pick(language,
+        `识别完成：${recognizedFoods.length} 个食物已进入待确认记录，确认后计入今日营养进度。`,
+        `Recognized ${recognizedFoods.length} foods. Confirm them in today's food records to update your nutrition progress.`
+      ) });
     } catch {
       setRecognitionNotice({ text: withRetryHint(t("AI 连接暂时没有响应。"), language) });
     } finally {
@@ -134,13 +139,12 @@ export function Dashboard({
     }
   }
 
-  return (
-    <div className="nutrition-experience">
-      <section className="nutrition-console" aria-label={t("AI 饮食识别与营养进度")}>
-      <section className="food-hero">
+  const recognitionPanel = (
+    <section className="food-hero">
         <img
-          src="/images/wellness-hero-v2.png"
-          alt={t("摆放着三文鱼、牛油果、蔬菜和谷物的均衡餐")}
+          src={presentation === "workspace" ? "/images/nutrition-garden.jpg" : "/images/wellness-hero-v2.png"}
+          alt={presentation === "workspace" ? "" : t("摆放着三文鱼、牛油果、蔬菜和谷物的均衡餐")}
+          aria-hidden={presentation === "workspace" ? true : undefined}
           className="food-hero__image"
         />
         <div className="food-hero__veil" />
@@ -179,8 +183,9 @@ export function Dashboard({
           {recognitionNotice ? <div className="recognition-toast">{"key" in recognitionNotice ? t(recognitionNotice.key, recognitionNotice.vars) : recognitionNotice.text}</div> : null}
         </div>
       </section>
-
-      <section className="experience-section meal-timeline">
+  );
+  const journalPanel = (
+    <section className="experience-section meal-timeline">
         <div className="section-heading">
           <div>
             <span className="experience-kicker">Today&apos;s journal</span>
@@ -226,8 +231,9 @@ export function Dashboard({
           </div>
         )}
       </section>
-
-      <section className="experience-section nutrition-story">
+  );
+  const nutritionPanel = (
+    <section id={presentation === "legacy" ? undefined : "overview"} className="experience-section nutrition-story">
         <div className="section-heading">
           <div>
             <span className="experience-kicker">Live nutrition dashboard</span>
@@ -303,8 +309,19 @@ export function Dashboard({
           </section>
         </div>
       </section>
-      </section>
+  );
 
+  return (
+    <div className="nutrition-experience">
+      <section className="nutrition-console" aria-label={t("AI 饮食识别与营养进度")}>
+        {presentation === "workspace" ? (
+          <section id="recognition" role="region" aria-labelledby="tab-recognition" className="preview-recognition">
+            {recognitionPanel}
+            {journalPanel}
+            {nutritionPanel}
+          </section>
+        ) : <>{recognitionPanel}{journalPanel}{nutritionPanel}</>}
+      </section>
       <section className="next-bite-feature">
         <img src="/images/recommendation-rail-v2.png" alt={t("三种适合作为下一餐的健康食物")} />
         <div className="next-bite-feature__overlay" />
@@ -326,7 +343,7 @@ export function Dashboard({
 function NutritionOrbit({ percent }: { percent: number }) {
   const { t } = useI18n();
   return (
-    <div className="master-orbit" style={{ background: `conic-gradient(#f2ce67 ${Math.min(percent, 100)}%, rgba(255,255,255,.16) 0)` }}>
+    <div className="master-orbit" style={{ background: `conic-gradient(var(--preview-orbit-color, #f2ce67) ${Math.min(percent, 100)}%, var(--preview-orbit-track, rgba(255,255,255,.16)) 0)` }}>
       <div><strong>{percent}%</strong><span>{t("营养达标率")}</span></div>
     </div>
   );

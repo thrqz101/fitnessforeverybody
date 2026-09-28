@@ -66,6 +66,8 @@ const styleFilters: Array<{ value: StyleFilter; label: string; regions: RegionFi
 ];
 
 type RecommendationsProps = {
+  preview?: boolean;
+  portalTarget?: Element | null;
   profile: UserProfile;
   day: DayState;
   gaps: MacroTotals;
@@ -76,14 +78,16 @@ type RecommendationsProps = {
   onRecognizeRequested: () => void;
 };
 
-export function Recommendations({ profile, day, gaps, targets, totals, foods, onChoose, onRecognizeRequested }: RecommendationsProps) {
+export function Recommendations({ preview = false, portalTarget, profile, day, gaps, targets, totals, foods, onChoose, onRecognizeRequested }: RecommendationsProps) {
   const { t, language } = useI18n();
+  const [visibleCount, setVisibleCount] = useState(6);
   const [aiRecommendations, setAiRecommendations] = useState<Recommendation[]>([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiNotice, setAiNotice] = useState("");
   const [regionFilter, setRegionFilter] = useState<RegionFilter>("all");
   const [mealSlotFilter, setMealSlotFilter] = useState<MealSlotFilter>("all");
   const [styleFilter, setStyleFilter] = useState<StyleFilter>("all");
+  useEffect(() => { setVisibleCount(6); }, [regionFilter, mealSlotFilter, styleFilter]);
   const mainMealCount = useMemo(() => countMainMeals(foods), [foods]);
   const currentPercentages = useMemo(() => getCompletionSnapshot(totals, targets), [totals, targets]);
   const shouldLightOnly = currentPercentages.average >= 80;
@@ -164,11 +168,27 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
   useEffect(() => {
     if (!shuffleOpen) return;
     const previousOverflow = document.body.style.overflow;
+    const previousFocus = document.activeElement as HTMLElement | null;
     document.body.style.overflow = "hidden";
+    const dialog = document.querySelector<HTMLElement>(".shuffle-flashcard");
+    if (preview) dialog?.querySelector<HTMLButtonElement>("button")?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!preview) return;
+      if (event.key === "Escape") { event.preventDefault(); setShuffleOpen(false); }
+      if (event.key === "Tab" && dialog) {
+        const buttons = Array.from(dialog.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"));
+        const first = buttons[0], last = buttons[buttons.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+      if (preview) previousFocus?.focus({ preventScroll: true });
     };
-  }, [shuffleOpen]);
+  }, [shuffleOpen, preview]);
 
   function startShuffle() {
     if (!shufflePool.length) return;
@@ -295,7 +315,7 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
         </div>
 
         <div className="recommendation-grid">
-          {filteredRanked.map((recommendation) => (
+          {(preview ? filteredRanked.slice(0, visibleCount) : filteredRanked).map((recommendation) => (
             <RecommendationCard
               key={recommendation.id}
               recommendation={recommendation}
@@ -307,6 +327,7 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
             />
           ))}
         </div>
+        {preview && visibleCount < filteredRanked.length && <div className="mt-8 text-center"><button type="button" className="precision-button precision-button--secondary" onClick={() => setVisibleCount((count) => count + 6)}>{language === "en" ? `Show more (${filteredRanked.length - visibleCount} remaining)` : `显示更多（还有 ${filteredRanked.length - visibleCount} 个）`}</button></div>}
         {!filteredRanked.length ? (
           <div className="empty-recommendations">
             <p className="text-lg font-black text-ink">{t("这个筛选组合暂时没有候选")}</p>
@@ -387,7 +408,7 @@ export function Recommendations({ profile, day, gaps, targets, totals, foods, on
             </div>
           </section>
         </div>,
-        document.body
+        portalTarget ?? document.body
       ) : null}
     </div>
   );

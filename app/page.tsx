@@ -1,5 +1,3 @@
-import { FitnessApp } from "@/components/FitnessApp";
+import { PreviewApp } from "@/components/preview/PreviewApp";
 
-export default function Home() {
-  return <FitnessApp />;
-}
+export default function Home() { return <PreviewApp mode="landing" />; }
