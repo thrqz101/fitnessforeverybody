@@ -355,3 +355,23 @@ html:has(.precision-preview), body:has(.precision-preview) {
   .precision-preview .precision-tabs button { padding:10px 14px; }
   .precision-preview .precision-nav-utilities { gap:8px; }
 }
+
+/* Semantic primary actions must win over the legacy utility-color overrides. */
+.precision-preview .settings-shell .settings-primary-action {
+  min-height:48px;
+  min-width:160px;
+  border:1px solid #4b7b60;
+  background:#4b7b60;
+  color:#ffffff;
+  font-weight:600;
+  box-shadow:0 6px 16px rgba(49,91,70,.18);
+}
+.precision-preview .settings-shell .settings-primary-action:not(:disabled):hover {
+  border-color:#3b654d;
+  background:#3b654d;
+  box-shadow:0 8px 20px rgba(49,91,70,.23);
+}
+.precision-preview .settings-shell .settings-primary-action:focus-visible {
+  outline:3px solid #4b7b60;
+  outline-offset:3px;
+}

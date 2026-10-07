@@ -366,7 +366,7 @@ export function Onboarding({
             </div>
             <button
               type="submit"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-[18px] bg-coral px-5 text-sm font-black text-white shadow-soft transition hover:bg-coral/90"
+              className="settings-primary-action inline-flex h-12 items-center justify-center gap-2 rounded-[18px] bg-moss px-5 text-sm font-black text-white shadow-soft transition hover:bg-moss/90"
             >
               {t(submitLabel)}
               <ArrowRight size={18} aria-hidden="true" />
@@ -486,7 +486,7 @@ export function Onboarding({
               <button
                 type="button"
                 onClick={confirmMacroDraft}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[18px] bg-coral px-5 text-sm font-black text-white shadow-soft transition hover:bg-coral/90"
+                className="settings-primary-action inline-flex min-h-11 items-center justify-center gap-2 rounded-[18px] bg-moss px-5 text-sm font-black text-white shadow-soft transition hover:bg-moss/90"
               >
                 <Check size={17} aria-hidden="true" />
                 {t("确认并保存")}
