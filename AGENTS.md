@@ -1,6 +1,6 @@
 # Agent Instructions
 
-Fitness for Everybody is a Next.js App Router nutrition-tracking web app backed by Supabase. Users describe what they ate in natural language; the recognition pipeline splits it into food entries, estimates nutrition, compares daily totals with a personalised macro target and recommends the next meal. Read [ARCHITECTURE.md](ARCHITECTURE.md) for ownership and request flow and [CODE.md](CODE.md) for coding conventions.
+Fitness for Everybody is a Next.js App Router nutrition-tracking web app backed by Supabase. Users describe what they ate in natural language; the recognition pipeline splits it into food entries, estimates nutrition, compares daily totals with a personalised macro target and recommends the next meal. Read [architecture](.docs/architecture.md) for ownership and request flow and [code conventions](.docs/code.md).
 
 `CLAUDE.md` is a symbolic link to this file. Edit `AGENTS.md` only.
 
@@ -38,19 +38,19 @@ Help people gain muscle, lose fat, lose weight or eat healthier without weighing
 - Before adding common functionality or a dependency, inspect existing dependencies, modules, documentation, and types. Prefer an established repository solution when it fits. Ask before adding any dependency.
 - Code introduced during the current task has no compatibility obligation until delivery. Rewrite it and remove superseded paths instead of adding adapters; this does not waive compatibility for pre-existing behaviour, persisted data, deployed clients, external consumers, or staged rollouts.
 - Delete clearly unused code when it is in scope for the files being changed.
-- Preserve supplied text, quotations, schemas, APIs, and product terminology. User-facing copy is bilingual; see [i18n](docs/i18n.md).
-- Write documentation as standalone current-state specifications of behaviour, ownership, and boundaries. Link to specialised guides instead of duplicating their rules; follow [documentation](docs/documentation.md) for prose conventions.
+- Preserve supplied text, quotations, schemas, APIs, and product terminology. User-facing copy is bilingual; see [i18n](.docs/i18n.md).
+- Write documentation as standalone current-state specifications of behaviour, ownership, and boundaries. Link to specialised guides instead of duplicating their rules; follow [documentation](.docs/documentation.md) for prose conventions.
 - Add documentation only when it preserves a durable contract, non-obvious invariant, operational procedure, or decision that future work needs and cannot readily recover from the owning code. Do not add prose merely to record that a change was made.
 - Before a cross-cutting workflow or data-model change, establish the current-state design in the owning document. Define lifecycle states, canonical storage, invariants, correction boundaries, affected consumers, and unresolved product decisions before coding.
 - Keep generic owners free of feature-specific branches. Put specialisation in the owning feature module.
 
 ## Commands and Safety
 
-- Use `npm` for repository commands. Commands that need secrets run through 1Password: the `dev`, `build:local`, `start`, `auth:smoke` and `api:smoke` scripts already wrap `op run --env-file=.env`. Set `OP_ACCOUNT` in your shell when several 1Password accounts are signed in; see [setup](docs/setup.md).
+- Use `npm` for repository commands. Commands that need secrets run through 1Password: the `dev`, `build:local`, `start`, `auth:smoke` and `api:smoke` scripts already wrap `op run --env-file=.env`. Set `OP_ACCOUNT` in your shell when several 1Password accounts are signed in; see [setup](.docs/setup.md).
 - Checks: `npm run typecheck`, `npm test` (Node's built-in runner over `tests/*.test.mjs`) and `npm run build`. `npm run auth:smoke` and `npm run api:smoke` exercise the real Supabase project and need a running dev server for the API suite; they are production writes, see below.
 - Dev servers may be started as needed; check for an existing process first. Do not run deploys, migrations, or the nutrition data scripts unless the user explicitly asks.
 - Read-only Git commands are always allowed without additional permission, including status, diff, log, show, and blame. Git operations that change local or remote state require explicit user authorisation. Do not commit, push, discard, or revert work implicitly, and never remove work you did not author.
-- For authorised commits and PRs follow [git](docs/git.md).
+- For authorised commits and PRs follow [git](.docs/git.md).
 - Rewrite history only when the user explicitly authorises the exact branch and operation. Preserve recoverable history before a destructive rewrite.
 
 ### Secrets and open-source safety
@@ -65,7 +65,7 @@ This repository is public. Anything local, personal or secret must never be comm
 6. A new service needs its key in 1Password before a reference line is added to `.env`. If the key is missing, ask the user to add it; never invent one.
 7. `NEXT_PUBLIC_*` variables are shipped to the browser and must only hold public values.
 8. Local data (the full nutrition database, SQLite files, Supabase CLI state), private notes (`HANDOFF.md`) and tool state stay local. When a new kind of local file appears, add it to `.gitignore` and `.vercelignore` first.
-9. Before committing, check `git status --short` for unexpected files. The release checklist in [setup](docs/setup.md#open-source-release-checklist) covers history scans.
+9. Before committing, check `git status --short` for unexpected files. The release checklist in [setup](.docs/setup.md#open-source-release-checklist) covers history scans.
 
 ### Production data safety
 
@@ -82,20 +82,20 @@ This repository is public. Anything local, personal or secret must never be comm
 
 Search the repository with `rg` first. Then read only the documents that apply to the code being changed. Do not preload unrelated guides.
 
-- Directory ownership, layering and request flow: [ARCHITECTURE.md](ARCHITECTURE.md).
-- TypeScript, naming, module and component conventions: [CODE.md](CODE.md).
-- Food recognition pipeline, routing, local and brand catalogues, LLM providers: [docs/recognition.md](docs/recognition.md).
-- Next-meal recommendations: [docs/recommendation.md](docs/recommendation.md).
-- BMR, macro targets and day adjustments: [docs/nutrition.md](docs/nutrition.md).
-- Tables, RLS, database functions, migrations and SQL tests: [docs/supabase.md](docs/supabase.md).
-- Copy and translations: [docs/i18n.md](docs/i18n.md).
-- Dates, the Beijing calendar day and time: [docs/date.md](docs/date.md).
-- Errors and retry behaviour: [docs/errors.md](docs/errors.md).
-- Interface, accessibility and copy conventions: [docs/ui.md](docs/ui.md); Tailwind, mobile and styling: [docs/css.md](docs/css.md).
-- Writing, changing or deleting tests: [docs/testing.md](docs/testing.md).
-- Local setup, environment variables and the release checklist: [docs/setup.md](docs/setup.md).
-- Markdown or domain documentation: [docs/documentation.md](docs/documentation.md).
-- Authorised commits, pushes and PRs: [docs/git.md](docs/git.md).
+- Directory ownership, layering and request flow: [.docs/architecture.md](.docs/architecture.md).
+- TypeScript, naming, module and component conventions: [.docs/code.md](.docs/code.md).
+- Food recognition pipeline, routing, local and brand catalogues, LLM providers: [.docs/recognition.md](.docs/recognition.md).
+- Next-meal recommendations: [.docs/recommendation.md](.docs/recommendation.md).
+- BMR, macro targets and day adjustments: [.docs/nutrition.md](.docs/nutrition.md).
+- Tables, RLS, database functions, migrations and SQL tests: [.docs/supabase.md](.docs/supabase.md).
+- Copy and translations: [.docs/i18n.md](.docs/i18n.md).
+- Dates, the Beijing calendar day and time: [.docs/date.md](.docs/date.md).
+- Errors and retry behaviour: [.docs/errors.md](.docs/errors.md).
+- Interface, accessibility and copy conventions: [.docs/ui.md](.docs/ui.md); Tailwind, mobile and styling: [.docs/css.md](.docs/css.md).
+- Writing, changing or deleting tests: [.docs/testing.md](.docs/testing.md).
+- Local setup, environment variables and the release checklist: [.docs/setup.md](.docs/setup.md).
+- Markdown or domain documentation: [.docs/documentation.md](.docs/documentation.md).
+- Authorised commits, pushes and PRs: [.docs/git.md](.docs/git.md).
 
 Use Context7 for unfamiliar libraries, frameworks, SDKs or CLIs after checking repository patterns and docs. If no pattern fits, use primary documentation, state that the change introduces a new pattern, and document it when it should be reused.
 
@@ -103,7 +103,7 @@ Use Context7 for unfamiliar libraries, frameworks, SDKs or CLIs after checking r
 
 - Keep React components and route handlers thin when branchy domain logic can be a pure, typed function in a feature's `domain/`.
 - Make important logic deterministic and testable. Inject clocks, IDs, storage, network, or service clients when hidden environment coupling would make meaningful tests difficult.
-- Add tests only when their expected regression value outweighs their maintenance cost. Before writing one, identify a concrete, consequential failure mode that the compiler and existing coverage would miss; follow [testing](docs/testing.md). A changed file or new branch is not by itself a reason to add a test. Prefer extending an existing behavioural scenario over adding a new test suite or harness.
+- Add tests only when their expected regression value outweighs their maintenance cost. Before writing one, identify a concrete, consequential failure mode that the compiler and existing coverage would miss; follow [testing](.docs/testing.md). A changed file or new branch is not by itself a reason to add a test. Prefer extending an existing behavioural scenario over adding a new test suite or harness.
 - Test backend behaviour through the API routes or the SQL scenarios in `supabase/tests`, with real users and owned records. Include a second user's records when checking access isolation. Fake only external boundaries such as LLM providers, web search, email and the clock.
 - When a pure domain rule warrants testing, use representative source inputs and counterexamples that challenge implementation assumptions, including ambiguous wording and missing metadata.
 - Omit tests that mirror literals, configuration, prompts, labels, trivial delegations, TypeScript guarantees, or mock choreography. When a scenario covers a behaviour, delete the lower-level tests it replaces.

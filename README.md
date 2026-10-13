@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://fitnessforeverybody.app"><img alt="Fitness for Everybody logo" src="docs/images/logo.png" width="112"></a>
+  <a href="https://fitnessforeverybody.app"><img alt="Fitness for Everybody logo" src=".docs/images/logo.png" width="112"></a>
 </p>
 
 <h1 align="center">Fitness for Everybody</h1>
@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://fitnessforeverybody.app">
-    <img alt="Fitness for Everybody: Record life, make sense of every meal." src="docs/images/landing.webp" width="100%">
+    <img alt="Fitness for Everybody: Record life, make sense of every meal." src=".docs/images/landing.webp" width="100%">
   </a>
 </p>
 
@@ -113,7 +113,7 @@ fitnessforeverybody/
 ├── supabase/                 # Database migrations and tests
 ├── scripts/                  # Build and test scripts
 ├── tests/                    # Automated tests
-└── docs/                     # Topic guides
+└── .docs/                    # Architecture, code conventions and topic guides
 ```
 
 Each feature module is split into `domain` (pure business logic), `server` (server-side calls) and `ui` (components).
@@ -140,21 +140,21 @@ npm test            # tests
 npm run build       # production build
 ```
 
-See [docs/setup.md](docs/setup.md) for the full environment setup.
+See [.docs/setup.md](.docs/setup.md) for the full environment setup.
 
 ## Documentation
 
 | Document | What it covers |
 | --- | --- |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | System overview, directory ownership, layering rules and the main request flow |
-| [CODE.md](CODE.md) | Coding conventions: naming, modules, API routes and TypeScript |
+| [architecture.md](.docs/architecture.md) | System overview, directory ownership, layering rules and the main request flow |
+| [code.md](.docs/code.md) | Coding conventions: naming, modules, API routes and TypeScript |
 | [AGENTS.md](AGENTS.md) | Working rules for AI coding assistants, also useful for human contributors |
-| [docs/](docs/) | Topic guides: recognition, recommendations, nutrition targets, database, i18n, testing, UI, setup and more |
+| [docs/](.docs/) | Topic guides: recognition, recommendations, nutrition targets, database, i18n, testing, UI, setup and more |
 | [CHANGELOG.md](CHANGELOG.md) | Release notes |
 
 ## Contributing
 
-Issues and pull requests are welcome. Please read [CODE.md](CODE.md) and [AGENTS.md](AGENTS.md) first.
+Issues and pull requests are welcome. Please read [.docs/code.md](.docs/code.md) and [AGENTS.md](AGENTS.md) first.
 
 1. Create a branch from `main`, for example `feat/your-feature`.
 2. Run `npm run typecheck` and `npm test` before committing.

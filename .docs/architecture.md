@@ -82,7 +82,7 @@ Features do not expose barrel `index.ts` files: a barrel would mix client and se
 
 ## Request boundary
 
-All writes go through Next.js API routes. A route calls `requireApiUser()`, which verifies the session cookie and returns the user plus a service-role client. The route then calls a database function with `p_user` taken from the session. Browsers can only `select` their own rows through RLS, and the database functions are not executable by `anon` or `authenticated`. See [Supabase](docs/supabase.md).
+All writes go through Next.js API routes. A route calls `requireApiUser()`, which verifies the session cookie and returns the user plus a service-role client. The route then calls a database function with `p_user` taken from the session. Browsers can only `select` their own rows through RLS, and the database functions are not executable by `anon` or `authenticated`. See [Supabase](supabase.md).
 
 ### Recording a meal
 
@@ -103,7 +103,7 @@ Dashboard (daily-log/ui)
 User confirms a draft → POST /api/entries/[id]/confirm → confirm_entry → day totals recomputed
 ```
 
-Details, fallbacks and diagnostics are specified in [recognition](docs/recognition.md).
+Details, fallbacks and diagnostics are specified in [recognition](recognition.md).
 
 ## Environments
 
@@ -112,7 +112,7 @@ Details, fallbacks and diagnostics are specified in [recognition](docs/recogniti
 | Local development | `npm run dev` on `localhost:3000` | The production project | Secrets resolved by `op run`; treat writes as production writes |
 | Production | Vercel (`https://fitnessforeverybody.app`, also `www.`) | Same project | `vercel.json` builds the full nutrition database before `next build` |
 
-Environment variables are listed with their visibility in `.env.example`; setup is described in [setup](docs/setup.md).
+Environment variables are listed with their visibility in `.env.example`; setup is described in [setup](setup.md).
 
 ## Verification contract
 

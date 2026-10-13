@@ -1,6 +1,6 @@
 # Code Conventions
 
-This guide owns how code is written. [ARCHITECTURE.md](ARCHITECTURE.md) owns where code lives and which layers may import each other.
+This guide owns how code is written. [Architecture](architecture.md) owns where code lives and which layers may import each other.
 
 ## Files and naming
 
@@ -10,7 +10,7 @@ This guide owns how code is written. [ARCHITECTURE.md](ARCHITECTURE.md) owns whe
 - Client modules that use React state, effects or browser APIs start with `"use client";` as the first statement.
 - Keep a file focused enough to read in one sitting; around 300 lines is the point to look for a seam. Pure data tables such as `shared/catalog/food-catalog.ts` are exempt.
 - Import application code through the `@/` alias (`@/features/...`, `@/shared/...`). Use relative imports only for siblings in the same folder and for files outside `src/`, such as JSON in `data/`.
-- Modules imported directly by Node tests (see [testing](docs/testing.md)) may only import other TypeScript modules as `import type`; their value imports must be JSON or Node built-ins.
+- Modules imported directly by Node tests (see [testing](testing.md)) may only import other TypeScript modules as `import type`; their value imports must be JSON or Node built-ins.
 
 ## Feature modules
 
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 }
 ```
 
-The user id always comes from the session, never from the request body. Error responses carry a stable `code`, never a raw database or provider message; see [errors](docs/errors.md).
+The user id always comes from the session, never from the request body. Error responses carry a stable `code`, never a raw database or provider message; see [errors](errors.md).
 
 ## TypeScript
 
@@ -63,8 +63,8 @@ The user id always comes from the session, never from the request body. Error re
 
 - Keep components thin: compute in `domain/` functions or `useMemo`, render in the component.
 - Extract a sub-component when a block has its own state or its own dialog (for example `MacroConfirmDialog`, `BodyFatGuideDialog`), not to shorten a file by moving markup around.
-- Every input has a label, every icon-only button has an `aria-label`, and progress values are shown as numbers, not only colour. See [ui](docs/ui.md).
-- User-facing text is written in Chinese in source and translated through `t()` or `useText()`; see [i18n](docs/i18n.md).
+- Every input has a label, every icon-only button has an `aria-label`, and progress values are shown as numbers, not only colour. See [ui](ui.md).
+- User-facing text is written in Chinese in source and translated through `t()` or `useText()`; see [i18n](i18n.md).
 
 ## Comments
 
@@ -72,4 +72,4 @@ Write comments for the reason behind a rule, an invariant or a non-obvious const
 
 ## Tests
 
-Follow [testing](docs/testing.md). Add a test for a calculation, a data-isolation rule or a lifecycle rule; do not add tests that restate constants or copy.
+Follow [testing](testing.md). Add a test for a calculation, a data-isolation rule or a lifecycle rule; do not add tests that restate constants or copy.

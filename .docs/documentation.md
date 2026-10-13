@@ -8,7 +8,7 @@ Read this guide when creating or changing repository documentation, product spec
 - Put rejected designs and historical narration only in an explicitly historical document such as `CHANGELOG.md`, a migration note, or a postmortem.
 - Preserve user-provided text, quotations, APIs, schemas, and established product terminology.
 - Use clear technical language, short grammatical sentences, active voice, and consistent terms. Repository guides and `README.md` are written in English; `CHANGELOG.md` is written in Chinese.
-- Keep guidance close to its owner: repository-wide rules in `AGENTS.md`, `ARCHITECTURE.md`, `CODE.md` and `docs/`, data-specific notes beside the data (for example `data/README.md`), and temporary implementation plans outside current-state guides.
+- Keep guidance close to its owner: agent rules in `AGENTS.md`, architecture, code conventions and topic guides in `.docs/`, data-specific notes beside the data (for example `data/README.md`), and temporary implementation plans outside current-state guides.
 - When an implementation plan is completed, promote only its surviving behaviour into the owning current-state document. Do not leave completed plans as competing specifications.
 - Link to the authoritative specialised guide instead of duplicating its rules. Fix a nearby stale link when the correction is small; ask before expanding into broad documentation cleanup.
 - Never copy secrets, account identifiers, vault names, personal data or private notes into documentation. The repository is public.
