@@ -110,7 +110,7 @@ Details, fallbacks and diagnostics are specified in [recognition](docs/recogniti
 | Environment | Web | Supabase | Notes |
 | --- | --- | --- | --- |
 | Local development | `npm run dev` on `localhost:3000` | The production project | Secrets resolved by `op run`; treat writes as production writes |
-| Production | Vercel (`https://fitnessforeverybody.vercel.app`) | Same project | `vercel.json` builds the full nutrition database before `next build` |
+| Production | Vercel (`https://fitnessforeverybody.app`, also `www.`) | Same project | `vercel.json` builds the full nutrition database before `next build` |
 
 Environment variables are listed with their visibility in `.env.example`; setup is described in [setup](docs/setup.md).
 
