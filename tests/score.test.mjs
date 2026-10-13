@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { formatScorePercent, weightedScore } from '../lib/score.ts';
+import { formatScorePercent, weightedScore } from '../src/shared/domain/score.ts';
 
 const targets = { protein: 100, carbs: 200, fat: 60, calories: 2000, fiber: 30 };
 const none = { protein: 0, carbs: 0, fat: 0, calories: 0, fiber: 0 };

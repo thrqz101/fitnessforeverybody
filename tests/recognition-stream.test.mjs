@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { readRecognitionResponse, requestFoodAi } from '../lib/recognition-client.ts';
-import { streamRecognition, updateRecognitionSteps } from '../lib/recognition-events.ts';
-import { normalizeSearchEvidence, safeExternalUrl } from '../lib/search-evidence.ts';
+import { readRecognitionResponse, requestFoodAi } from '../src/features/recognition/ui/recognition-client.ts';
+import { streamRecognition, updateRecognitionSteps } from '../src/features/recognition/domain/events.ts';
+import { normalizeSearchEvidence, safeExternalUrl } from '../src/shared/domain/search-evidence.ts';
 
 const step={id:'search',status:'active',labelZh:'正在联网搜索…',labelEn:'Searching the web…'};
 const terminal={type:'result',status:200,result:{ok:true,isFoodRelated:true,foods:[{name:'奶茶'}]}};

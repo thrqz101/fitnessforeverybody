@@ -2,10 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { lib } from './helpers/load-ts.mjs';
 
-const { parseFeedback, parseProfile, parseDay, coerceDay } = lib('cloud/validate.ts');
-const { legacyToImport, sanitizeImport } = lib('cloud/import.ts');
-const { entryRowToFood, foodToEntryPayload, sanitizeMacros } = lib('cloud/mappers.ts');
-const { mapRpcError } = lib('cloud/errors.ts');
+const { parseFeedback, parseProfile, parseDay, coerceDay } = lib('shared/api/validate.ts');
+const { legacyToImport, sanitizeImport } = lib('shared/api/import.ts');
+const { entryRowToFood, foodToEntryPayload, sanitizeMacros } = lib('shared/api/mappers.ts');
+const { mapRpcError } = lib('shared/api/errors.ts');
 
 const macros = { protein: 20, carbs: 30, fat: 5, calories: 250, fiber: 3 };
 const uuid = '11111111-1111-4111-8111-111111111111';

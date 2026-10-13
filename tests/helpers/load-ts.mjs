@@ -23,7 +23,7 @@ export function loadTs(file) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true }
   }).outputText;
   const requireFrom = (id) => {
-    if (id.startsWith('@/')) return loadTs(path.join(root, id.slice(2)));
+    if (id.startsWith('@/')) return loadTs(path.join(root, 'src', id.slice(2)));
     if (id.startsWith('.')) return loadTs(path.resolve(path.dirname(full), id));
     throw new Error(`Unsupported import "${id}" in ${full}`);
   };
@@ -31,4 +31,4 @@ export function loadTs(file) {
   return module.exports;
 }
 
-export const lib = (name) => loadTs(path.join(root, 'lib', name));
+export const lib = (name) => loadTs(path.join(root, 'src', name));

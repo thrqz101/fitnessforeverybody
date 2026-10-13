@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import data from '../data/food-brands.json' with { type: 'json' };
-import { foodBrandCatalog, findFoodBrandMatches, normalizeBrandText, isBrandOnlyDescription } from '../lib/brand-catalog.ts';
+import { foodBrandCatalog, findFoodBrandMatches, normalizeBrandText, isBrandOnlyDescription } from '../src/features/recognition/domain/brand-catalog.ts';
 
 const categories = ['western_fast_food','chinese_fast_food','noodles_rice','hotpot','malatang','tea_coffee','snack_bakery','convenience','casual_dining'];
 test('catalog IDs, canonical names and aliases are unique and all new entries have provenance', () => {
