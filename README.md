@@ -1,155 +1,162 @@
-# Fitness for Everybody
+<h1 align="center">Fitness for Everybody</h1>
 
-**一句话记录一餐，AI 帮你算营养、看缺口、推荐下一餐。**
+<h3 align="center">
+  Log a meal in one sentence.<br>
+  AI tracks your nutrition, shows your gaps, and plans your next meal.
+</h3>
 
-[![Website](https://img.shields.io/badge/website-fitnessforeverybody.app-315b46)](https://fitnessforeverybody.app)
-[![License: MIT](https://img.shields.io/badge/license-MIT-4b7b60)](LICENSE)
-![Next.js](https://img.shields.io/badge/Next.js-14-1d2a22)
-![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3f7354)
+<p align="center">
+  <a href="https://fitnessforeverybody.app"><img alt="website" src="https://img.shields.io/badge/website-fitnessforeverybody.app-315b46"></a>
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-14-1d2a22">
+  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-PostgreSQL-3f7354">
+  <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-7fae8a"></a>
+</p>
 
-👉 立即体验：**<https://fitnessforeverybody.app>**
+<p align="center">
+  <a href="https://fitnessforeverybody.app">
+    <img alt="Fitness for Everybody: Record life, make sense of every meal." src="docs/images/landing.webp" width="100%">
+  </a>
+</p>
 
-免费 · 中英双语 · 手机和电脑都能用
+<p align="center">
+  <b>Try it now → <a href="https://fitnessforeverybody.app">fitnessforeverybody.app</a></b><br>
+  Free · English and Chinese · Works on phone and desktop
+</p>
 
-## 目录
+## Table of Contents
 
-- [为什么做这个](#为什么做这个)
-- [核心功能](#核心功能)
-- [技术栈](#技术栈)
-- [项目结构](#项目结构)
-- [本地开发](#本地开发)
-- [文档](#文档)
-- [参与贡献](#参与贡献)
-- [许可](#许可)
+1. 💡 [Why Fitness for Everybody?](#why-fitness-for-everybody)
+2. ✨ [Features](#features)
+3. 🧱 [Tech Stack](#tech-stack)
+4. 🗂️ [Project Structure](#project-structure)
+5. 🚀 [Getting Started](#getting-started)
+6. 📚 [Documentation](#documentation)
+7. 🤝 [Contributing](#contributing)
+8. 📄 [License](#license)
 
-## 为什么做这个
+## Why Fitness for Everybody?
 
-想增肌、减脂或者吃得更健康，最难坚持的往往不是训练，而是饮食记录：传统的记录方式要称重、查表、手动算宏量营养素，几天就放弃了。而真实的日常饮食大多是外卖、食堂、连锁品牌和家常菜，很难在国外的食品数据库里找到对应条目。
+Whether you are building muscle, losing fat or simply trying to eat better, the hardest habit to keep is usually not the training. It is the food log. Traditional trackers ask you to weigh every portion, search long food databases and add up macros by hand, and most people give up within a week. Real meals are also messy: takeaway, canteen lunches, chain-restaurant combos and home cooking rarely match a database entry.
 
-Fitness for Everybody 想让记录饮食像发一条消息一样简单：你只需要用自己的话说出吃了什么，剩下的交给 AI。它会告诉你今天吃够了没有、哪里还差一点，以及下一餐怎么吃更合适。
+Fitness for Everybody makes logging food as easy as sending a message. Describe what you ate in your own words and let AI do the rest. It tells you whether you have eaten enough today, what is still missing, and what your next meal could be.
 
-适合这些人：
+It is built for people who:
 
-- 正在增肌、减脂或减重，需要控制每天的蛋白质和热量；
-- 有训练习惯，希望饮食跟着训练日和休息日调整；
-- 没有时间称重算数，只想大致知道自己吃得对不对。
+- are building muscle, losing fat or losing weight and need to watch protein and calories;
+- train regularly and want their diet to follow training and rest days;
+- have no time to weigh food, but want to know they are roughly on track.
 
-## 核心功能
+## Features
 
-### AI 识别每一餐
+### 🥗 AI meal recognition
 
-用自然语言描述你吃的东西，AI Agent 通过自主 function calling 把这一餐拆成具体食物，并估算每一项的营养。
+Describe a meal in plain language. An AI agent with autonomous function calling breaks it into individual foods and estimates the nutrition of each one.
 
-- 外卖、连锁品牌套餐、麻辣烫、盖饭和家常菜都能识别，可以带上品牌、份量和克数；
-- 识别过程实时显示，结果先放进待确认列表，你可以调整份量，确认后才计入当天；
-- 查到公开资料时，会附上参考来源和品牌官网；
-- 每种食物附一句简短的饮食小建议。
+- Handles takeaway, chain-restaurant meals, mixed dishes and home cooking, including brands, portions and grams.
+- Shows its progress live. Results land in a review list where you can adjust portions before they count toward today.
+- Links the public sources and official brand pages it used when it looked something up.
+- Adds a short, practical tip to each food.
 
-### 今日营养进度
+### 📊 Daily nutrition progress
 
-- 蛋白质、碳水、脂肪、热量、膳食纤维五项进度，都显示具体数字；
-- 汇总成一个今日达标率，一眼看出今天完成得怎么样；
-- 每日目标根据你的身体资料、目标、训练日和饮食日状态自动计算。
+- Live progress for protein, carbs, fat, calories and fiber, always shown as numbers.
+- One daily score that tells you at a glance how today is going.
+- Daily targets adapt to your body, your goal, and whether today is a training or rest day.
 
-### 智能推荐下一餐
+### 🍽️ Smart next-meal recommendations
 
-- 根据当日营养预算和剩余缺口，智能推荐下一餐；
-- 可按餐饮地域、餐次和风格筛选；
-- 当天快要达标时自动切换为轻补模式，优先推荐水果、酸奶等轻量加餐；
-- 不满意可以让 AI 再推荐一批，拿不定主意时用“随机推荐”摇一个。
+- Recommendations follow today's nutrition budget and what is still missing.
+- Filter by cuisine, meal slot and style.
+- Switches to light top-ups such as fruit or yogurt when you are close to your targets.
+- Ask AI for more ideas, or let the shuffle pick one for you.
 
-### 日历与设置
+### 📅 Calendar and settings
 
-- 训练和饮食日历：记录每天练了什么、吃了什么，随时回看以往的记录和完成度；
-- 身体资料和目标只需设置一次，之后会记住；也可以随时调整每日营养目标。
+- A training and food calendar to look back at what you ate and trained on any day.
+- Set up your body profile and goal once; it is remembered, and you can fine-tune daily targets at any time.
 
-### 账号与数据
+### 🔐 Account
 
-- 邮箱 + 验证码登录，无需密码；
-- 记录保存在账号中，换设备也能继续使用；
-- 可以随时删除账号和全部数据。
+- Sign in with your email and a one-time code. No password.
+- Your records follow you across devices, and you can delete your account and all data at any time.
 
-> 营养数值为估算结果，仅供日常参考，不构成医疗或营养诊断。
+> Nutrition values are estimates for everyday guidance, not medical or dietary advice.
 
-## 技术栈
+## Tech Stack
 
-| 部分 | 技术 |
+| Layer | Technology |
 | --- | --- |
-| 前端 | Next.js 14（App Router）、React 18、TypeScript、Tailwind CSS |
-| 后端 | Next.js API Routes（Node.js） |
-| 数据库 | Supabase（PostgreSQL） |
+| Frontend | Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS |
+| Backend | Next.js API Routes (Node.js) |
+| Database | Supabase (PostgreSQL) |
 
-## 项目结构
+## Project Structure
 
 ```text
 fitnessforeverybody/
 ├── src/
-│   ├── app/                  # 页面与 API 路由
-│   ├── features/             # 按功能划分的业务模块
-│   │   ├── recognition/      # 食物识别
-│   │   ├── recommendation/   # 下一餐推荐
-│   │   ├── profile/          # 身体资料与目标设置
-│   │   ├── daily-log/        # 今日进度与日历
-│   │   ├── account/          # 登录与账号
-│   │   ├── feedback/         # 意见反馈
-│   │   └── agent/            # AI Agent
-│   └── shared/               # 跨功能共用的逻辑、组件与类型
-├── data/                     # 静态数据
-├── supabase/                 # 数据库迁移与测试
-├── scripts/                  # 构建与测试脚本
-├── tests/                    # 自动化测试
-├── docs/                     # 专题文档
-├── ARCHITECTURE.md
-├── CODE.md
-├── AGENTS.md
-└── CHANGELOG.md
+│   ├── app/                  # Pages and API routes
+│   ├── features/             # Feature modules
+│   │   ├── recognition/      # Meal recognition
+│   │   ├── recommendation/   # Next-meal recommendations
+│   │   ├── profile/          # Body profile and goals
+│   │   ├── daily-log/        # Daily progress and calendar
+│   │   ├── account/          # Sign-in and account
+│   │   ├── feedback/         # In-app feedback
+│   │   └── agent/            # AI agent
+│   └── shared/               # Shared logic, components and types
+├── data/                     # Static data
+├── supabase/                 # Database migrations and tests
+├── scripts/                  # Build and test scripts
+├── tests/                    # Automated tests
+└── docs/                     # Topic guides
 ```
 
-每个功能模块内部再分为 `domain`（纯业务逻辑）、`server`（服务端调用）和 `ui`（界面组件）三层。
+Each feature module is split into `domain` (pure business logic), `server` (server-side calls) and `ui` (components).
 
-## 本地开发
+## Getting Started
 
-如果你克隆了这个仓库，可以按以下步骤在本地运行。需要 Node.js 22.6 或更高版本。
+If you have cloned this repository, you can run it locally. You need Node.js 22.6 or later.
 
 ```bash
 git clone https://github.com/thrqz101/fitnessforeverybody.git
 cd fitnessforeverybody
 npm install
-cp .env.example .env    # 按 .env.example 中的说明填写配置
+cp .env.example .env    # fill in the values described in .env.example
 npm run dev
 ```
 
-然后打开 <http://localhost:3000>。
+Then open <http://localhost:3000>.
 
-常用命令：
+Useful commands:
 
 ```bash
-npm run typecheck   # 类型检查
-npm test            # 运行测试
-npm run build       # 生产构建
+npm run typecheck   # type checking
+npm test            # tests
+npm run build       # production build
 ```
 
-详细的环境配置说明见 [docs/setup.md](docs/setup.md)。
+See [docs/setup.md](docs/setup.md) for the full environment setup.
 
-## 文档
+## Documentation
 
-| 文档 | 说明 |
+| Document | What it covers |
 | --- | --- |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | 系统架构：目录职责、分层规则和主要请求流程 |
-| [CODE.md](CODE.md) | 代码规范：命名、模块划分、接口写法和 TypeScript 约定 |
-| [AGENTS.md](AGENTS.md) | 给 AI 编程助手的协作规则，也适合人类贡献者阅读 |
-| [docs/](docs/) | 专题文档：识别、推荐、营养目标、数据库、多语言、测试、界面规范、环境配置等 |
-| [CHANGELOG.md](CHANGELOG.md) | 版本更新记录 |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | System overview, directory ownership, layering rules and the main request flow |
+| [CODE.md](CODE.md) | Coding conventions: naming, modules, API routes and TypeScript |
+| [AGENTS.md](AGENTS.md) | Working rules for AI coding assistants, also useful for human contributors |
+| [docs/](docs/) | Topic guides: recognition, recommendations, nutrition targets, database, i18n, testing, UI, setup and more |
+| [CHANGELOG.md](CHANGELOG.md) | Release notes |
 
-## 参与贡献
+## Contributing
 
-欢迎提交 Issue 和 Pull Request。开始之前请先阅读 [CODE.md](CODE.md) 和 [AGENTS.md](AGENTS.md)。
+Issues and pull requests are welcome. Please read [CODE.md](CODE.md) and [AGENTS.md](AGENTS.md) first.
 
-1. 从 `main` 新建分支，例如 `feat/your-feature`；
-2. 提交前运行 `npm run typecheck` 和 `npm test`；
-3. 提交信息使用 Conventional Commits 格式，例如 `feat(recommendation): ...`；
-4. 推送分支并发起 Pull Request，说明改动内容和验证方式。
+1. Create a branch from `main`, for example `feat/your-feature`.
+2. Run `npm run typecheck` and `npm test` before committing.
+3. Use Conventional Commits, for example `feat(recommendation): ...`.
+4. Push your branch and open a pull request describing the change and how you verified it.
 
-## 许可
+## License
 
 [MIT](LICENSE)
