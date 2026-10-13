@@ -15,7 +15,7 @@ import {
   Trash2,
   Utensils
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { getLocalizedFoodField } from "@/lib/translations";
 import { pick, type Language } from "@/lib/i18n-utils";

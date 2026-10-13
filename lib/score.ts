@@ -2,8 +2,6 @@ import type { MacroKey, MacroTotals } from "./types";
 
 /** Weights v1. Must match public.weighted_score in the database (protein 25, calories 25, carbs 20, fat 15, fiber 15). */
 export const scoreWeights: Record<MacroKey, number> = { protein: 25, calories: 25, carbs: 20, fat: 15, fiber: 15 };
-export const REQUIRED_FLOWS = 2;
-export const EFFECTIVE_SCORE = 0.5;
 
 /** Each item counts min(actual / target, 1); the result is 0..1 and unrounded. */
 export function weightedScore(totals: MacroTotals, targets: MacroTotals): number {

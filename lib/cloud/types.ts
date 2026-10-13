@@ -79,4 +79,3 @@ export type ProfileRow = {
 };
 
 /** Result of a mutation on an entry: the entry plus the refreshed day (null for drafts). */
-export type EntryMutation = { food: FoodLogItem; day: CloudDay | null };

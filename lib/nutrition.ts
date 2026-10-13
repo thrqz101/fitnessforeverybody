@@ -306,10 +306,6 @@ export function recommendationCoverage(recommendation: Recommendation, gaps: Mac
   return Math.max(0, coverage / scoredKeys.length - overagePenalty + fitBonus + getDietRecommendationBonus(recommendation, profile, day) + getGoalRecommendationAdjustment(recommendation, profile));
 }
 
-export function formatMacro(value: number, key: MacroKey) {
-  return `${Math.round(value)}${macroLabels[key].unit}`;
-}
-
 export function isLightTopUpGap(gaps: MacroTotals) {
   return gaps.calories <= 520 && gaps.protein <= 28 && gaps.carbs <= 55 && gaps.fat <= 22 && gaps.fiber <= 12;
 }

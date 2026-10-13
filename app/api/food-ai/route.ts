@@ -745,77 +745,6 @@ function shouldRepairAiPayload(parsed: AiPayload, content: unknown, description:
   return /[\{\[]/.test(content);
 }
 
-const localFoodRules: Array<{
-  test: RegExp;
-  food: AiFood;
-}> = [
-  {
-    test: /白菜.*(鲜肉)?饺子|饺子.*白菜|水饺/,
-    food: {
-      name: "白菜鲜肉饺子",
-      brand: "饺子馆 / 行业平均",
-      foodType: "饺子",
-      portionLabel: "正常一份",
-      meal: "lunch",
-      macros: { protein: 28, carbs: 78, fat: 22, calories: 620, fiber: 5 },
-      recognitionMode: "industry-average",
-      warning: "按常见白菜鲜肉水饺一份估算；如果个头特别大或特别小，可以在右侧改。"
-    }
-  },
-  {
-    test: /素菜拼盘|蔬菜拼盘|素菜.*拼|蔬菜.*拼/,
-    food: {
-      name: "素菜拼盘",
-      brand: "素菜拼盘 / 行业平均",
-      foodType: "素菜",
-      portionLabel: "正常一盘",
-      meal: "lunch",
-      macros: { protein: 16, carbs: 48, fat: 18, calories: 415, fiber: 12 },
-      recognitionMode: "industry-average",
-      warning: "按藕片、黄瓜、花生、豆制品等混合素菜拼盘估算；油拌和花生会让脂肪更高。"
-    }
-  },
-  {
-    test: /麻辣烫|冒菜/,
-    food: {
-      name: "麻辣烫混合碗",
-      brand: "麻辣烫 / 行业平均",
-      foodType: "麻辣烫",
-      portionLabel: "正常一碗",
-      meal: "lunch",
-      macros: { protein: 34, carbs: 58, fat: 24, calories: 610, fiber: 9 },
-      recognitionMode: "industry-average",
-      warning: "按少量主食、豆制品、丸子和蔬菜估算；麻酱和宽粉多的话热量会更高。"
-    }
-  },
-  {
-    test: /盖浇饭|盖饭|鸡腿饭|猪脚饭|黄焖鸡/,
-    food: {
-      name: "盖浇饭",
-      brand: "中式快餐 / 行业平均",
-      foodType: "盖饭",
-      portionLabel: "正常一份",
-      meal: "lunch",
-      macros: { protein: 36, carbs: 86, fat: 26, calories: 720, fiber: 6 },
-      recognitionMode: "industry-average",
-      warning: "按一份米饭和一份肉菜估算；加蛋、加肉或大份米饭会更高。"
-    }
-  },
-  {
-    test: /火锅|海底捞|巴奴|呷哺/,
-    food: {
-      name: "火锅常规组合",
-      brand: "火锅 / 行业平均",
-      foodType: "火锅",
-      portionLabel: "正常一餐",
-      meal: "dinner",
-      macros: { protein: 54, carbs: 35, fat: 38, calories: 700, fiber: 9 },
-      recognitionMode: "industry-average",
-      warning: "按肉类、豆制品、蔬菜和少量主食估算；油碟、麻酱、酥肉会显著增加脂肪。"
-    }
-  }
-];
-
 type StrictLocalFoodMatch = {
   food: AiFood;
   tokens: string[];
@@ -1064,32 +993,6 @@ function buildExactLocalResult(description: string, language: Language = "zh") {
   return buildStrictLocalResponse(matches, true, language);
 }
 
-function canUseExactLocalFallback(description: string) {
-  const text = normalizeSearchText(description);
-  if (!text) return false;
-
-  const looksLikeDetailedMeal = /点了|主要有|里面有|还吃|还喝|另外|再加|加了|配了|包含|还有|其中|分别|；|;/.test(description);
-  if (looksLikeDetailedMeal) return false;
-
-  return true;
-}
-
-function estimateFoodsFromExactLocalKnowledge(description: string): AiFood[] {
-  const text = normalizeSearchText(description);
-  if (!text) return [];
-
-  const exactFoods = foodCatalog
-    .filter((item) => isExactCatalogFoodMatch(item, text))
-    .slice(0, 4)
-    .map((item) => catalogItemToAiFood(item));
-
-  return uniqueAiFoods(exactFoods).slice(0, 4);
-}
-
-function isExactCatalogFoodMatch(item: FoodCatalogItem, text: string) {
-  return getStrictCatalogMatchTokens(item, text).length > 0;
-}
-
 function cleanExactFoodToken(token: string) {
   return normalizeSearchText(token)
     .replace(/\d+(\.\d+)?(g|克|ml|毫升)?/gi, "")
@@ -1108,73 +1011,10 @@ function isExactTokenPresent(token: string, text: string) {
   return false;
 }
 
-function hasSimilarRuleFood(item: FoodCatalogItem, ruleFoods: AiFood[]) {
-  const itemText = normalizeSearchText(`${item.title}${item.foodType}${item.items.join("")}${item.aliases.join("")}`);
-  return ruleFoods.some((food) => {
-    const foodType = normalizeSearchText(food.foodType ?? "");
-    const foodName = normalizeSearchText(food.name ?? "");
-    if (foodType && itemText.includes(foodType)) return true;
-    if (foodName && itemText.includes(foodName)) return true;
-    if (foodType === "素菜" && /素菜|蔬菜|拼盘/.test(itemText)) return true;
-    return false;
-  });
-}
-
-function hasStrongCatalogMatch(item: FoodCatalogItem, text: string) {
-  const fields = [
-    item.brand,
-    item.title,
-    ...item.aliases,
-    ...item.items
-  ];
-
-  return fields.some((field) => {
-    for (const token of splitSearchTokens(field)) {
-      if (token.length < 3) continue;
-      if (isGenericFoodToken(token)) continue;
-      if (text.includes(token)) return true;
-    }
-    return false;
-  });
-}
-
 function splitSearchTokens(value: string) {
   return normalizeSearchText(value)
     .split(/[/／+＋、，,;；:：|｜\s]+/)
     .filter(Boolean);
-}
-
-function isGenericFoodToken(token: string) {
-  return /^(咖啡|拿铁|奶茶|汉堡|米饭|面条|粉面|饮料|茶饮|水果|蔬菜|青菜|牛肉|鸡肉|猪肉|豆腐|酸奶|沙拉|蛋白|套餐|快餐)$/.test(token);
-}
-
-function scoreCatalogItem(item: FoodCatalogItem, text: string) {
-  const aliases = item.aliases ?? [];
-  const fields = [
-    item.brand,
-    item.title,
-    item.foodType,
-    ...item.items,
-    ...aliases
-  ].map(normalizeSearchText).filter(Boolean);
-
-  let score = 0;
-  for (const field of fields) {
-    if (!field || field.length < 2) continue;
-    if (text.includes(field)) score += field.length >= 4 ? 5 : 3;
-  }
-
-  for (const token of splitCatalogTokens(item)) {
-    if (token.length >= 2 && text.includes(token)) score += 1;
-  }
-
-  return score;
-}
-
-function splitCatalogTokens(item: FoodCatalogItem) {
-  return normalizeSearchText(`${item.brand} ${item.title} ${item.foodType} ${item.items.join(" ")} ${item.aliases.join(" ")}`)
-    .split(/[/／+＋、，,;；:：|｜\s]+/)
-    .filter((token) => token.length >= 2);
 }
 
 function catalogItemToAiFood(item: FoodCatalogItem): AiFood {

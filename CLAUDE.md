@@ -21,10 +21,13 @@ food or manually calculating macros.
 - **Next.js App Router + Server Components**: `app/api` is the HTTP boundary,
   `lib` holds domain logic, the agent, tools, conversions, and i18n, and
   `components` renders UI only.
-- **Agent**: `lib/agent/run-agent.ts` runs a function-calling loop over three
-  tools — the local per-100g food DB, Exa web search, and LLM estimation.
-- **Backend**: an independent EdgeSpark (Cloudflare D1 + Drizzle) module lives in
-  `server/` and is excluded from the Next build via `tsconfig`.
+- **Food recognition**: `app/api/food-ai/route.ts` is the in-app pipeline: brand and
+  rule routing, the local per-100g DB, Tavily web search and LLM estimation, streamed as
+  progress events. `app/api/nutrition-agent` is a separate function-calling agent
+  (`lib/agent/run-agent.ts`) over the local DB, Exa search and LLM estimation.
+- **Backend**: Supabase (Postgres + Auth + RLS). Schema lives in
+  `supabase/migrations`, SQL scenario tests in `supabase/tests`; Next API routes
+  reach it through `lib/supabase` and `lib/cloud`.
 - **Types**: `lib/types.ts` centralizes domain types for cross-layer reuse.
 
 ## Engineering Rules
