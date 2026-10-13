@@ -2,6 +2,7 @@ import type { DayState, FoodLogItem, UserProfile } from "../types";
 import type { Language } from "../i18n-utils";
 import type { CloudDay, CloudState } from "./types";
 import type { FeedbackProgress } from "../feedback-progress";
+import type { ImportPayload } from "./import";
 
 export class CloudApiError extends Error {
   constructor(public readonly status: number, public readonly code: string) { super(code); }
@@ -37,7 +38,13 @@ export const cloudApi = {
     call<EntryResult>(`/api/entries/${id}/confirm`, "POST", portionScale === undefined ? {} : { portionScale }),
   setPortion: (id: string, portionScale: number) => call<EntryResult>(`/api/entries/${id}`, "PATCH", { portionScale }),
   deleteEntry: (id: string) => call<EntryResult>(`/api/entries/${id}`, "DELETE"),
-  saveFeedbackProgress: (progress: FeedbackProgress) => call<object>("/api/feedback-progress", "PUT", { progress })
+  saveFeedbackProgress: (progress: FeedbackProgress) => call<object>("/api/feedback-progress", "PUT", { progress }),
+  submitFeedback: (input: { dedupeId: string; kind: string; message: string; contact: string }) =>
+    call<{ id: string }>("/api/feedback", "POST", input),
+  importRecords: (payload: ImportPayload) =>
+    call<{ imported: number; skippedDays: number }>("/api/import", "POST", { records: payload.records }),
+  skipImport: () => call<object>("/api/import", "POST", { skip: true }),
+  deleteAccount: (confirm: string) => call<object>("/api/account", "DELETE", { confirm })
 };
 
 const messages: Record<string, [string, string]> = {
@@ -50,6 +57,8 @@ const messages: Record<string, [string, string]> = {
   rate_limited: ["操作太频繁，请稍后再试。", "Too many requests. Please try again shortly."],
   invalid_input: ["提交的内容不符合要求，请检查后重试。", "Some of the values are not valid. Please check and try again."],
   network: ["网络连接失败，请重试。", "Network error. Please try again."],
+  confirm_mismatch: ["输入的邮箱与当前账号不一致。", "The email you typed does not match this account."],
+  conflict: ["这条内容已经存在。", "That already exists."],
   backend_unconfigured: ["云端服务暂不可用。", "The cloud service is unavailable right now."]
 };
 

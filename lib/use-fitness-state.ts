@@ -6,7 +6,8 @@ import { getBeijingDateKey } from "@/lib/dates";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { cloudApi, describeCloudError, type EntryResult } from "@/lib/cloud/client";
-import type { CloudDay, CloudState } from "@/lib/cloud/types";
+import type { CloudDay, CloudState, LocalImportState } from "@/lib/cloud/types";
+import { legacyToImport } from "@/lib/cloud/import";
 import { acknowledgeFeedbackMilestone, completeRecognitionFlow, emptyFeedbackProgress, feedbackProgressKey, nextFeedbackMilestone, parseFeedbackProgress, type FeedbackProgress } from "@/lib/feedback-progress";
 import { calculateRecommendedFiberGrams, calculateRecommendedMacroMultipliers, calculateTargets, defaultDayState, defaultProfile, hasMeaningfulGap, normalizeFiberGrams, normalizeMacroMultipliers, remainingMacros, sumFoods } from "@/lib/nutrition";
 import type { DayRecord, DayState, FoodLogItem, MacroTotals, UserProfile } from "@/lib/types";
@@ -45,6 +46,7 @@ export function useFitnessState(snapshotBeforeWrite = false) {
   const [profileVersion, setProfileVersion] = useState<number | null>(null);
   const [cloudError, setCloudError] = useState<string | null>(null);
   const [busyFoodIds, setBusyFoodIds] = useState<string[]>([]);
+  const [localImportState, setLocalImportState] = useState<LocalImportState>("pending");
 
   const inflight = useRef(0);
   const syncing = useRef(false);
@@ -133,6 +135,7 @@ export function useFitnessState(snapshotBeforeWrite = false) {
       ...state.foods.filter((food) => food.entryDate === state.today)
     ]);
     setProfileVersion(state.profileVersion);
+    setLocalImportState(state.localImportState);
     if (state.profile) {
       setProfile(normalizeProfile(state.profile));
       setHasProfile(true);
@@ -409,6 +412,34 @@ export function useFitnessState(snapshotBeforeWrite = false) {
     });
   }
 
+  /** What this device still holds from the old local-only version (saved foods only). */
+  function readLegacyImport() {
+    return legacyToImport(window.localStorage.getItem(recordsKey), currentDateKey);
+  }
+
+  async function importLegacyRecords(): Promise<{ imported: number; skippedDays: number } | null> {
+    try {
+      const result = await track(() => cloudApi.importRecords(readLegacyImport()));
+      setLocalImportState("imported");
+      void resync(true);
+      return { imported: result.imported, skippedDays: result.skippedDays };
+    } catch (error) {
+      failWith(error);
+      return null;
+    }
+  }
+
+  async function skipLegacyImport(): Promise<boolean> {
+    try {
+      await track(() => cloudApi.skipImport());
+      setLocalImportState("skipped");
+      return true;
+    } catch (error) {
+      failWith(error);
+      return false;
+    }
+  }
+
   function acknowledgeFeedbackInvitation(milestone: number) {
     setFeedbackProgress((progress: FeedbackProgress) => acknowledgeFeedbackMilestone(progress, milestone));
   }
@@ -433,6 +464,7 @@ export function useFitnessState(snapshotBeforeWrite = false) {
     addFoods, chooseRecommendation, removeFood, saveFoodToCalendar, clearDraftFoods,
     completedRecognitionFlows: feedbackProgress.completedBatchIds.length,
     feedbackMilestone: nextFeedbackMilestone(feedbackProgress), acknowledgeFeedbackInvitation,
+    localImportState, readLegacyImport, importLegacyRecords, skipLegacyImport,
     cloudMode, cloudError, clearCloudError: () => setCloudError(null), retrySync: () => resync(true), busyFoodIds,
     todayScore: todayMeta?.score ?? null, todayFlows: todayMeta?.flows ?? 0,
     selectedScore: selectedDateKey === currentDateKey ? todayMeta?.score ?? null : selectedMeta?.score ?? null,

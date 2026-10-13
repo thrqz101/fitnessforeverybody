@@ -35,7 +35,7 @@ async function signIn(label) {
   const verified = await client.auth.verifyOtp({ email, token: link.data.properties.email_otp, type: 'email' });
   if (verified.error) throw verified.error;
   const cookie = [...jar].map(([name, value]) => `${name}=${value}`).join('; ');
-  return { id: user.data.user.id, cookie };
+  return { id: user.data.user.id, cookie, email };
 }
 
 async function api(who, method, path, body) {
@@ -133,6 +133,75 @@ try {
       check('confirming a second food of the same recognition does not add a flow', second.json.day.flows === 1, JSON.stringify(second.json?.day));
     }
   }
+
+  // ---- Feedback ----
+  const dedupeId = crypto.randomUUID();
+  const feedback = { dedupeId, kind: 'issue', message: '按钮点了没反应', contact: ' me@example.com ' };
+  r = await api(null, 'POST', '/api/feedback', feedback);
+  check('feedback requires a session (401)', r.status === 401, r.status);
+  r = await api(a, 'POST', '/api/feedback', { ...feedback, kind: 'spam' });
+  check('feedback with an unknown type is rejected (400)', r.status === 400, r.status);
+  r = await api(a, 'POST', '/api/feedback', { ...feedback, message: ' x ' });
+  check('too-short feedback is rejected (400)', r.status === 400, r.status);
+  r = await api(a, 'POST', '/api/feedback', feedback);
+  const feedbackId = r.json?.id;
+  check('feedback is stored and returns its id', r.status === 200 && Boolean(feedbackId), JSON.stringify(r.json));
+  r = await api(a, 'POST', '/api/feedback', feedback);
+  check('submitting the same feedback twice returns the same row', r.status === 200 && r.json.id === feedbackId);
+  const stored = await admin.from('feedback').select('message,contact,status').eq('user_id', a.id);
+  check('exactly one private row with trimmed contact and status new', stored.data?.length === 1 && stored.data[0].contact === 'me@example.com' && stored.data[0].status === 'new', JSON.stringify(stored.data));
+
+  // ---- Local import ----
+  const shift = (key, days) => { const d = new Date(`${key}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + days); return d.toISOString().slice(0, 10); };
+  const food = (clientId, name, calories) => ({ clientId, name, meal: 'lunch', baseMacros: { protein: 20, carbs: 30, fat: 5, calories, fiber: 3 }, macros: { protein: 20, carbs: 30, fat: 5, calories, fiber: 3 }, portionScale: 1, item: { nameEn: name } });
+  const records = [
+    { date: shift(today, -6), day, foods: [food('d6:a', '旧记录甲', 400)] },
+    { date: shift(today, -5), day, foods: [food('d5:a', '旧记录乙', 300), food('d5:b', '旧记录丙', 200)] },
+    { date: today, day, foods: [food('t:a', '今天的旧记录', 100)] }
+  ];
+  const todayBefore = (await api(a, 'POST', '/api/sync')).json.state.days[today];
+  r = await api(a, 'POST', '/api/import', { records: [{ date: shift(today, 3), foods: [] }] });
+  check('importing a future day is rejected (400)', r.status === 400, r.status);
+  r = await api(a, 'POST', '/api/import', { records });
+  check('local records import (past days and today)', r.status === 200 && r.json.imported === 4, JSON.stringify(r.json));
+  r = await api(a, 'POST', '/api/import', { records });
+  check('importing again adds nothing', r.status === 200 && r.json.imported === 0, JSON.stringify(r.json));
+  r = await api(a, 'POST', '/api/sync');
+  const old = r.json.state.days[shift(today, -5)];
+  check('imported past days are finalized, migrated and carry no verdict or flows', old?.migrated === true && old.finalized === true && old.effective === null && old.flows === 0 && old.score === null && old.totals.calories === 500, JSON.stringify(old));
+  check('today import adds nutrition but never a recognition flow', r.json.state.days[today].totals.calories === todayBefore.totals.calories + 100 && r.json.state.days[today].flows === todayBefore.flows, JSON.stringify([todayBefore, r.json.state.days[today]]));
+  check('import state is recorded as imported', r.json.state.localImportState === 'imported');
+
+  // ---- Skip, then account deletion with cascade ----
+  r = await api(b, 'PUT', '/api/profile', { profile, day, expectedVersion: null });
+  r = await api(b, 'POST', '/api/entries', { source: 'manual', food: shake, confirm: true });
+  await api(b, 'POST', '/api/feedback', { dedupeId: crypto.randomUUID(), kind: 'other', message: '要被删除的反馈' });
+  const bForm = new FormData(); bForm.append('description', '一碗米饭'); bForm.append('lang', 'zh'); bForm.append('requestId', crypto.randomUUID());
+  await api(b, 'POST', '/api/food-ai', bForm);
+  r = await api(b, 'POST', '/api/import', { skip: true });
+  check('declining the import is recorded', r.status === 200 && (await admin.from('profiles').select('local_import_state').eq('user_id', b.id).single()).data.local_import_state === 'skipped');
+
+  const rows = async (id) => {
+    const counts = {};
+    for (const table of ['profiles', 'daily_activity', 'food_entries', 'recognition_requests', 'feedback']) {
+      counts[table] = (await admin.from(table).select('*', { count: 'exact', head: true }).eq('user_id', id)).count;
+    }
+    return counts;
+  };
+  const before = await rows(b.id);
+  check('the account has data before deletion', before.profiles === 1 && before.food_entries >= 1 && before.feedback === 1 && before.daily_activity >= 1, JSON.stringify(before));
+  r = await api(null, 'DELETE', '/api/account', { confirm: b.email });
+  check('account deletion requires a session (401)', r.status === 401, r.status);
+  r = await api(b, 'DELETE', '/api/account', { confirm: 'someone-else@example.com' });
+  check('deletion with the wrong email is refused (400)', r.status === 400 && r.json.code === 'confirm_mismatch', JSON.stringify(r.json));
+  check('nothing was deleted by the refused request', (await rows(b.id)).profiles === 1);
+  r = await api(b, 'DELETE', '/api/account', { confirm: b.email.toUpperCase() });
+  check('deletion with the typed email succeeds', r.status === 200, JSON.stringify(r.json));
+  const after = await rows(b.id);
+  check('profile, days, foods, recognitions and feedback are all gone', Object.values(after).every((n) => n === 0), JSON.stringify(after));
+  r = await api(b, 'POST', '/api/sync');
+  check('the deleted account can no longer use its old session', r.status === 401, r.status);
+  check('other users are untouched by that deletion', (await rows(a.id)).profiles === 1);
 } catch (error) {
   check('smoke run completed without exceptions', false, error?.message ?? String(error));
 } finally {
