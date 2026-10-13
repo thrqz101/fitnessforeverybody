@@ -7,6 +7,8 @@ import { Dashboard } from "@/components/Dashboard";
 import { ProfilePanel } from "@/components/ProfilePanel";
 import { Recommendations } from "@/components/Recommendations";
 import { TrainingCalendar } from "@/components/TrainingCalendar";
+import { LoginDialog } from "@/components/auth/LoginDialog";
+import { useAuth } from "@/lib/auth/AuthProvider";
 import { useI18n } from "@/lib/i18n";
 import { useFitnessState } from "@/lib/use-fitness-state";
 import { PrecisionHero, PreviewFooter, PreviewNav, Reviews, usePreviewText, type ToolTab } from "./PreviewChrome";
@@ -24,6 +26,8 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
   const { t } = useI18n();
   const text = usePreviewText();
   const router = useRouter();
+  const auth = useAuth();
+  const [loginIntent, setLoginIntent] = useState<ToolTab | null>(null);
   const [tab, setTab] = useState<ToolTab>("recognition");
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackInvitation, setFeedbackInvitation] = useState<number | null>(null);
@@ -82,8 +86,16 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
     return () => cancelAnimationFrame(frame);
   }, [focusRequest, settingsOpen, state.hasProfile]);
 
+  useEffect(() => {
+    if (auth.status !== "signed_in" || !loginIntent) return;
+    const intent = loginIntent;
+    setLoginIntent(null);
+    navigate(intent);
+  }, [auth.status, loginIntent, state.hydrated]);
+
   function navigate(nextTab: ToolTab, records = false) {
-    if (!state.hydrated) return;
+    if (!state.hydrated || auth.status === "loading") return;
+    if (auth.status === "signed_out") { setLoginIntent(nextTab); auth.openLogin(); return; }
     if (mode === "landing") {
       if (!state.hasProfile) { setPendingTab(nextTab); setSettingsOpen(true); }
       else router.push(nextTab === "recognition" ? "/workspace" : `/workspace?view=${nextTab}`);
@@ -106,7 +118,9 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
           {primaryViews.map((key) => <button key={key} id={`tab-${key}`} aria-current={tab === key ? "page" : undefined} className={tab === key ? "is-active" : ""} onClick={() => navigate(key)}>{labels[key]}</button>)}
           <button onClick={() => openFeedback()} aria-haspopup="dialog" className="precision-feedback-action"><MessageSquare size={15} />{text("意见反馈", "Feedback")}</button>
         </nav>
-        {!state.hydrated ? <p className="py-20 text-center text-zinc-500">{t("正在准备你的健康空间")}</p> : !state.hasProfile ? <div className="precision-locked-tools">
+        {auth.status === "signed_out" ? <div className="precision-locked-tools">
+          <section id={tab} className="precision-locked-card"><div className="precision-locked-icon"><LockKeyhole size={22} /></div><span className="precision-eyebrow">{text("需要登录", "SIGN IN REQUIRED")}</span><h3>{text("登录后使用识别、记录和反馈", "Sign in to use recognition, records and feedback")}</h3><p>{text("用邮箱验证码登录，无需密码，数据会保存到你的账号。", "Sign in with an emailed code. No password needed, and your data is saved to your account.")}</p><button className="precision-button" onClick={auth.openLogin}>{text("登录", "Sign in")}<ArrowRight size={16} /></button></section>
+        </div> : !state.hydrated || auth.status === "loading" ? <p className="py-20 text-center text-zinc-500">{t("正在准备你的健康空间")}</p> : !state.hasProfile ? <div className="precision-locked-tools">
           {[tab].map((key, index) => <section id={key} key={key} className="precision-locked-card"><div className="precision-locked-icon">{key === "recognition" ? <ScanLine size={26} /> : <LockKeyhole size={22} />}</div><span className="precision-eyebrow">0{index + 1} / {labels[key]}</span><h3>{key === "recognition" ? t("输入食物、品牌和份量，AI 会识别食材并估算这一餐的营养。") : labels[key]}</h3><p>{text("先填写身体资料，再查看属于你的营养目标与记录。", "Set up your profile to see your personal targets and records.")}</p><button className="precision-button" onClick={() => navigate(key)}>{key === "recognition" ? text("开始识别", "Start identifying") : text("填写资料", "Set up profile")}<ArrowRight size={16} /></button></section>)}
         </div> : <div className="precision-tool-content">
           <div hidden={tab !== "recognition"}>
@@ -131,6 +145,7 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
     </main>
     <PreviewFooter onStart={() => navigate("recognition")} onFeedback={() => openFeedback()} />
     {feedbackOpen && <Feedback invitation={feedbackInvitation} onClose={() => setFeedbackOpen(false)} />}
+    {auth.loginOpen && <LoginDialog onClose={() => { auth.closeLogin(); setLoginIntent(null); }} />}
     {settingsOpen && <PreviewDialog title={t("本地系统设置")} wide onClose={() => { setSettingsOpen(false); setPendingTab(null); }}>
       <ProfilePanel profile={state.profile} day={state.day} onBack={() => { setSettingsOpen(false); setPendingTab(null); }} onSave={(profile, day) => {
         state.completeProfile(profile, day); setSettingsOpen(false);
