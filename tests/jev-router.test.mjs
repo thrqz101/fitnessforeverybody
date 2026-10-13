@@ -60,12 +60,10 @@ import * as brands from '../src/features/recognition/domain/brand-catalog.ts';
 import * as eventModule from '../src/features/recognition/domain/events.ts';
 import * as evidenceCore from '../src/shared/domain/search-evidence.ts';
 import * as nutritionDb from '../src/shared/catalog/nutrition-db.ts';
+import { loadTsGraph } from './helpers/load-ts.mjs';
 const evidenceModule = {};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(new URL('../src/features/recognition/domain/build-search-evidence.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:evidenceModule,require:()=>evidenceCore,URL});
 function loadHandler(fetcher, router = 'jev', extraEnv = {}, cloudStubs = {}) {
-  const source = fs.readFileSync(new URL('../src/app/api/food-ai/route.ts', import.meta.url), 'utf8');
-  const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
-  const exports = {};
   const env = { FOOD_ROUTER: router, AI_PROVIDER: 'deepseek', DEEPSEEK_API_KEY: 'test-placeholder', TAVILY_API_KEY: 'test-placeholder', ...extraEnv };
   const dependencies = {
     '@/features/recognition/domain/events':eventModule,
@@ -81,8 +79,8 @@ function loadHandler(fetcher, router = 'jev', extraEnv = {}, cloudStubs = {}) {
     '@/features/recognition/server/cloud-recognition': { beginCloudRecognition: async () => ({ mode: 'off' }), ...cloudStubs.recognition },
     '@/features/recognition/server/persist': { persistRecognition: async () => { throw new Error('must not persist when the backend is off'); }, ...cloudStubs.persist }
   };
-  vm.runInNewContext(code, { exports, require: id => { if (!(id in dependencies)) throw new Error(id); return dependencies[id]; }, process: { env }, fetch: fetcher, Response, Headers, AbortController, AbortSignal, URL, setTimeout, clearTimeout, console });
-  return exports.POST;
+  const route = loadTsGraph('src/app/api/food-ai/route.ts', { stubs: dependencies, globals: { process: { env }, fetch: fetcher, Response, Headers, AbortController, AbortSignal, URL, setTimeout, clearTimeout, console } });
+  return route.POST;
 }
 const meal = { isFoodRelated: true, foods: [{ name: '牛肉面', brand: '小林面馆', foodType: '面食', portionLabel: '一碗', macros: { protein: 25, carbs: 70, fat: 15, calories: 515, fiber: 3 } }] };
 const completion = value => Response.json({ choices: [{ message: { content: JSON.stringify(value) } }] });
