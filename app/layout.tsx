@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { I18nProvider } from "@/lib/i18n";
+import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { PreviewProvider } from "@/components/preview/PreviewApp";
 import "./globals.css";
 import "./preview/preview.css";
@@ -22,7 +23,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     <html lang="zh-CN">
       <body>
-        <I18nProvider><PreviewProvider>{children}</PreviewProvider></I18nProvider>
+        <I18nProvider><AuthProvider><PreviewProvider>{children}</PreviewProvider></AuthProvider></I18nProvider>
       </body>
     </html>
   );

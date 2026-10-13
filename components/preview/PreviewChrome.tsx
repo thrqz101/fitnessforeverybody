@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, CalendarDays, Star, Settings } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, LogOut, Star, Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { useAuth } from "@/lib/auth/AuthProvider";
 import { useI18n } from "@/lib/i18n";
 
 export type ToolTab = "recognition" | "recommend" | "calendar";
@@ -27,6 +28,7 @@ export function PreviewNav({ mode, onStart, onNavigate, onSettings, onFeedback, 
 }) {
   const text = usePreviewText();
   const { t } = useI18n();
+  const auth = useAuth();
   return <nav className="precision-nav" aria-label={t("主要导航")}>
     <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
       <Link href="/" aria-label="Fitness for Everybody"><Brand /></Link>
@@ -37,6 +39,11 @@ export function PreviewNav({ mode, onStart, onNavigate, onSettings, onFeedback, 
       </div>
       <div className="precision-nav-utilities flex items-center gap-3">
         <LanguageSwitch compact />
+        {auth.status === "signed_out" && <button type="button" className="precision-button precision-button--secondary !min-h-[38px] !py-0 !px-4" onClick={auth.openLogin}>{text("登录", "Sign in")}</button>}
+        {auth.status === "signed_in" && <span className="precision-auth-chip" title={auth.user?.email ?? undefined}>
+          <span className="hidden sm:block">{auth.user?.email}</span>
+          <button type="button" className="precision-icon-button" onClick={() => void auth.signOut()} aria-label={text("退出登录", "Sign out")} title={text("退出登录", "Sign out")}><LogOut size={16} /></button>
+        </span>}
         {mode === "workspace" && <button id="calendar-access" className={`precision-icon-button ${calendarActive ? "is-active" : ""}`} onClick={() => onNavigate("calendar")} aria-label={t("趋势与日历")} title={t("趋势与日历")} aria-pressed={calendarActive}><CalendarDays size={18} /></button>}
         {mode !== "landing" && <button className="precision-icon-button" title={text("身体信息设置", "Body profile settings")} onClick={onSettings} aria-label={t("打开设置")}><Settings size={18} /></button>}
         <button onClick={onStart} className={`precision-nav-cta ${mode === "workspace" ? "precision-nav-cta--workspace" : ""} bg-zinc-900 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-zinc-800 transition-all shadow-sm`}>{text("开始识别", "Start identifying")}</button>
