@@ -1,27 +1,19 @@
 "use client";
 
-import { RecognitionProgress } from "@/features/recognition/ui/RecognitionProgress";
-import { requestFoodAi } from "@/features/recognition/ui/recognition-client";
-import { useRecognitionProgress } from "@/features/recognition/ui/use-recognition-progress";
-
-import {
-  ArrowRight,
-  Check,
-  ChevronRight,
-  Loader2,
-  MessageSquareText,
-  ScanLine,
-  Sparkles,
-  Trash2,
-  Utensils
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import type { UserProfile, DayState, MacroTotals, FoodLogItem, MacroKey } from "@/shared/domain/types";
 import { useI18n } from "@/shared/i18n/i18n";
-import { getLocalizedFoodField } from "@/shared/i18n/translations";
+import { useState, useEffect } from "react";
+import { useRecognitionProgress } from "@/features/recognition/ui/use-recognition-progress";
+import { weightedScore, formatScorePercent } from "@/shared/domain/score";
+import { requestFoodAi } from "@/features/recognition/ui/recognition-client";
 import { pick, type Language } from "@/shared/i18n/i18n-utils";
-import { completion, macroKeys, macroLabels } from "@/shared/domain/nutrition";
-import { formatScorePercent, weightedScore } from "@/shared/domain/score";
-import type { DayState, FoodLogItem, MacroKey, MacroTotals, UserProfile } from "@/shared/domain/types";
+import { MessageSquareText, Loader2, ScanLine, ArrowRight, Trash2, Utensils, Sparkles, Check, ChevronRight } from "lucide-react";
+import { RecognitionProgress } from "@/features/recognition/ui/RecognitionProgress";
+import { getLocalizedFoodField } from "@/shared/i18n/translations";
+import { macroKeys, completion } from "@/shared/domain/nutrition";
+import { macroLabels } from "@/shared/domain/labels";
+import { useAnimatedMacroTotals } from "@/features/daily-log/ui/use-animated-macro-totals";
+import { MealMacroGrid, getFoodHealthTip } from "@/features/daily-log/ui/MealMacroGrid";
 
 type DashboardProps = {
   presentation?: "legacy" | "workspace";
@@ -323,63 +315,6 @@ export function Dashboard({
       </section>
     </div>
   );
-}
-
-function MealMacroGrid({ food }: { food: FoodLogItem }) {
-  const { t, language } = useI18n();
-  return (
-    <div className="meal-entry__macros" aria-label={`${getLocalizedFoodField(food, "name", language)} ${t("的营养含量")}`}>
-      {macroKeys.map((macro) => (
-        <span key={macro}>
-          <strong>{Math.round(food.macros[macro])}{macroLabels[macro].unit}</strong>
-          {t(macroLabels[macro].short)}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function getFoodHealthTip(food: FoodLogItem) {
-  const details = `${food.name} ${food.foodType} ${food.warning ?? ""}`;
-
-  if (/奶茶|可乐|含糖|甜饮|果茶|糖浆/.test(details)) return "饮料换成无糖版本，减少额外糖分";
-  if (/炸|酥|鸡皮|油碟|烧烤|烤肉|重油/.test(details) || food.macros.fat >= 28) return "去皮少油，再搭配一份蔬菜";
-  if (/米饭|盖饭|炒饭|面|粉/.test(details) && food.macros.fiber < 5) return "部分精制主食换成杂粮或薯类";
-  if (food.macros.calories >= 450 && food.macros.fiber < 5) return "补一份蔬菜，提高这一餐的纤维";
-  if (food.warning && /少油|无糖|换成|搭配|补一份|减少|控制/.test(food.warning)) return food.warning;
-  return null;
-}
-
-const emptyMacroTotals: MacroTotals = { protein: 0, carbs: 0, fat: 0, calories: 0, fiber: 0 };
-
-function useAnimatedMacroTotals(target: MacroTotals) {
-  const [displayed, setDisplayed] = useState<MacroTotals>(emptyMacroTotals);
-  const displayedRef = useRef<MacroTotals>(emptyMacroTotals);
-
-  useEffect(() => {
-    const from = displayedRef.current;
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const duration = reduceMotion ? 1 : 1500;
-    const startedAt = performance.now();
-    let frame = 0;
-
-    const animate = (now: number) => {
-      const progress = Math.min((now - startedAt) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const next = macroKeys.reduce((values, macro) => {
-        values[macro] = from[macro] + (target[macro] - from[macro]) * eased;
-        return values;
-      }, { ...emptyMacroTotals });
-      displayedRef.current = next;
-      setDisplayed(next);
-      if (progress < 1) frame = window.requestAnimationFrame(animate);
-    };
-
-    frame = window.requestAnimationFrame(animate);
-    return () => window.cancelAnimationFrame(frame);
-  }, [target]);
-
-  return displayed;
 }
 
 function withRetryHint(message: string, language: Language) {

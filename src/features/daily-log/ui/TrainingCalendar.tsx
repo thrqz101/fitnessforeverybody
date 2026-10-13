@@ -1,14 +1,16 @@
 "use client";
 
-import { CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Dumbbell, Utensils } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { formatDateKey, formatMonthKey, getMonthGrid, shiftMonth } from "@/shared/domain/dates";
-import { useI18n } from "@/shared/i18n/i18n";
-import { getLocalizedFoodField } from "@/shared/i18n/translations";
-import { completion, dietStatusLabels, goalLabels, macroKeys, macroLabels, sumFoods } from "@/shared/domain/nutrition";
-import { formatScorePercent, weightedScore } from "@/shared/domain/score";
+import type { UserProfile, DayState, FoodLogItem, DayRecord, MacroTotals, MacroKey } from "@/shared/domain/types";
 import type { DayStatus } from "@/features/daily-log/state/use-fitness-state";
-import type { DayRecord, DayState, FoodLogItem, MacroKey, MacroTotals, UserProfile } from "@/shared/domain/types";
+import { useI18n } from "@/shared/i18n/i18n";
+import { useState, useMemo, useEffect } from "react";
+import { getMonthGrid, formatDateKey, shiftMonth, formatMonthKey } from "@/shared/domain/dates";
+import { weightedScore, formatScorePercent } from "@/shared/domain/score";
+import { CalendarDays, ChevronLeft, ChevronRight, Dumbbell, CheckCircle2, Utensils } from "lucide-react";
+import { sumFoods, macroKeys, completion } from "@/shared/domain/nutrition";
+import { dietStatusLabels, goalLabels, macroLabels } from "@/shared/domain/labels";
+import { getLocalizedFoodField } from "@/shared/i18n/translations";
+import { Dot, CalendarNumber } from "@/features/daily-log/ui/CalendarParts";
 
 type TrainingCalendarProps = {
   profile: UserProfile;
@@ -28,7 +30,9 @@ type TrainingCalendarProps = {
 };
 
 const trainingParts = ["胸", "背", "腿", "肩", "手臂", "腹", "全身", "休息"];
+
 const weekLabels = ["日", "一", "二", "三", "四", "五", "六"];
+
 const progressToneByMacro: Record<MacroKey, string> = {
   protein: "#4f805d",
   carbs: "#e9bd45",
@@ -323,43 +327,4 @@ export function TrainingCalendar({
       </div>
     </div>
   );
-}
-
-function Dot({ label, tone }: { label: string; tone: "moss" | "coral" }) {
-  return (
-    <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${tone === "moss" ? "bg-moss text-white" : "bg-coral text-white"}`}>
-      {label}
-    </span>
-  );
-}
-
-function CalendarNumber({
-  label,
-  value,
-  onChange,
-  disabled
-}: {
-  label: string;
-  value: number;
-  onChange: (value: number) => void;
-  disabled: boolean;
-}) {
-  return (
-    <label className="grid gap-2 text-sm font-bold text-ink">
-      {label}
-      <input
-        className="h-11 rounded-[18px] border border-ink/12 bg-paper px-3 disabled:cursor-not-allowed disabled:opacity-60"
-        min="0"
-        type="number"
-        disabled={disabled}
-        value={formatNumberInputValue(value)}
-        onChange={(event) => onChange(Number(event.target.value) || 0)}
-      />
-    </label>
-  );
-}
-
-function formatNumberInputValue(value: number) {
-  if (!Number.isFinite(value) || value === 0) return "";
-  return value;
 }

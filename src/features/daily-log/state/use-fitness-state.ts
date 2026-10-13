@@ -1,21 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { normalizeSearchEvidence } from "@/shared/domain/search-evidence";
-import { getBeijingDateKey } from "@/shared/domain/dates";
 import { useI18n } from "@/shared/i18n/i18n";
 import { useAuth } from "@/shared/auth/AuthProvider";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import type { UserProfile, DayState, FoodLogItem, DayRecord, MacroTotals } from "@/shared/domain/types";
+import { defaultProfile, defaultDayState, calculateTargets, sumFoods, remainingMacros } from "@/shared/domain/nutrition";
+import { hasMeaningfulGap } from "@/shared/domain/recommendation-fit";
+import { getBeijingDateKey } from "@/shared/domain/dates";
+import { emptyFeedbackProgress, parseFeedbackProgress, feedbackProgressKey, completeRecognitionFlow, type FeedbackProgress, acknowledgeFeedbackMilestone, nextFeedbackMilestone } from "@/shared/domain/feedback-progress";
+import type { CloudDay, LocalImportState, CloudState } from "@/shared/api/types";
 import { cloudApi, describeCloudError, type EntryResult } from "@/shared/api/client";
-import type { CloudDay, CloudState, LocalImportState } from "@/shared/api/types";
 import { legacyToImport } from "@/shared/api/import";
-import { acknowledgeFeedbackMilestone, completeRecognitionFlow, emptyFeedbackProgress, feedbackProgressKey, nextFeedbackMilestone, parseFeedbackProgress, type FeedbackProgress } from "@/shared/domain/feedback-progress";
-import { calculateRecommendedFiberGrams, calculateRecommendedMacroMultipliers, calculateTargets, defaultDayState, defaultProfile, hasMeaningfulGap, normalizeFiberGrams, normalizeMacroMultipliers, remainingMacros, sumFoods } from "@/shared/domain/nutrition";
-import type { DayRecord, DayState, FoodLogItem, MacroTotals, UserProfile } from "@/shared/domain/types";
+import { profileKey, dayKey, foodsKey, recordsKey, parseRecords, normalizeProfile, normalizeDay, normalizeFoods, markFoodAsDraft } from "@/features/daily-log/state/local-records";
 
-const profileKey = "ffe-profile";
-const dayKey = "ffe-day";
-const foodsKey = "ffe-foods";
-const recordsKey = "ffe-day-records";
 const SYNC_MIN_INTERVAL_MS = 30_000;
 
 export type DayStatus = { kind: "open" | "effective" | "ineffective" | "migrated"; flows: number };
@@ -469,94 +466,4 @@ export function useFitnessState(snapshotBeforeWrite = false) {
     todayScore: todayMeta?.score ?? null, todayFlows: todayMeta?.flows ?? 0,
     selectedScore: selectedDateKey === currentDateKey ? todayMeta?.score ?? null : selectedMeta?.score ?? null,
     selectedStatus };
-}
-
-function normalizeProfile(profile: Partial<UserProfile>): UserProfile {
-  const merged = { ...defaultProfile, ...profile };
-  const validTrainingStyles = ["三分化", "五分化", "功能性训练", "徒手训练", "不训练"];
-  const validDietPatterns = ["三餐正常", "16+8 间歇性断食", "碳循环", "地中海 / 均衡饮食", "外卖 / 便利店为主", "不确定，先按普通模式算"];
-  const normalized = {
-    ...merged,
-    bmrKcal: merged.bmrKcal || defaultProfile.bmrKcal,
-    trainingStyle: validTrainingStyles.includes(merged.trainingStyle) ? merged.trainingStyle : defaultProfile.trainingStyle,
-    eatingPattern: validDietPatterns.includes(merged.eatingPattern) ? merged.eatingPattern : defaultProfile.eatingPattern
-  };
-
-  return {
-    ...normalized,
-    macroMultipliers: profile.macroMultipliers
-      ? normalizeMacroMultipliers(
-        profile.macroMultipliers,
-        calculateRecommendedMacroMultipliers(normalized, defaultDayState)
-      )
-      : undefined,
-    fiberGrams: profile.fiberGrams
-      ? normalizeFiberGrams(
-        profile.fiberGrams,
-        calculateRecommendedFiberGrams(normalized, defaultDayState)
-      )
-      : undefined
-  };
-}
-
-function parseRecords(raw: string): Record<string, DayRecord> {
-  try {
-    const parsed = JSON.parse(raw) as Record<string, Partial<DayRecord>>;
-    return Object.fromEntries(
-      Object.entries(parsed).map(([dateKey, record]) => [
-        dateKey,
-        {
-          dateKey,
-          day: normalizeDay(record.day ?? defaultDayState),
-          foods: normalizeFoods(record.foods ?? [])
-        }
-      ])
-    );
-  } catch {
-    return {};
-  }
-}
-
-function normalizeDay(day: Partial<DayState>): DayState {
-  return {
-    ...defaultDayState,
-    ...day,
-    trainingSets: Number.isFinite(day.trainingSets) ? day.trainingSets ?? defaultDayState.trainingSets : defaultDayState.trainingSets,
-    durationMinutes: Number.isFinite(day.durationMinutes) ? day.durationMinutes ?? defaultDayState.durationMinutes : defaultDayState.durationMinutes,
-    dietStatus: ["normal", "high_carb", "low_carb", "high_protein", "free"].includes(day.dietStatus ?? "")
-      ? (day.dietStatus as DayState["dietStatus"])
-      : defaultDayState.dietStatus
-  };
-}
-
-function normalizeFoods(foods: Partial<FoodLogItem>[]): FoodLogItem[] {
-  return foods.map((food) => ({
-    ...food,
-    id: food.id ?? `food-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    name: food.name ?? "未命名食物",
-    brand: food.brand,
-    foodType: food.foodType ?? "食品",
-    portionLabel: food.portionLabel ?? "标准份",
-    portionScale: food.portionScale ?? 1,
-    baseMacros: food.baseMacros ?? food.macros ?? { protein: 0, carbs: 0, fat: 0, calories: 0, fiber: 0 },
-    macros: food.macros ?? { protein: 0, carbs: 0, fat: 0, calories: 0, fiber: 0 },
-    meal: food.meal ?? "snack",
-    warning: food.warning,
-    source: ["ai-text", "manual", "recommendation"].includes(food.source ?? "")
-      ? (food.source as FoodLogItem["source"])
-      : "manual",
-    recognitionMode: food.recognitionMode,
-    sourceLabel: food.sourceLabel,
-    loggedAt: food.loggedAt ?? new Date().toISOString(),
-    savedToCalendar: food.savedToCalendar ?? true,
-    recognitionBatchId: typeof food.recognitionBatchId === "string" ? food.recognitionBatchId : undefined,
-    searchEvidence: normalizeSearchEvidence(food.searchEvidence)
-  }));
-}
-
-function markFoodAsDraft(food: FoodLogItem): FoodLogItem {
-  return {
-    ...food,
-    savedToCalendar: false
-  };
 }

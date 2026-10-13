@@ -9,7 +9,6 @@ import { isGenericDiningDescription } from "@/features/recognition/domain/route-
 import { localized } from "@/features/recognition/domain/prompts";
 
 export const id = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-
 const mealValues: MealType[] = ["breakfast", "lunch", "dinner", "snack", "midnight"];
 
 export function shouldRepairAiPayload(parsed: AiPayload, content: unknown, description: string) {

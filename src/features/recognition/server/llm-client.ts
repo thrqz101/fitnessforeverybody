@@ -15,13 +15,9 @@ export type ProviderConfig = {
 };
 
 export const routingAiTimeoutMs = 20_000;
-
 export const searchAiTimeoutMs = 25_000;
-
 export const mainAiTimeoutMs = 35_000;
-
 export const repairAiTimeoutMs = 20_000;
-
 export const warmupAiTimeoutMs = 12_000;
 
 export function getProviderConfig(): ProviderConfig | null {
