@@ -2,9 +2,25 @@
 
 **一句话记录一餐，AI 帮你算营养、看缺口、推荐下一餐。**
 
+[![Website](https://img.shields.io/badge/website-fitnessforeverybody.app-315b46)](https://fitnessforeverybody.app)
+[![License: MIT](https://img.shields.io/badge/license-MIT-4b7b60)](LICENSE)
+![Next.js](https://img.shields.io/badge/Next.js-14-1d2a22)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3f7354)
+
 👉 立即体验：**<https://fitnessforeverybody.app>**
 
 免费 · 中英双语 · 手机和电脑都能用
+
+## 目录
+
+- [为什么做这个](#为什么做这个)
+- [核心功能](#核心功能)
+- [技术栈](#技术栈)
+- [项目结构](#项目结构)
+- [本地开发](#本地开发)
+- [文档](#文档)
+- [参与贡献](#参与贡献)
+- [许可](#许可)
 
 ## 为什么做这个
 
@@ -124,6 +140,15 @@ npm run build       # 生产构建
 | [AGENTS.md](AGENTS.md) | 给 AI 编程助手的协作规则，也适合人类贡献者阅读 |
 | [docs/](docs/) | 专题文档：识别、推荐、营养目标、数据库、多语言、测试、界面规范、环境配置等 |
 | [CHANGELOG.md](CHANGELOG.md) | 版本更新记录 |
+
+## 参与贡献
+
+欢迎提交 Issue 和 Pull Request。开始之前请先阅读 [CODE.md](CODE.md) 和 [AGENTS.md](AGENTS.md)。
+
+1. 从 `main` 新建分支，例如 `feat/your-feature`；
+2. 提交前运行 `npm run typecheck` 和 `npm test`；
+3. 提交信息使用 Conventional Commits 格式，例如 `feat(recommendation): ...`；
+4. 推送分支并发起 Pull Request，说明改动内容和验证方式。
 
 ## 许可
 
