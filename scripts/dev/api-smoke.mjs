@@ -19,13 +19,7 @@ const results = [];
 const check = (name, ok, detail = '') => { results.push(ok); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${ok ? '' : `  ${detail}`}`); };
 const created = [];
 
-async function signIn(label) {
-  const email = `api-smoke-${label}-${Date.now()}@test.invalid`;
-  const user = await admin.auth.admin.createUser({ email, email_confirm: true });
-  if (user.error) throw user.error;
-  created.push(user.data.user.id);
-  await admin.rpc('ensure_profile', { p_user: user.data.user.id });
-  await admin.from('profiles').update({ is_test: true }).eq('user_id', user.data.user.id);
+async function session(email) {
   const link = await admin.auth.admin.generateLink({ type: 'magiclink', email });
   if (link.error) throw link.error;
   const jar = new Map();
@@ -34,8 +28,17 @@ async function signIn(label) {
   });
   const verified = await client.auth.verifyOtp({ email, token: link.data.properties.email_otp, type: 'email' });
   if (verified.error) throw verified.error;
-  const cookie = [...jar].map(([name, value]) => `${name}=${value}`).join('; ');
-  return { id: user.data.user.id, cookie, email };
+  return [...jar].map(([name, value]) => `${name}=${value}`).join('; ');
+}
+
+async function signIn(label) {
+  const email = `api-smoke-${label}-${Date.now()}@test.invalid`;
+  const user = await admin.auth.admin.createUser({ email, email_confirm: true });
+  if (user.error) throw user.error;
+  created.push(user.data.user.id);
+  await admin.rpc('ensure_profile', { p_user: user.data.user.id });
+  await admin.from('profiles').update({ is_test: true }).eq('user_id', user.data.user.id);
+  return { id: user.data.user.id, cookie: await session(email), email };
 }
 
 async function api(who, method, path, body) {
@@ -171,6 +174,61 @@ try {
   check('imported past days are finalized, migrated and carry no verdict or flows', old?.migrated === true && old.finalized === true && old.effective === null && old.flows === 0 && old.score === null && old.totals.calories === 500, JSON.stringify(old));
   check('today import adds nutrition but never a recognition flow', r.json.state.days[today].totals.calories === todayBefore.totals.calories + 100 && r.json.state.days[today].flows === todayBefore.flows, JSON.stringify([todayBefore, r.json.state.days[today]]));
   check('import state is recorded as imported', r.json.state.localImportState === 'imported');
+
+
+  // ---- Concurrency: two devices (two sessions of one account) acting at the same time ----
+  const c = await signIn('c');
+  const device2 = { ...c, cookie: await session(c.email) };
+  check('a second sign-in yields a different session', device2.cookie !== c.cookie);
+  r = await api(c, 'PUT', '/api/profile', { profile, day, expectedVersion: null });
+  const devices = [c, device2];
+  const alternate = (n, make) => Promise.all(Array.from({ length: n }, (_, i) => make(devices[i % 2], i)));
+
+  // 1) the same draft confirmed 8 times at once counts once
+  r = await api(c, 'POST', '/api/entries', { source: 'manual', food: shake, confirm: false });
+  const draftId = r.json?.food?.id;
+  const many = await alternate(8, (who) => api(who, 'POST', `/api/entries/${draftId}/confirm`, {}));
+  check('8 simultaneous confirms of one entry all succeed', many.every((x) => x.status === 200), many.map((x) => x.status).join(','));
+  r = await api(c, 'POST', '/api/sync');
+  check('...and the nutrition is counted exactly once', r.json.state.days[today].totals.protein === 30 && r.json.state.foods.filter((f) => f.id === draftId).length === 1, JSON.stringify(r.json.state.days[today]?.totals));
+
+  // 2) confirm and delete racing on the same entry end in a consistent state
+  r = await api(c, 'POST', '/api/entries', { source: 'manual', food: { ...shake, name: '竞争条目' }, confirm: true });
+  const raceId = r.json.food.id;
+  const race = await Promise.all([api(c, 'DELETE', `/api/entries/${raceId}`), api(device2, 'DELETE', `/api/entries/${raceId}`), api(c, 'POST', `/api/entries/${raceId}/confirm`, {})]);
+  check('racing delete / delete / confirm never errors with a server fault', race.every((x) => [200, 409].includes(x.status)), race.map((x) => x.status).join(','));
+  const raced = await admin.from('food_entries').select('status').eq('id', raceId).single();
+  r = await api(c, 'POST', '/api/sync');
+  const expectedProtein = 30 + (raced.data.status === 'confirmed' ? 30 : 0);
+  check('the day total matches the final entry status after the race', r.json.state.days[today].totals.protein === expectedProtein, `${raced.data.status} ${JSON.stringify(r.json.state.days[today].totals)}`);
+
+  // 3) the same recognition request sent from two devices at once creates one set of foods
+  const sameId = crypto.randomUUID();
+  const twin = await Promise.all([api(c, 'POST', '/api/food-ai', form(sameId, '一碗米饭，一个苹果')), api(device2, 'POST', '/api/food-ai', form(sameId, '一碗米饭，一个苹果')), api(c, 'POST', '/api/food-ai', form(sameId, '一碗米饭，一个苹果'))]);
+  check('simultaneous identical recognitions: no server fault, at least one succeeds', twin.every((x) => [200, 409].includes(x.status)) && twin.some((x) => x.status === 200 && x.json.isFoodRelated), twin.map((x) => x.status).join(','));
+  const requests = await admin.from('recognition_requests').select('id,status').eq('user_id', c.id).eq('request_id', sameId);
+  check('exactly one recognition request exists for that id', requests.data?.length === 1 && requests.data[0].status === 'succeeded', JSON.stringify(requests.data));
+  const ownedRows = await admin.from('food_entries').select('id').eq('request_id', requests.data?.[0]?.id);
+  const returned = twin.find((x) => x.status === 200 && x.json.foods?.length)?.json.foods ?? [];
+  check('foods were created once: stored rows equal the foods returned', ownedRows.data?.length === returned.length && returned.length > 0, `${ownedRows.data?.length} vs ${returned.length}`);
+
+  check('that recognition returned several foods, so the multi-food flow rule is really exercised', returned.length >= 2, `foods: ${returned.length}`);
+  // 4) every food of that recognition confirmed from both devices at once: one flow, each food counted once
+  const foodIds = returned.map((f) => f.id);
+  const dayBefore = (await api(c, 'POST', '/api/sync')).json.state.days[today];
+  const total = returned.reduce((sum, f) => sum + f.macros.calories, 0);
+  await Promise.all(foodIds.flatMap((id) => [api(c, 'POST', `/api/entries/${id}/confirm`, {}), api(device2, 'POST', `/api/entries/${id}/confirm`, {})]));
+  const dayAfter = (await api(c, 'POST', '/api/sync')).json.state.days[today];
+  check('confirming all foods from both devices at once adds exactly one flow', dayAfter.flows === dayBefore.flows + 1, `${dayBefore.flows} -> ${dayAfter.flows}`);
+  check('...and each food is counted exactly once', dayAfter.totals.calories === dayBefore.totals.calories + total, `${dayBefore.totals.calories} + ${total} vs ${dayAfter.totals.calories}`);
+
+  // 5) concurrent day-setting changes never leave a goal snapshot that mixes two of them
+  const variants = [{ ...day, isTrainingDay: true, dietStatus: 'high_carb' }, { ...day, isTrainingDay: false, dietStatus: 'low_carb' }, { ...day, isTrainingDay: true, dietStatus: 'free' }, { ...day, isTrainingDay: false, dietStatus: 'high_protein' }];
+  const puts = await alternate(8, (who, i) => api(who, 'PUT', '/api/day', { day: variants[i % 4] }));
+  check('simultaneous day changes all succeed', puts.every((x) => x.status === 200), puts.map((x) => x.status).join(','));
+  const settled = (await api(c, 'POST', '/api/sync')).json.state.days[today];
+  const replay = await api(c, 'PUT', '/api/day', { day: settled.day });
+  check('the stored goal snapshot belongs to the stored day settings', JSON.stringify(replay.json.day.targets) === JSON.stringify(settled.targets), JSON.stringify([settled.targets, replay.json.day.targets]));
 
   // ---- Skip, then account deletion with cascade ----
   r = await api(b, 'PUT', '/api/profile', { profile, day, expectedVersion: null });
