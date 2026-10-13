@@ -71,3 +71,24 @@ export function parseDay(input: unknown): DayState | null {
 export function coerceDay(raw: unknown): DayState {
   return parseDay({ ...defaultDayState, ...(raw && typeof raw === "object" ? raw : {}) }) ?? defaultDayState;
 }
+
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export type FeedbackInput = { dedupeId: string; kind: "suggestion" | "issue" | "other"; message: string; contact: string | null };
+
+/** Strict validation of a feedback submission. */
+export function parseFeedback(input: unknown): FeedbackInput | null {
+  if (!input || typeof input !== "object") return null;
+  const raw = input as Record<string, unknown>;
+  if (typeof raw.dedupeId !== "string" || !uuidPattern.test(raw.dedupeId)) return null;
+  if (raw.kind !== "suggestion" && raw.kind !== "issue" && raw.kind !== "other") return null;
+  const message = typeof raw.message === "string" ? raw.message.trim() : "";
+  if (message.length < 2 || message.length > 2000) return null;
+  let contact: string | null = null;
+  if (raw.contact !== undefined && raw.contact !== null) {
+    if (typeof raw.contact !== "string") return null;
+    const trimmed = raw.contact.trim();
+    if (trimmed.length > 200) return null;
+    contact = trimmed.length ? trimmed : null;
+  }
+  return { dedupeId: raw.dedupeId, kind: raw.kind, message, contact };
+}
