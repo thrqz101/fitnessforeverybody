@@ -190,9 +190,9 @@ export function Reviews() {
     </div>
   </section>;
 }
-export function PreviewFooter({ onStart, onFeedback }: { onStart?: () => void; onFeedback: () => void }) {
+export function PreviewFooter({ onStart, onFeedback, onAccount }: { onStart?: () => void; onFeedback: () => void; onAccount?: () => void }) {
   const text = usePreviewText();
   return <footer className="border-t border-zinc-200/60 bg-white py-12 px-6"><div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-    <Brand /><div className="flex gap-6 text-xs text-zinc-500 font-medium"><Link href="/">{text("首页", "Home")}</Link>{onStart && <button onClick={onStart}>{text("开始识别", "Start identifying")}</button>}<button onClick={onFeedback} aria-haspopup="dialog">{text("意见反馈", "Feedback")}</button></div>
+    <Brand /><div className="flex gap-6 text-xs text-zinc-500 font-medium"><Link href="/">{text("首页", "Home")}</Link>{onStart && <button onClick={onStart}>{text("开始识别", "Start identifying")}</button>}<button onClick={onFeedback} aria-haspopup="dialog">{text("意见反馈", "Feedback")}</button>{onAccount && <button onClick={onAccount} aria-haspopup="dialog">{text("账号与数据", "Account & data")}</button>}</div>
   </div></footer>;
 }

@@ -7,6 +7,8 @@ import { Dashboard } from "@/components/Dashboard";
 import { ProfilePanel } from "@/components/ProfilePanel";
 import { Recommendations } from "@/components/Recommendations";
 import { TrainingCalendar } from "@/components/TrainingCalendar";
+import { AccountDialog } from "@/components/auth/AccountDialog";
+import { ImportDialog } from "@/components/auth/ImportDialog";
 import { LoginDialog } from "@/components/auth/LoginDialog";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useI18n } from "@/lib/i18n";
@@ -28,6 +30,9 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
   const router = useRouter();
   const auth = useAuth();
   const [loginIntent, setLoginIntent] = useState<ToolTab | null>(null);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [legacyImport, setLegacyImport] = useState<{ days: number; foods: number } | null>(null);
+  const importDeferred = useRef(false);
   const [tab, setTab] = useState<ToolTab>("recognition");
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackInvitation, setFeedbackInvitation] = useState<number | null>(null);
@@ -44,6 +49,8 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
   const primaryViews: ToolTab[] = ["recognition", "recommend"];
 
   function openFeedback(invitation: number | null = null) {
+    if (auth.status === "loading") return;
+    if (auth.status === "signed_out") { auth.openLogin(); return; }
     if (state.feedbackMilestone) state.acknowledgeFeedbackInvitation(state.feedbackMilestone);
     setFeedbackInvitation(invitation);
     setFeedbackOpen(true);
@@ -85,6 +92,13 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
     });
     return () => cancelAnimationFrame(frame);
   }, [focusRequest, settingsOpen, state.hasProfile]);
+
+  useEffect(() => {
+    // Offer the one-time import after the profile exists (today's goal snapshot is needed for today's records).
+    if (!state.cloudMode || !state.hydrated || !state.hasProfile || state.localImportState !== "pending" || importDeferred.current) return;
+    const found = state.readLegacyImport();
+    if (found.foodCount > 0) setLegacyImport({ days: found.dayCount, foods: found.foodCount });
+  }, [state.cloudMode, state.hydrated, state.hasProfile, state.localImportState]);
 
   useEffect(() => {
     if (auth.status !== "signed_in" || !loginIntent) return;
@@ -153,8 +167,13 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
       </div>}
       {mode === "landing" && <Reviews />}
     </main>
-    <PreviewFooter onStart={() => navigate("recognition")} onFeedback={() => openFeedback()} />
+    <PreviewFooter onStart={() => navigate("recognition")} onFeedback={() => openFeedback()} onAccount={auth.status === "signed_in" ? () => setAccountOpen(true) : undefined} />
     {feedbackOpen && <Feedback invitation={feedbackInvitation} onClose={() => setFeedbackOpen(false)} />}
+    {accountOpen && <AccountDialog onClose={() => setAccountOpen(false)} />}
+    {legacyImport && <ImportDialog days={legacyImport.days} foods={legacyImport.foods}
+      onImport={state.importLegacyRecords}
+      onSkip={async () => { const ok = await state.skipLegacyImport(); if (ok) setLegacyImport(null); return ok; }}
+      onLater={() => { importDeferred.current = true; setLegacyImport(null); }} />}
     {auth.loginOpen && <LoginDialog onClose={() => { auth.closeLogin(); setLoginIntent(null); }} />}
     {settingsOpen && <PreviewDialog title={t("本地系统设置")} wide onClose={() => { setSettingsOpen(false); setPendingTab(null); }}>
       <ProfilePanel profile={state.profile} day={state.day} onBack={() => { setSettingsOpen(false); setPendingTab(null); }} onSave={async (profile, day) => {
