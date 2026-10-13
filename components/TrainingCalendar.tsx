@@ -6,7 +6,7 @@ import { formatDateKey, formatMonthKey, getMonthGrid, shiftMonth } from "@/lib/d
 import { useI18n } from "@/lib/i18n";
 import { getLocalizedFoodField } from "@/lib/translations";
 import { completion, dietStatusLabels, goalLabels, macroKeys, macroLabels, sumFoods } from "@/lib/nutrition";
-import { formatScorePercent, REQUIRED_FLOWS, weightedScore } from "@/lib/score";
+import { formatScorePercent, weightedScore } from "@/lib/score";
 import type { DayStatus } from "@/lib/use-fitness-state";
 import type { DayRecord, DayState, FoodLogItem, MacroKey, MacroTotals, UserProfile } from "@/lib/types";
 
@@ -65,7 +65,7 @@ export function TrainingCalendar({
     : status.kind === "effective" ? (language === "en" ? "Effective day" : "有效日")
     : status.kind === "ineffective" ? (language === "en" ? "Not counted as an effective day" : "未计为有效日")
     : status.kind === "migrated" ? (language === "en" ? "Imported history, not counted" : "迁移的历史记录，不参与有效统计")
-    : (language === "en" ? `${status.flows}/${REQUIRED_FLOWS} confirmed recognitions. An effective day needs ${REQUIRED_FLOWS} and a score of at least 50%.` : `已确认识别 ${status.flows}/${REQUIRED_FLOWS} 次；完成 ${REQUIRED_FLOWS} 次且达标率不低于 50%，才计为有效日。`);
+    : null;
 
   useEffect(() => {
     setMonthKey(selectedDateKey.slice(0, 7));

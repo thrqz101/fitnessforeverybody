@@ -322,8 +322,8 @@ html:has(.precision-preview), body:has(.precision-preview) {
 .precision-preview :is(.next-bite-feature__content,.recommend-hero__content) { color:#315b46; }
 .precision-preview :is(.next-bite-feature p,.recommend-hero__content > p) { color:#647665; }
 .precision-preview :is(.next-bite-feature,.recommend-hero) .experience-kicker { color:#708870; }
-.precision-preview .gap-summary span,.precision-preview .recommend-hero__metrics div { background:#ffffffc9; border-color:#d9e5d5; color:#697c68; }
-.precision-preview .gap-summary strong,.precision-preview .recommend-hero__metrics strong { color:#315b46; }
+.precision-preview .recommend-hero__metrics div { background:#ffffffc9; border-color:#d9e5d5; color:#697c68; }
+.precision-preview .recommend-hero__metrics strong { color:#315b46; }
 .precision-preview .recommend-hero__metrics span { color:#647665; }
 .precision-preview .recommend-hero__actions button { color:#315b46; border-color:#cfdeca; background:#ffffffd9; }
 .precision-preview .recommend-hero__actions button:first-child { background:#4b7b60; border-color:#4b7b60; color:white; }
