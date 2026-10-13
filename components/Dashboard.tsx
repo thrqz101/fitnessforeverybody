@@ -8,7 +8,6 @@ import {
   ArrowRight,
   Check,
   ChevronRight,
-  Flame,
   Loader2,
   MessageSquareText,
   ScanLine,
@@ -20,7 +19,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { getLocalizedFoodField } from "@/lib/translations";
 import { pick, type Language } from "@/lib/i18n-utils";
-import { completion, dietStatusLabels, estimateBmr, goalLabels, macroKeys, macroLabels } from "@/lib/nutrition";
+import { completion, macroKeys, macroLabels } from "@/lib/nutrition";
+import { formatScorePercent, weightedScore } from "@/lib/score";
 import type { DayState, FoodLogItem, MacroKey, MacroTotals, UserProfile } from "@/lib/types";
 
 type DashboardProps = {
@@ -38,6 +38,11 @@ type DashboardProps = {
   onRemoveFood: (id: string) => void;
   onSaveFood: (id: string) => void;
   onClearDrafts: () => void;
+  /** Cloud mode: server-computed weighted score (0..1) and confirmed recognition count for today. */
+  score?: number | null;
+  busyFoodIds?: string[];
+  /** Confirmed entries may be deleted until the Beijing day ends (cloud mode only). */
+  allowDeleteSaved?: boolean;
 };
 
 type RecognitionNoticeState =
@@ -73,7 +78,10 @@ export function Dashboard({
   onAddFoods,
   onRemoveFood,
   onSaveFood,
-  onClearDrafts
+  onClearDrafts,
+  score,
+  busyFoodIds = [],
+  allowDeleteSaved = false
 }: DashboardProps) {
   const { t, language } = useI18n();
   const [mealDescription, setMealDescription] = useState("");
@@ -82,12 +90,10 @@ export function Dashboard({
   const progress = useRecognitionProgress();
   const draftFoods = foods.filter((food) => !food.savedToCalendar);
   const savedFoods = foods.filter((food) => food.savedToCalendar);
-  const bmr = profile.bmrKcal > 0 ? profile.bmrKcal : estimateBmr(profile);
   const animatedTotals = useAnimatedMacroTotals(totals);
-  const overallProgress = useMemo(
-    () => Math.round(macroKeys.reduce((sum, macro) => sum + Math.min(completion(animatedTotals[macro], targets[macro]), 100), 0) / macroKeys.length),
-    [animatedTotals, targets]
-  );
+  const scoreFraction = score ?? weightedScore(totals, targets);
+  const scoreText = formatScorePercent(scoreFraction);
+  const overallProgress = Math.min(100, scoreFraction * 100);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -212,18 +218,21 @@ export function Dashboard({
               <article key={food.id} className="meal-entry meal-entry--draft">
                 <div className="meal-entry__top">
                   <span>{t("待确认")}</span>
-                  <button type="button" onClick={() => onRemoveFood(food.id)} aria-label={`${t("删除")}${getLocalizedFoodField(food, "name", language)}`}><Trash2 size={15} /></button>
+                  <button type="button" disabled={busyFoodIds.includes(food.id)} onClick={() => onRemoveFood(food.id)} aria-label={`${t("删除")}${getLocalizedFoodField(food, "name", language)}`}><Trash2 size={15} /></button>
                 </div>
                 <h3>{getLocalizedFoodField(food, "name", language)}</h3>
                 <p>{food.brand ? getLocalizedFoodField(food, "brand", language) : t("AI 估算")} · {getLocalizedFoodField(food, "portionLabel", language)}</p>
                 <MealMacroGrid food={food} />
                 {getFoodHealthTip(food) ? <p className="meal-entry__tip"><Sparkles size={14} /> {t(getFoodHealthTip(food) ?? "")}</p> : null}
-                <button type="button" className="meal-entry__save" onClick={() => onSaveFood(food.id)}><Check size={16} /> {t("计入今天")}</button>
+                <button type="button" className="meal-entry__save" disabled={busyFoodIds.includes(food.id)} onClick={() => onSaveFood(food.id)}><Check size={16} /> {busyFoodIds.includes(food.id) ? pick(language, "保存中…", "Saving…") : t("计入今天")}</button>
               </article>
             ))}
             {savedFoods.map((food) => (
               <article key={food.id} className="meal-entry meal-entry--saved">
-                <div className="meal-entry__top"><span><Check size={13} /> {t("已记录")}</span></div>
+                <div className="meal-entry__top">
+                  <span><Check size={13} /> {t("已记录")}</span>
+                  {allowDeleteSaved ? <button type="button" disabled={busyFoodIds.includes(food.id)} onClick={() => onRemoveFood(food.id)} aria-label={`${t("删除")}${getLocalizedFoodField(food, "name", language)}`}><Trash2 size={15} /></button> : null}
+                </div>
                 <h3>{getLocalizedFoodField(food, "name", language)}</h3>
                 <p>{food.brand ? getLocalizedFoodField(food, "brand", language) : t("日常饮食")} · {getLocalizedFoodField(food, "portionLabel", language)}</p>
                 <MealMacroGrid food={food} />
@@ -256,7 +265,7 @@ export function Dashboard({
             </div>
             <div className="nutrition-summary__numbers">
               <div className="nutrition-summary__attainment">
-                <strong>{overallProgress}<span>%</span></strong>
+                <strong>{scoreText}<span>%</span></strong>
                 <span>{pick(language, "综合营养达标率", "Overall nutrient progress")}</span>
               </div>
               <div className="nutrition-summary__energy">
@@ -265,14 +274,13 @@ export function Dashboard({
                 <span>{pick(language, "每日目标", "Daily target")} {Math.round(targets.calories)} kcal</span>
               </div>
             </div>
-            <div className="nutrition-summary__track" role="progressbar" aria-label={t("今日营养达标率")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={overallProgress}>
+            <div className="nutrition-summary__track" role="progressbar" aria-label={t("今日营养达标率")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Number(scoreText)}>
               <i style={{ width: `${overallProgress}%` }} />
             </div>
             <div className="nutrition-summary__balance">
               <span>{pick(language, "已计入", "Logged")} <strong>{savedFoods.length}</strong> {pick(language, "项食物", "foods")}</span>
               <span>{gaps.calories < 0 ? pick(language, "超出目标", "Over target") : pick(language, "剩余", "Remaining")} <strong>{Math.round(Math.abs(gaps.calories))}</strong> kcal</span>
             </div>
-            <p className="nutrition-summary__context">{t(goalLabels[profile.goal])} · {t(dietStatusLabels[day.dietStatus].label)} · BMR {bmr} kcal</p>
           </section>
 
           <section className="nutrition-metrics" aria-label={pick(language, "营养指标进度", "Nutrient progress")}>
@@ -307,13 +315,9 @@ export function Dashboard({
         <img src="/images/recommendation-rail-v2.png" alt={t("三种适合作为下一餐的健康食物")} />
         <div className="next-bite-feature__overlay" />
         <div className="next-bite-feature__content">
-          <span className="experience-kicker experience-kicker--light"><Flame size={14} /> Smart recommendation</span>
+          <span className="experience-kicker experience-kicker--light">Smart recommendation</span>
           <h2>{t("智能推荐下一餐")}</h2>
           <p>{t("根据当前营养缺口、训练状态和已有记录生成推荐方案。")}</p>
-          <div className="gap-summary">
-            <span>{t("蛋白还差")} <strong>{Math.max(0, Math.round(gaps.protein))}g</strong></span>
-            <span>{t("热量余量")} <strong>{Math.max(0, Math.round(gaps.calories))} kcal</strong></span>
-          </div>
           <button type="button" onClick={() => onNavigate("recommend")} className="feature-cta">{t("看看下一餐")} <ArrowRight size={18} /></button>
         </div>
       </section>

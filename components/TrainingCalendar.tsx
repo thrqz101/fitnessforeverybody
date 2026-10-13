@@ -6,6 +6,8 @@ import { formatDateKey, formatMonthKey, getMonthGrid, shiftMonth } from "@/lib/d
 import { useI18n } from "@/lib/i18n";
 import { getLocalizedFoodField } from "@/lib/translations";
 import { completion, dietStatusLabels, goalLabels, macroKeys, macroLabels, sumFoods } from "@/lib/nutrition";
+import { formatScorePercent, weightedScore } from "@/lib/score";
+import type { DayStatus } from "@/lib/use-fitness-state";
 import type { DayRecord, DayState, FoodLogItem, MacroKey, MacroTotals, UserProfile } from "@/lib/types";
 
 type TrainingCalendarProps = {
@@ -20,6 +22,9 @@ type TrainingCalendarProps = {
   todayLabel: string;
   onSelectDate: (dateKey: string) => void;
   onDayChange?: (day: DayState) => void;
+  /** Server-computed weighted score (0..1) for the selected day; computed locally when absent. */
+  score?: number | null;
+  status?: DayStatus | null;
 };
 
 const trainingParts = ["胸", "背", "腿", "肩", "手臂", "腹", "全身", "休息"];
@@ -43,7 +48,9 @@ export function TrainingCalendar({
   totals,
   todayLabel,
   onSelectDate,
-  onDayChange
+  onDayChange,
+  score,
+  status
 }: TrainingCalendarProps) {
   const { t, language } = useI18n();
   const [monthKey, setMonthKey] = useState(selectedDateKey.slice(0, 7));
@@ -51,9 +58,14 @@ export function TrainingCalendar({
   const editable = selectedDateKey === currentDateKey && Boolean(onDayChange);
   const trainingFieldsDisabled = !editable || !day.isTrainingDay;
   const selectedLabel = selectedDateKey === currentDateKey ? `${t("今天")} · ${todayLabel}` : formatDateKey(selectedDateKey, language);
-  const completionAverage = Math.round(
-    macroKeys.reduce((sum, key) => sum + Math.min(totals[key] / Math.max(targets[key], 1), 1), 0) / macroKeys.length * 100
-  );
+  const scoreFraction = score ?? weightedScore(totals, targets);
+  const scoreText = formatScorePercent(scoreFraction);
+  const ringPercent = Math.min(100, scoreFraction * 100);
+  const statusText = !status ? null
+    : status.kind === "effective" ? (language === "en" ? "Effective day" : "有效日")
+    : status.kind === "ineffective" ? (language === "en" ? "Not counted as an effective day" : "未计为有效日")
+    : status.kind === "migrated" ? (language === "en" ? "Imported history, not counted" : "迁移的历史记录，不参与有效统计")
+    : null;
 
   useEffect(() => {
     setMonthKey(selectedDateKey.slice(0, 7));
@@ -68,8 +80,8 @@ export function TrainingCalendar({
           <p>{t("把今天吃了什么、完成了多少和训练节奏放在一处，切换日期即可回看每日变化。")}</p>
         </div>
         <div className="progress-overview__dashboard">
-          <div className="progress-overview__ring" style={{ background: `conic-gradient(#4f805d ${completionAverage}%, rgba(79,128,93,.12) 0)` }}>
-            <div><strong>{completionAverage}%</strong><span>{t("今日营养达标率")}</span></div>
+          <div className="progress-overview__ring" style={{ background: `conic-gradient(#4f805d ${ringPercent}%, rgba(79,128,93,.12) 0)` }}>
+            <div><strong>{scoreText}%</strong><span>{t("今日营养达标率")}</span></div>
           </div>
           <div className="progress-overview__facts">
             <span><small>{t("饮食记录")}</small><strong>{foods.length}<i> {t("餐")}</i></strong></span>
@@ -256,8 +268,9 @@ export function TrainingCalendar({
               <h2>{t("当日营养进度")}</h2>
               <p>{t(goalLabels[profile.goal])}{t("目标")} · {t("五项指标共同计算达标率")}</p>
             </div>
-            <span className="day-nutrition-card__score"><strong>{completionAverage}%</strong>{t("整体达标")}</span>
+            <span className="day-nutrition-card__score"><strong>{scoreText}%</strong>{t("整体达标")}</span>
           </div>
+          {statusText ? <p className="text-xs text-zinc-500 mb-3" role="status">{statusText}</p> : null}
           <div className="day-nutrient-grid">
             {macroKeys.map((macro) => {
               const percent = completion(totals[macro], targets[macro]);

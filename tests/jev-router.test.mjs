@@ -62,7 +62,7 @@ import * as evidenceCore from '../lib/search-evidence.ts';
 import * as nutritionDb from '../lib/nutrition-db.ts';
 const evidenceModule = {};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(new URL('../lib/agent/search-evidence.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:evidenceModule,require:()=>evidenceCore,URL});
-function loadHandler(fetcher, router = 'jev', extraEnv = {}) {
+function loadHandler(fetcher, router = 'jev', extraEnv = {}, cloudStubs = {}) {
   const source = fs.readFileSync(new URL('../app/api/food-ai/route.ts', import.meta.url), 'utf8');
   const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
   const exports = {};
@@ -77,7 +77,9 @@ function loadHandler(fetcher, router = 'jev', extraEnv = {}) {
     '@/lib/nutrition-db': nutritionDb,
     '@/lib/brand-catalog': brands,
     '@/lib/i18n-utils': { normalizeLanguage: lang => lang === 'en' ? 'en' : 'zh', pick: (lang, zh, en) => lang === 'en' ? en : zh, normalizeMacroTotals: m => Object.fromEntries(['protein','carbs','fat','calories','fiber'].map(k => [k, Math.max(0, Math.round(Number(m?.[k]) || 0))])) },
-    '@/lib/translations': { translateToEn: t => t, translateToZh: t => t }
+    '@/lib/translations': { translateToEn: t => t, translateToZh: t => t },
+    '@/lib/cloud/recognition': { beginCloudRecognition: async () => ({ mode: 'off' }), ...cloudStubs.recognition },
+    '@/lib/cloud/recognition-persist': { persistRecognition: async () => { throw new Error('must not persist when the backend is off'); }, ...cloudStubs.persist }
   };
   vm.runInNewContext(code, { exports, require: id => { if (!(id in dependencies)) throw new Error(id); return dependencies[id]; }, process: { env }, fetch: fetcher, Response, Headers, AbortController, AbortSignal, URL, setTimeout, clearTimeout, console });
   return exports.POST;
@@ -363,4 +365,47 @@ test('a known brand with an explicit generic-food weight still searches the bran
     return completion({isFoodRelated:true,foods:[{...meal.foods[0],name:'米饭',brand:'麦当劳',portionLabel:'150g'}]});
   },'rules'),'麦当劳米饭150g');
   assert.equal(searches,1);assert.equal(result.routing.effectiveRoute,'brand_search');assert.ok(result.foods[0].searchEvidence);
+});
+
+const cloudRun = { admin: {}, userId: 'user-1', requestId: '11111111-1111-4111-8111-111111111111' };
+const rulesLocal = '米饭';
+test('cloud mode: a replied start (unauthenticated, processing, reused) short-circuits recognition', async () => {
+  let fetched = 0;
+  const handler = loadHandler(async () => { fetched++; return Response.json({}); }, 'rules', {}, {
+    recognition: { beginCloudRecognition: async () => ({ mode: 'reply', response: Response.json({ ok: false, code: 'unauthenticated' }, { status: 401 }) }) }
+  });
+  const response = await handler(new Request('http://localhost/api/food-ai', { method: 'POST', body: (() => { const f = new FormData(); f.set('description', rulesLocal); return f; })() }));
+  assert.equal(response.status, 401);
+  assert.equal((await response.json()).code, 'unauthenticated');
+  assert.equal(fetched, 0);
+});
+test('cloud mode: the stored result replaces transient foods and the route is recorded', async () => {
+  const calls = [];
+  const handler = loadHandler(async () => Response.json({}), 'rules', {}, {
+    recognition: { beginCloudRecognition: async () => ({ mode: 'run', run: cloudRun }) },
+    persist: { persistRecognition: async (admin, userId, requestId, body, route, language) => {
+      calls.push({ userId, requestId, route, language, foods: body.foods?.length, ok: body.ok });
+      return { ok: true, body: { ...body, foods: body.foods.map((food, i) => ({ ...food, id: `cloud-${i}`, cloud: true })) } };
+    } }
+  });
+  const form = new FormData(); form.set('description', rulesLocal); form.set('lang', 'zh');
+  const json = await (await handler(new Request('http://localhost/api/food-ai', { method: 'POST', body: form }))).json();
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].userId, 'user-1');
+  assert.equal(calls[0].requestId, cloudRun.requestId);
+  assert.equal(calls[0].route, 'local_exact');
+  assert.ok(json.foods.length > 0 && json.foods.every(food => food.cloud === true && food.id.startsWith('cloud-')));
+});
+test('cloud mode: a failed save is reported as an error, never as success', async () => {
+  const handler = loadHandler(async () => Response.json({}), 'rules', {}, {
+    recognition: { beginCloudRecognition: async () => ({ mode: 'run', run: cloudRun }) },
+    persist: { persistRecognition: async () => ({ ok: false, status: 502, body: { ok: false, code: 'persist_failed', retryable: true, message: 'not saved' } }) }
+  });
+  const form = new FormData(); form.set('description', rulesLocal);
+  const response = await handler(new Request('http://localhost/api/food-ai', { method: 'POST', body: form }));
+  const json = await response.json();
+  assert.equal(response.status, 502);
+  assert.equal(json.ok, false);
+  assert.equal(json.code, 'persist_failed');
+  assert.equal(json.foods, undefined);
 });

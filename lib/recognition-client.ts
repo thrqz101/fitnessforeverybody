@@ -53,11 +53,24 @@ export async function readRecognitionResponse(response: Response, onProgress?: P
   } finally { reader.releaseLock(); }
 }
 
+const codeMessages: Record<string, [string, string]> = {
+  unauthenticated: ['登录已过期，请重新登录。', 'Your session has expired. Please sign in again.'],
+  rate_limited: ['识别太频繁，请稍后再试。', 'Too many recognitions. Please try again shortly.'],
+  invalid_input: ['提交的内容不符合要求，请检查后重试。', 'Some of the input is not valid. Please check and try again.'],
+  backend_unconfigured: ['云端服务暂不可用。', 'The cloud service is unavailable right now.']
+};
+function codeMessage(code: string, language: Language) {
+  const pair = codeMessages[code];
+  return pair ? (language === 'en' ? pair[1] : pair[0]) : undefined;
+}
+
 export async function requestFoodAi(form: FormData, language: Language, options: RecognitionRequestOptions = {}): Promise<RecognitionResponse> {
   const timeout = new AbortController();
   const timer = setTimeout(() => timeout.abort(), options.timeoutMs ?? 120_000);
   const signal = options.signal ? AbortSignal.any([options.signal, timeout.signal]) : timeout.signal;
   const fallback = language === 'en' ? 'Recognition could not finish. Please try again.' : '识别暂未完成，请再试一次。';
+  // One id per FormData: automatic retries reuse it, so the server never creates a second recognition.
+  if (!form.has('requestId')) form.append('requestId', crypto.randomUUID());
   try {
     const response = await (options.fetcher ?? fetch)('/api/food-ai', {
       method: 'POST', headers: { Accept: 'application/x-ndjson' }, body: form, signal
@@ -69,7 +82,8 @@ export async function requestFoodAi(form: FormData, language: Language, options:
     options.onProgress?.({ id: 'result', status: hasFoods ? 'complete' : ok ? 'warning' : 'error',
       labelZh: hasFoods ? '识别完成，结果已准备好' : ok ? '需要补充具体的食物信息' : '识别暂未完成，请重试',
       labelEn: hasFoods ? 'Recognition complete. Results are ready.' : ok ? 'Please provide more specific food information.' : 'Recognition could not finish. Please retry.' });
-    return { ok, retryable: !result.needsConfig && (status === 408 || status === 429 || status >= 500), result, message: result.message || (ok ? undefined : fallback) };
+    const coded = !result.message && result.code ? codeMessage(result.code, language) : undefined;
+    return { ok, retryable: !result.needsConfig && result.code !== 'unauthenticated' && (status === 408 || status === 429 || status >= 500), result, message: result.message || coded || (ok ? undefined : fallback) };
   } catch {
     options.onProgress?.({ id: 'result', status: 'error', labelZh: timeout.signal.aborted ? '等待超时，请重试' : '连接已中断，请重试', labelEn: timeout.signal.aborted ? 'Request timed out. Please retry.' : 'Connection interrupted. Please retry.' });
     return { ok: false, retryable: !options.signal?.aborted, message: fallback };

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, CalendarDays, Star, Settings } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, LogOut, Star, Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { useAuth } from "@/lib/auth/AuthProvider";
 import { useI18n } from "@/lib/i18n";
 
 export type ToolTab = "recognition" | "recommend" | "calendar";
@@ -27,6 +28,7 @@ export function PreviewNav({ mode, onStart, onNavigate, onSettings, onFeedback, 
 }) {
   const text = usePreviewText();
   const { t } = useI18n();
+  const auth = useAuth();
   return <nav className="precision-nav" aria-label={t("主要导航")}>
     <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
       <Link href="/" aria-label="Fitness for Everybody"><Brand /></Link>
@@ -37,6 +39,11 @@ export function PreviewNav({ mode, onStart, onNavigate, onSettings, onFeedback, 
       </div>
       <div className="precision-nav-utilities flex items-center gap-3">
         <LanguageSwitch compact />
+        {auth.status === "signed_out" && <button type="button" className="precision-button precision-button--secondary !min-h-[38px] !py-0 !px-4" onClick={auth.openLogin}>{text("登录", "Sign in")}</button>}
+        {auth.status === "signed_in" && <span className="precision-auth-chip" title={auth.user?.email ?? undefined}>
+          <span className="hidden sm:block">{auth.user?.email}</span>
+          <button type="button" className="precision-icon-button" onClick={() => void auth.signOut()} aria-label={text("退出登录", "Sign out")} title={text("退出登录", "Sign out")}><LogOut size={16} /></button>
+        </span>}
         {mode === "workspace" && <button id="calendar-access" className={`precision-icon-button ${calendarActive ? "is-active" : ""}`} onClick={() => onNavigate("calendar")} aria-label={t("趋势与日历")} title={t("趋势与日历")} aria-pressed={calendarActive}><CalendarDays size={18} /></button>}
         {mode !== "landing" && <button className="precision-icon-button" title={text("身体信息设置", "Body profile settings")} onClick={onSettings} aria-label={t("打开设置")}><Settings size={18} /></button>}
         <button onClick={onStart} className={`precision-nav-cta ${mode === "workspace" ? "precision-nav-cta--workspace" : ""} bg-zinc-900 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-zinc-800 transition-all shadow-sm`}>{text("开始识别", "Start identifying")}</button>
@@ -183,9 +190,9 @@ export function Reviews() {
     </div>
   </section>;
 }
-export function PreviewFooter({ onStart, onFeedback }: { onStart?: () => void; onFeedback: () => void }) {
+export function PreviewFooter({ onStart, onFeedback, onAccount }: { onStart?: () => void; onFeedback: () => void; onAccount?: () => void }) {
   const text = usePreviewText();
   return <footer className="border-t border-zinc-200/60 bg-white py-12 px-6"><div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-    <Brand /><div className="flex gap-6 text-xs text-zinc-500 font-medium"><Link href="/">{text("首页", "Home")}</Link>{onStart && <button onClick={onStart}>{text("开始识别", "Start identifying")}</button>}<button onClick={onFeedback} aria-haspopup="dialog">{text("意见反馈", "Feedback")}</button></div>
+    <Brand /><div className="flex gap-6 text-xs text-zinc-500 font-medium"><Link href="/">{text("首页", "Home")}</Link>{onStart && <button onClick={onStart}>{text("开始识别", "Start identifying")}</button>}<button onClick={onFeedback} aria-haspopup="dialog">{text("意见反馈", "Feedback")}</button>{onAccount && <button onClick={onAccount} aria-haspopup="dialog">{text("账号与数据", "Account & data")}</button>}</div>
   </div></footer>;
 }

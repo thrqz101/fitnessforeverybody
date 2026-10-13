@@ -7,6 +7,10 @@ import { Dashboard } from "@/components/Dashboard";
 import { ProfilePanel } from "@/components/ProfilePanel";
 import { Recommendations } from "@/components/Recommendations";
 import { TrainingCalendar } from "@/components/TrainingCalendar";
+import { AccountDialog } from "@/components/auth/AccountDialog";
+import { ImportDialog } from "@/components/auth/ImportDialog";
+import { LoginDialog } from "@/components/auth/LoginDialog";
+import { useAuth } from "@/lib/auth/AuthProvider";
 import { useI18n } from "@/lib/i18n";
 import { useFitnessState } from "@/lib/use-fitness-state";
 import { PrecisionHero, PreviewFooter, PreviewNav, Reviews, usePreviewText, type ToolTab } from "./PreviewChrome";
@@ -24,6 +28,11 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
   const { t } = useI18n();
   const text = usePreviewText();
   const router = useRouter();
+  const auth = useAuth();
+  const [loginIntent, setLoginIntent] = useState<ToolTab | null>(null);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [legacyImport, setLegacyImport] = useState<{ days: number; foods: number } | null>(null);
+  const importDeferred = useRef(false);
   const [tab, setTab] = useState<ToolTab>("recognition");
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackInvitation, setFeedbackInvitation] = useState<number | null>(null);
@@ -40,6 +49,8 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
   const primaryViews: ToolTab[] = ["recognition", "recommend"];
 
   function openFeedback(invitation: number | null = null) {
+    if (auth.status === "loading") return;
+    if (auth.status === "signed_out") { auth.openLogin(); return; }
     if (state.feedbackMilestone) state.acknowledgeFeedbackInvitation(state.feedbackMilestone);
     setFeedbackInvitation(invitation);
     setFeedbackOpen(true);
@@ -82,7 +93,23 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
     return () => cancelAnimationFrame(frame);
   }, [focusRequest, settingsOpen, state.hasProfile]);
 
+  useEffect(() => {
+    // Offer the one-time import after the profile exists (today's goal snapshot is needed for today's records).
+    if (!state.cloudMode || !state.hydrated || !state.hasProfile || state.localImportState !== "pending" || importDeferred.current) return;
+    const found = state.readLegacyImport();
+    if (found.foodCount > 0) setLegacyImport({ days: found.dayCount, foods: found.foodCount });
+  }, [state.cloudMode, state.hydrated, state.hasProfile, state.localImportState]);
+
+  useEffect(() => {
+    if (auth.status !== "signed_in" || !loginIntent) return;
+    const intent = loginIntent;
+    setLoginIntent(null);
+    navigate(intent);
+  }, [auth.status, loginIntent, state.hydrated]);
+
   function navigate(nextTab: ToolTab, records = false) {
+    if (auth.status === "loading") return;
+    if (auth.status === "signed_out") { setLoginIntent(nextTab); auth.openLogin(); return; }
     if (!state.hydrated) return;
     if (mode === "landing") {
       if (!state.hasProfile) { setPendingTab(nextTab); setSettingsOpen(true); }
@@ -98,6 +125,13 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
 
   return <>
     <PreviewNav mode={mode} onStart={() => navigate("recognition")} onNavigate={navigate} calendarActive={tab === "calendar"} onFeedback={() => openFeedback()} onSettings={() => { setPendingTab(null); setSettingsOpen(true); }} />
+    {state.cloudError && <div role="alert" className="precision-cloud-alert">
+      <span>{state.cloudError}</span>
+      <span className="flex gap-2">
+        {!state.hydrated && <button type="button" onClick={() => void state.retrySync()}>{text("重试", "Retry")}</button>}
+        <button type="button" onClick={state.clearCloudError} aria-label={text("关闭提示", "Dismiss")}>{text("知道了", "Dismiss")}</button>
+      </span>
+    </div>}
     <main>
       {mode === "landing" && <PrecisionHero animated onStart={() => navigate("recognition")} />}
       {mode === "workspace" && <div className="precision-tools precision-tools--workspace max-w-7xl mx-auto px-6">
@@ -106,7 +140,9 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
           {primaryViews.map((key) => <button key={key} id={`tab-${key}`} aria-current={tab === key ? "page" : undefined} className={tab === key ? "is-active" : ""} onClick={() => navigate(key)}>{labels[key]}</button>)}
           <button onClick={() => openFeedback()} aria-haspopup="dialog" className="precision-feedback-action"><MessageSquare size={15} />{text("意见反馈", "Feedback")}</button>
         </nav>
-        {!state.hydrated ? <p className="py-20 text-center text-zinc-500">{t("正在准备你的健康空间")}</p> : !state.hasProfile ? <div className="precision-locked-tools">
+        {auth.status === "signed_out" ? <div className="precision-locked-tools">
+          <section id={tab} className="precision-locked-card"><div className="precision-locked-icon"><LockKeyhole size={22} /></div><span className="precision-eyebrow">{text("需要登录", "SIGN IN REQUIRED")}</span><h3>{text("登录后使用识别、记录和反馈", "Sign in to use recognition, records and feedback")}</h3><p>{text("用邮箱验证码登录，无需密码，数据会保存到你的账号。", "Sign in with an emailed code. No password needed, and your data is saved to your account.")}</p><button className="precision-button" onClick={auth.openLogin}>{text("登录", "Sign in")}<ArrowRight size={16} /></button></section>
+        </div> : !state.hydrated || auth.status === "loading" ? <p className="py-20 text-center text-zinc-500">{t("正在准备你的健康空间")}</p> : !state.hasProfile ? <div className="precision-locked-tools">
           {[tab].map((key, index) => <section id={key} key={key} className="precision-locked-card"><div className="precision-locked-icon">{key === "recognition" ? <ScanLine size={26} /> : <LockKeyhole size={22} />}</div><span className="precision-eyebrow">0{index + 1} / {labels[key]}</span><h3>{key === "recognition" ? t("输入食物、品牌和份量，AI 会识别食材并估算这一餐的营养。") : labels[key]}</h3><p>{text("先填写身体资料，再查看属于你的营养目标与记录。", "Set up your profile to see your personal targets and records.")}</p><button className="precision-button" onClick={() => navigate(key)}>{key === "recognition" ? text("开始识别", "Start identifying") : text("填写资料", "Set up profile")}<ArrowRight size={16} /></button></section>)}
         </div> : <div className="precision-tool-content">
           <div hidden={tab !== "recognition"}>
@@ -114,7 +150,8 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
               profile={state.profile} day={state.day} targets={state.targets} totals={state.totals} gaps={state.gaps} foods={state.foods} todayLabel={state.todayLabel}
               onNavigate={(view) => view === "settings" ? setSettingsOpen(true) : navigate(view)}
               onDayChange={state.setDay} onAddFoods={(foods) => { state.addFoods(foods); navigate("recognition", true); }}
-              onRemoveFood={state.removeFood} onSaveFood={state.saveFoodToCalendar} onClearDrafts={state.clearDraftFoods} />
+              onRemoveFood={state.removeFood} onSaveFood={state.saveFoodToCalendar} onClearDrafts={state.clearDraftFoods}
+              score={state.todayScore} busyFoodIds={state.busyFoodIds} allowDeleteSaved={state.cloudMode} />
           </div>
           {visited.current.has("recommend") && <section id="recommend" role="region" aria-labelledby="tab-recommend" aria-label={labels.recommend} hidden={tab !== "recommend"} className="precision-functional-section">
             <Recommendations preview portalTarget={document.querySelector(".precision-preview")} profile={state.profile} day={state.day} gaps={state.gaps} targets={state.targets} totals={state.totals} foods={state.savedFoods}
@@ -123,17 +160,25 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
           {visited.current.has("calendar") && <section id="calendar" role="region" aria-labelledby="calendar-access" aria-label={labels.calendar} hidden={tab !== "calendar"} className="precision-functional-section">
             <TrainingCalendar profile={state.profile} day={state.selectedDay} foods={state.selectedFoods} records={state.records} currentDateKey={state.currentDateKey}
               selectedDateKey={state.selectedDateKey} onSelectDate={state.setSelectedDateKey} targets={state.selectedTargets} totals={state.selectedTotals} todayLabel={state.todayLabel}
-              onDayChange={state.selectedDateKey === state.currentDateKey ? state.setDay : undefined} />
+              onDayChange={state.selectedDateKey === state.currentDateKey ? state.setDay : undefined}
+              score={state.cloudMode ? state.selectedScore : undefined} status={state.selectedStatus} />
           </section>}
         </div>}
       </div>}
       {mode === "landing" && <Reviews />}
     </main>
-    <PreviewFooter onStart={() => navigate("recognition")} onFeedback={() => openFeedback()} />
+    <PreviewFooter onStart={() => navigate("recognition")} onFeedback={() => openFeedback()} onAccount={auth.status === "signed_in" ? () => setAccountOpen(true) : undefined} />
     {feedbackOpen && <Feedback invitation={feedbackInvitation} onClose={() => setFeedbackOpen(false)} />}
+    {accountOpen && <AccountDialog onClose={() => setAccountOpen(false)} />}
+    {legacyImport && <ImportDialog days={legacyImport.days} foods={legacyImport.foods}
+      onImport={state.importLegacyRecords}
+      onSkip={async () => { const ok = await state.skipLegacyImport(); if (ok) setLegacyImport(null); return ok; }}
+      onLater={() => { importDeferred.current = true; setLegacyImport(null); }} />}
+    {auth.loginOpen && <LoginDialog onClose={() => { auth.closeLogin(); setLoginIntent(null); }} />}
     {settingsOpen && <PreviewDialog title={t("本地系统设置")} wide onClose={() => { setSettingsOpen(false); setPendingTab(null); }}>
-      <ProfilePanel profile={state.profile} day={state.day} onBack={() => { setSettingsOpen(false); setPendingTab(null); }} onSave={(profile, day) => {
-        state.completeProfile(profile, day); setSettingsOpen(false);
+      <ProfilePanel profile={state.profile} day={state.day} onBack={() => { setSettingsOpen(false); setPendingTab(null); }} onSave={async (profile, day) => {
+        if (!await state.completeProfile(profile, day)) return;
+        setSettingsOpen(false);
         if (mode === "landing" && pendingTab) router.push(pendingTab === "recognition" ? "/workspace" : `/workspace?view=${pendingTab}`);
         else if (pendingTab) { visited.current.add(pendingTab); setTab(pendingTab); setFocusRequest({ target: pendingTab }); }
         setPendingTab(null);
