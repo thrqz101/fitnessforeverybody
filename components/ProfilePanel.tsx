@@ -6,7 +6,7 @@ import type { DayState, UserProfile } from "@/lib/types";
 type ProfilePanelProps = {
   profile: UserProfile;
   day: DayState;
-  onSave: (profile: UserProfile, day: DayState) => void;
+  onSave: (profile: UserProfile, day: DayState) => void | Promise<void>;
   onBack?: () => void;
 };
 
