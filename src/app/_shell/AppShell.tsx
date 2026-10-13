@@ -10,7 +10,7 @@ import { useI18n, useText } from "@/shared/i18n/i18n";
 export type ToolTab = "recognition" | "recommend" | "calendar";
 export function Brand() {
   return <span className="inline-flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:gap-3">
-    <span className="precision-brand"><span className="precision-brand-mark">F</span><span>Fitness for Everybody<span className="precision-brand-dot">.</span></span></span>
+    <span className="precision-brand"><img className="precision-brand-mark" src="/images/brand-mark.svg" alt="" width={26} height={26} /><span>Fitness for Everybody<span className="precision-brand-dot">.</span></span></span>
     <span className="brand-credit inline-flex items-baseline gap-1 whitespace-nowrap tracking-normal">
       <span style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: 11, fontWeight: 400, color: "#7b867d" }}>built by</span>
       <span style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", fontStyle: "italic", fontSize: 13, fontWeight: 600, letterSpacing: "-.035em", color: "#4b7b60" }}>thrqz</span>
