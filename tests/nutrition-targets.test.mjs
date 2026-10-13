@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { calculateTargets, calculateCaloriesFromMacros, calculateCaloriesFromMacroMultipliers, defaultProfile, defaultDayState } from '../lib/nutrition.ts';
+import { calculateTargets, calculateCaloriesFromMacros, calculateCaloriesFromMacroMultipliers, defaultProfile, defaultDayState } from '../src/shared/domain/nutrition.ts';
 
 test('lower protein multiplier reduces both displayed and saved calories', () => {
   const macroMultipliers = { protein: 2.04, carbs: 4.1, fat: 0.9 };

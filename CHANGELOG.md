@@ -1,5 +1,14 @@
 # 更新记录
 
+## 2026-10-13 — 代码架构整理与开源安全
+
+- 代码迁入 `src/`，按功能拆分为 recognition、recommendation、profile、daily-log、account、feedback、agent，每个功能内分 domain / server / ui；跨功能代码放在 `src/shared`。
+- 拆分超大文件：识别接口从 1800 行拆成识别流水线各阶段模块；推荐、设置页、营养计算按职责拆开。删除不再使用的 EdgeSpark 后端和旧组件。功能与界面不变。
+- 新增 `AGENTS.md`（`CLAUDE.md` 指向它）、`ARCHITECTURE.md`、`CODE.md` 与 `docs/` 专题文档。
+- 收紧 `.gitignore` / `.vercelignore`，`.env.example` 改为空值并标注公开与服务端变量，脚本不再写死 1Password 账户。
+
+验证：类型检查、85 项测试、生产构建（CSS 与重构前逐字节一致）、真实后端冒烟测试（登录 12 项、接口 58 项）。
+
 ## 2026-10-13 — 食物识别路由与营养体验升级
 
 - 接入可切换的 Jev 路由；默认采用品牌优先联网、食品库匹配、营养分析的三路流程，并补充超时与失败回退。

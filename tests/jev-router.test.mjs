@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildJevRequest, classifyWithJev, effectiveFoodRoute, validateJevAnswer } from '../lib/agent/jev-router.ts';
+import { buildJevRequest, classifyWithJev, effectiveFoodRoute, validateJevAnswer } from '../src/features/recognition/domain/jev-router.ts';
 const context = { description: '小林面馆牛肉面加鸡蛋', localCandidates: [], localCoverageComplete: false, brandHints: '' };
 const payload = (route = 'brand_search', confidence = 0.95) => ({ answers: { route: { type: 'choice', choice: route, confidence, probabilities: Object.fromEntries(['local_exact','brand_search','ai_estimate','not_food'].map(r => [r, r === route ? 1 : 0])) } } });
 const invoke = (fetcher, extra = {}) => classifyWithJev(context, { apiKey: 'test-placeholder', fetcher, ...extra });
@@ -54,35 +54,33 @@ test('unresolved 1Password reference never reaches an external endpoint', async 
 import fs from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
-import * as jevModule from '../lib/agent/jev-router.ts';
-import * as foodRouter from '../lib/agent/food-router.ts';
-import * as brands from '../lib/brand-catalog.ts';
-import * as eventModule from '../lib/recognition-events.ts';
-import * as evidenceCore from '../lib/search-evidence.ts';
-import * as nutritionDb from '../lib/nutrition-db.ts';
+import * as jevModule from '../src/features/recognition/domain/jev-router.ts';
+import * as foodRouter from '../src/features/recognition/domain/food-router.ts';
+import * as brands from '../src/features/recognition/domain/brand-catalog.ts';
+import * as eventModule from '../src/features/recognition/domain/events.ts';
+import * as evidenceCore from '../src/shared/domain/search-evidence.ts';
+import * as nutritionDb from '../src/shared/catalog/nutrition-db.ts';
+import { loadTsGraph } from './helpers/load-ts.mjs';
 const evidenceModule = {};
-vm.runInNewContext(ts.transpileModule(fs.readFileSync(new URL('../lib/agent/search-evidence.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:evidenceModule,require:()=>evidenceCore,URL});
+vm.runInNewContext(ts.transpileModule(fs.readFileSync(new URL('../src/features/recognition/domain/build-search-evidence.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:evidenceModule,require:()=>evidenceCore,URL});
 function loadHandler(fetcher, router = 'jev', extraEnv = {}, cloudStubs = {}) {
-  const source = fs.readFileSync(new URL('../app/api/food-ai/route.ts', import.meta.url), 'utf8');
-  const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
-  const exports = {};
   const env = { FOOD_ROUTER: router, AI_PROVIDER: 'deepseek', DEEPSEEK_API_KEY: 'test-placeholder', TAVILY_API_KEY: 'test-placeholder', ...extraEnv };
   const dependencies = {
-    '@/lib/recognition-events':eventModule,
-    '@/lib/search-evidence':evidenceCore,
-    '@/lib/agent/search-evidence':evidenceModule,
-    '@/lib/agent/food-router': foodRouter,
-    '@/lib/agent/jev-router': { ...jevModule, classifyWithJev: context => jevModule.classifyWithJev(context, { apiKey: 'test-placeholder', fetcher }) },
-    '@/lib/food-catalog': { foodCatalog: [] },
-    '@/lib/nutrition-db': nutritionDb,
-    '@/lib/brand-catalog': brands,
-    '@/lib/i18n-utils': { normalizeLanguage: lang => lang === 'en' ? 'en' : 'zh', pick: (lang, zh, en) => lang === 'en' ? en : zh, normalizeMacroTotals: m => Object.fromEntries(['protein','carbs','fat','calories','fiber'].map(k => [k, Math.max(0, Math.round(Number(m?.[k]) || 0))])) },
-    '@/lib/translations': { translateToEn: t => t, translateToZh: t => t },
-    '@/lib/cloud/recognition': { beginCloudRecognition: async () => ({ mode: 'off' }), ...cloudStubs.recognition },
-    '@/lib/cloud/recognition-persist': { persistRecognition: async () => { throw new Error('must not persist when the backend is off'); }, ...cloudStubs.persist }
+    '@/features/recognition/domain/events':eventModule,
+    '@/shared/domain/search-evidence':evidenceCore,
+    '@/features/recognition/domain/build-search-evidence':evidenceModule,
+    '@/features/recognition/domain/food-router': foodRouter,
+    '@/features/recognition/domain/jev-router': { ...jevModule, classifyWithJev: context => jevModule.classifyWithJev(context, { apiKey: 'test-placeholder', fetcher }) },
+    '@/shared/catalog/food-catalog': { foodCatalog: [] },
+    '@/shared/catalog/nutrition-db': nutritionDb,
+    '@/features/recognition/domain/brand-catalog': brands,
+    '@/shared/i18n/i18n-utils': { normalizeLanguage: lang => lang === 'en' ? 'en' : 'zh', pick: (lang, zh, en) => lang === 'en' ? en : zh, normalizeMacroTotals: m => Object.fromEntries(['protein','carbs','fat','calories','fiber'].map(k => [k, Math.max(0, Math.round(Number(m?.[k]) || 0))])) },
+    '@/shared/i18n/translations': { translateToEn: t => t, translateToZh: t => t },
+    '@/features/recognition/server/cloud-recognition': { beginCloudRecognition: async () => ({ mode: 'off' }), ...cloudStubs.recognition },
+    '@/features/recognition/server/persist': { persistRecognition: async () => { throw new Error('must not persist when the backend is off'); }, ...cloudStubs.persist }
   };
-  vm.runInNewContext(code, { exports, require: id => { if (!(id in dependencies)) throw new Error(id); return dependencies[id]; }, process: { env }, fetch: fetcher, Response, Headers, AbortController, AbortSignal, URL, setTimeout, clearTimeout, console });
-  return exports.POST;
+  const route = loadTsGraph('src/app/api/food-ai/route.ts', { stubs: dependencies, globals: { process: { env }, fetch: fetcher, Response, Headers, AbortController, AbortSignal, URL, setTimeout, clearTimeout, console } });
+  return route.POST;
 }
 const meal = { isFoodRelated: true, foods: [{ name: '牛肉面', brand: '小林面馆', foodType: '面食', portionLabel: '一碗', macros: { protein: 25, carbs: 70, fat: 15, calories: 515, fiber: 3 } }] };
 const completion = value => Response.json({ choices: [{ message: { content: JSON.stringify(value) } }] });

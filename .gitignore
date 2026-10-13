@@ -1,23 +1,48 @@
+# This repository is public. Anything that is local, personal or secret must be ignored here
+# explicitly; do not rely on a machine-wide global gitignore.
+
+# Dependencies and build output
 node_modules
 .next
 out
-.vercel
-.env*.local
-.env
-.env.*
-!.env.example
-# Real per-100g food nutrition DB stays local; only the example is committed.
-data/nutrition-100g.json
-data/nutrition-100g.csv
-data/nutrition-recipes.json
-scripts/nutrition/__pycache__/
+coverage
+*.tsbuildinfo
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-*.tsbuildinfo
 
-output/
-HANDOFF.md
+# Environment and secrets: ignore every env file, then allow only the committed templates.
+.env
+.env.*
+!.env.example
+.secrets.*
+!.secrets.example
+*.pem
+*.key
+*.p12
+
+# Local data: the full per-100g nutrition DB is generated locally; only the example is committed.
+data/nutrition-100g.json
+data/nutrition-100g.csv
+data/nutrition-recipes.json
+*.db
+*.sqlite
+*.sqlite3
+supabase/.temp/
+supabase/.branches/
+supabase/.env
+
+# Tool, agent and editor local state
+.claude/settings.local.json
+.trae/
 .vscode/
+.idea/
 .playwright-mcp/
+.vercel/
+.DS_Store
+
+# Private notes and scratch output
+HANDOFF.md
+output/
+scripts/nutrition/__pycache__/

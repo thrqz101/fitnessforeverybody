@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { emptyFeedbackProgress, parseFeedbackProgress, completeRecognitionFlow, nextFeedbackMilestone, acknowledgeFeedbackMilestone } from '../lib/feedback-progress.ts';
+import { emptyFeedbackProgress, parseFeedbackProgress, completeRecognitionFlow, nextFeedbackMilestone, acknowledgeFeedbackMilestone } from '../src/shared/domain/feedback-progress.ts';
 
 function complete(progress, first, last) {
   for (let i = first; i <= last; i++) progress = completeRecognitionFlow(progress, `batch-${i}`);

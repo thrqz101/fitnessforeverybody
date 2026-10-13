@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_USE_ENV_PROXY=1 op run --account GNCASLY6RVBK3BVANK75JPBRQU --env-file=.env -- next dev",
+    "dev": "NODE_USE_ENV_PROXY=1 op run --env-file=.env -- next dev",
     "build": "next build",
-    "build:local": "op run --account GNCASLY6RVBK3BVANK75JPBRQU --env-file=.env -- next build",
-    "start": "op run --account GNCASLY6RVBK3BVANK75JPBRQU --env-file=.env -- next start",
+    "build:local": "op run --env-file=.env -- next build",
+    "start": "op run --env-file=.env -- next start",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
-    "auth:smoke": "op run --account GNCASLY6RVBK3BVANK75JPBRQU --env-file=.env -- node scripts/dev/auth-smoke.mjs",
-    "api:smoke": "op run --account GNCASLY6RVBK3BVANK75JPBRQU --env-file=.env -- node scripts/dev/api-smoke.mjs"
+    "auth:smoke": "op run --env-file=.env -- node scripts/dev/auth-smoke.mjs",
+    "api:smoke": "op run --env-file=.env -- node scripts/dev/api-smoke.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { classifyAuthError, isPlausibleEmail, normalizeOtp, resendSecondsLeft, safeNextPath } from '../lib/auth/helpers.ts';
+import { classifyAuthError, isPlausibleEmail, normalizeOtp, resendSecondsLeft, safeNextPath } from '../src/shared/auth/helpers.ts';
 
 test('email validation accepts normal addresses and rejects junk', () => {
   assert.equal(isPlausibleEmail('  a.b+c@example.com '), true);
