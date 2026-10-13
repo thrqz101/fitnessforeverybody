@@ -151,7 +151,7 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
               onNavigate={(view) => view === "settings" ? setSettingsOpen(true) : navigate(view)}
               onDayChange={state.setDay} onAddFoods={(foods) => { state.addFoods(foods); navigate("recognition", true); }}
               onRemoveFood={state.removeFood} onSaveFood={state.saveFoodToCalendar} onClearDrafts={state.clearDraftFoods}
-              score={state.todayScore} flows={state.todayFlows} cloud={state.cloudMode} busyFoodIds={state.busyFoodIds} allowDeleteSaved={state.cloudMode} />
+              score={state.todayScore} busyFoodIds={state.busyFoodIds} allowDeleteSaved={state.cloudMode} />
           </div>
           {visited.current.has("recommend") && <section id="recommend" role="region" aria-labelledby="tab-recommend" aria-label={labels.recommend} hidden={tab !== "recommend"} className="precision-functional-section">
             <Recommendations preview portalTarget={document.querySelector(".precision-preview")} profile={state.profile} day={state.day} gaps={state.gaps} targets={state.targets} totals={state.totals} foods={state.savedFoods}

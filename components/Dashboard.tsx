@@ -8,7 +8,6 @@ import {
   ArrowRight,
   Check,
   ChevronRight,
-  Flame,
   Loader2,
   MessageSquareText,
   ScanLine,
@@ -20,8 +19,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { getLocalizedFoodField } from "@/lib/translations";
 import { pick, type Language } from "@/lib/i18n-utils";
-import { completion, dietStatusLabels, estimateBmr, goalLabels, macroKeys, macroLabels } from "@/lib/nutrition";
-import { formatScorePercent, REQUIRED_FLOWS, weightedScore } from "@/lib/score";
+import { completion, macroKeys, macroLabels } from "@/lib/nutrition";
+import { formatScorePercent, weightedScore } from "@/lib/score";
 import type { DayState, FoodLogItem, MacroKey, MacroTotals, UserProfile } from "@/lib/types";
 
 type DashboardProps = {
@@ -41,8 +40,6 @@ type DashboardProps = {
   onClearDrafts: () => void;
   /** Cloud mode: server-computed weighted score (0..1) and confirmed recognition count for today. */
   score?: number | null;
-  flows?: number;
-  cloud?: boolean;
   busyFoodIds?: string[];
   /** Confirmed entries may be deleted until the Beijing day ends (cloud mode only). */
   allowDeleteSaved?: boolean;
@@ -83,8 +80,6 @@ export function Dashboard({
   onSaveFood,
   onClearDrafts,
   score,
-  flows = 0,
-  cloud = false,
   busyFoodIds = [],
   allowDeleteSaved = false
 }: DashboardProps) {
@@ -95,7 +90,6 @@ export function Dashboard({
   const progress = useRecognitionProgress();
   const draftFoods = foods.filter((food) => !food.savedToCalendar);
   const savedFoods = foods.filter((food) => food.savedToCalendar);
-  const bmr = profile.bmrKcal > 0 ? profile.bmrKcal : estimateBmr(profile);
   const animatedTotals = useAnimatedMacroTotals(totals);
   const scoreFraction = score ?? weightedScore(totals, targets);
   const scoreText = formatScorePercent(scoreFraction);
@@ -287,10 +281,6 @@ export function Dashboard({
               <span>{pick(language, "已计入", "Logged")} <strong>{savedFoods.length}</strong> {pick(language, "项食物", "foods")}</span>
               <span>{gaps.calories < 0 ? pick(language, "超出目标", "Over target") : pick(language, "剩余", "Remaining")} <strong>{Math.round(Math.abs(gaps.calories))}</strong> kcal</span>
             </div>
-            {cloud ? <p className="nutrition-summary__context" role="status">{pick(language,
-              `已确认识别 ${flows}/${REQUIRED_FLOWS} 次；完成 ${REQUIRED_FLOWS} 次且达标率不低于 50%，今天才计为有效日。`,
-              `${flows}/${REQUIRED_FLOWS} recognitions confirmed. Today counts as an effective day with ${REQUIRED_FLOWS} confirmed recognitions and a score of at least 50%.`)}</p> : null}
-            <p className="nutrition-summary__context">{t(goalLabels[profile.goal])} · {t(dietStatusLabels[day.dietStatus].label)} · BMR {bmr} kcal</p>
           </section>
 
           <section className="nutrition-metrics" aria-label={pick(language, "营养指标进度", "Nutrient progress")}>
@@ -325,13 +315,9 @@ export function Dashboard({
         <img src="/images/recommendation-rail-v2.png" alt={t("三种适合作为下一餐的健康食物")} />
         <div className="next-bite-feature__overlay" />
         <div className="next-bite-feature__content">
-          <span className="experience-kicker experience-kicker--light"><Flame size={14} /> Smart recommendation</span>
+          <span className="experience-kicker experience-kicker--light">Smart recommendation</span>
           <h2>{t("智能推荐下一餐")}</h2>
           <p>{t("根据当前营养缺口、训练状态和已有记录生成推荐方案。")}</p>
-          <div className="gap-summary">
-            <span>{t("蛋白还差")} <strong>{Math.max(0, Math.round(gaps.protein))}g</strong></span>
-            <span>{t("热量余量")} <strong>{Math.max(0, Math.round(gaps.calories))} kcal</strong></span>
-          </div>
           <button type="button" onClick={() => onNavigate("recommend")} className="feature-cta">{t("看看下一餐")} <ArrowRight size={18} /></button>
         </div>
       </section>

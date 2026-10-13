@@ -537,9 +537,6 @@ textarea:focus-visible {
 .next-bite-feature__content { position: relative; display: flex; min-height: 540px; max-width: 660px; flex-direction: column; justify-content: center; padding: clamp(32px, 6vw, 80px); color: white; }
 .next-bite-feature h2 { margin: 18px 0 13px; font-size: clamp(43px, 5.2vw, 75px); line-height: .98; letter-spacing: -.06em; }
 .next-bite-feature p { max-width: 520px; margin: 0; color: rgba(255,255,255,.65); font-size: 14px; line-height: 1.8; }
-.gap-summary { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 21px; }
-.gap-summary span { padding: 9px 12px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; color: rgba(255,255,255,.66); font-size: 11px; background: rgba(255,255,255,.08); }
-.gap-summary strong { color: white; }
 .feature-cta { display: inline-flex; width: fit-content; align-items: center; gap: 8px; margin-top: 25px; padding: 14px 18px; border: 0; border-radius: 16px; color: #21372a; font-size: 12px; font-weight: 900; background: #f2ce67; }
 
 /* Recommendation cinema */
