@@ -16,12 +16,6 @@ function orThrow<T>(result: { data: T | null; error: { message?: string; code?: 
   return result.data;
 }
 
-function shiftDate(dateKey: string, days: number): string {
-  const date = new Date(`${dateKey}T00:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString().slice(0, 10);
-}
-
 /** Computes targets with the shared nutrition formulas and stores them as today's snapshot. */
 export async function writeTodaySnapshot(admin: SupabaseClient, userId: string, profile: UserProfile, day: DayState): Promise<CloudDay> {
   const targets = calculateTargets(profile, day);
@@ -29,36 +23,26 @@ export async function writeTodaySnapshot(admin: SupabaseClient, userId: string, 
   return dayRowToCloudDay(row);
 }
 
-/** Reads (and, when the account is set up, makes sure today has) the authoritative state. */
+type RawCloudState = { profile: ProfileRow; today: string; days: DayRow[]; entries: EntryRow[] };
+
+/**
+ * Reads the authoritative state in one database round trip and, when the account is set up but today has no
+ * goal snapshot yet (first visit of a new Beijing day), writes it with one more call.
+ */
 export async function loadCloudState(admin: SupabaseClient, userId: string): Promise<CloudState> {
-  const profileRow = orThrow<ProfileRow>(await admin.rpc("ensure_profile", { p_user: userId }));
-  const today = orThrow<string>(await admin.rpc("app_today"));
-  const profile = profileRowToProfile(profileRow);
-  const from = shiftDate(today, -WINDOW_DAYS);
-
-  if (profile) {
-    const existing = await admin.from("daily_activity").select("activity_date").eq("user_id", userId).eq("activity_date", today).maybeSingle();
-    if (existing.error) throw new CloudError(existing.error);
-    if (!existing.data) await writeTodaySnapshot(admin, userId, profile, defaultDayState);
-  }
-
-  const [days, entries] = await Promise.all([
-    admin.from("daily_activity").select("*").eq("user_id", userId).gte("activity_date", from).order("activity_date", { ascending: false }),
-    admin.from("food_entries").select("*").eq("user_id", userId).gte("entry_date", from)
-      .or(`status.eq.confirmed,and(status.eq.draft,entry_date.eq.${today})`)
-      .order("created_at", { ascending: false }).limit(ENTRY_LIMIT)
-  ]);
-  const dayRows = orThrow<DayRow[]>(days);
-  const entryRows = orThrow<EntryRow[]>(entries);
+  const raw = orThrow<RawCloudState>(await admin.rpc("get_cloud_state", { p_user: userId, p_window_days: WINDOW_DAYS, p_entry_limit: ENTRY_LIMIT }));
+  const profile = profileRowToProfile(raw.profile);
+  const days: Record<string, CloudDay> = Object.fromEntries(raw.days.map((row) => [row.activity_date, dayRowToCloudDay(row)]));
+  if (profile && !days[raw.today]) days[raw.today] = await writeTodaySnapshot(admin, userId, profile, defaultDayState);
 
   return {
-    today,
-    setupCompleted: profileRow.setup_completed,
+    today: raw.today,
+    setupCompleted: raw.profile.setup_completed,
     profile,
-    profileVersion: profileRow.version,
-    localImportState: profileRow.local_import_state,
-    feedbackProgress: profileRow.feedback_progress,
-    days: Object.fromEntries(dayRows.map((row) => [row.activity_date, dayRowToCloudDay(row)])),
-    foods: entryRows.map(entryRowToFood)
+    profileVersion: raw.profile.version,
+    localImportState: raw.profile.local_import_state,
+    feedbackProgress: raw.profile.feedback_progress,
+    days,
+    foods: raw.entries.map(entryRowToFood)
   };
 }
