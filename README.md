@@ -182,17 +182,17 @@ EXA_API_KEY=...             # /api/nutrition-agent 的 exa_web_search
 FOOD_ROUTER=rules
 FOOD_SEARCH_DEPTH=basic
 TYPESAFE_MODEL=jev-latest
-TYPESAFE_API_KEY="op://API keys/TypeSafe API/credential"
+TYPESAFE_API_KEY="op://<vault>/<item>/<field>"
 ```
 
 可切回 `FOOD_ROUTER=jev`（Jev 选路，低于 0.8 置信度、2 秒超时或异常时回退原 LLM）或 `FOOD_ROUTER=llm`，修改后重启。独立 `/api/nutrition-agent` 不受影响。代码只读取环境变量，不添加 dotenv 加载器；启动、测试一律通过 `op run --env-file=.env -- <cmd>`。
 
 离线验证：`op run --env-file=.env -- node --test tests/jev-router.test.mjs`、`op run --env-file=.env -- npm run typecheck`。页面测试只生成待确认记录，不计入日历。比较端到端耗时需使用相同输入并重复采样，搜索缓存和网络波动可能影响结果。
 
-此机器有多个 1Password 账户，TypeSafe 条目位于账户 `UWN5AXQ2NBAZLA4EXNMXSB2ZUQ`。当前终端还继承了另一个账户的 `GITHUB_PACKAGES_TOKEN_OP_REF`；`op run` 会解析继承的引用，因此本项目命令可使用以下形式，仅在子进程移除无关引用：
+如果机器上有多个 1Password 账户，用 `OP_ACCOUNT` 环境变量选择存放这些条目的账户。当前终端还继承了另一个账户的 `GITHUB_PACKAGES_TOKEN_OP_REF`；`op run` 会解析继承的引用，因此本项目命令可使用以下形式，仅在子进程移除无关引用：
 
 ```bash
-env -u GITHUB_PACKAGES_TOKEN_OP_REF op run --account UWN5AXQ2NBAZLA4EXNMXSB2ZUQ --env-file=.env -- npm run dev
+env -u GITHUB_PACKAGES_TOKEN_OP_REF op run --env-file=.env -- npm run dev
 ```
 
 无需 GitHub 包认证的测试命令同样适用；不要在安装私有包的命令中移除它。
