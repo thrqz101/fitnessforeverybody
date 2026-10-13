@@ -94,8 +94,9 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
   }, [auth.status, loginIntent, state.hydrated]);
 
   function navigate(nextTab: ToolTab, records = false) {
-    if (!state.hydrated || auth.status === "loading") return;
+    if (auth.status === "loading") return;
     if (auth.status === "signed_out") { setLoginIntent(nextTab); auth.openLogin(); return; }
+    if (!state.hydrated) return;
     if (mode === "landing") {
       if (!state.hasProfile) { setPendingTab(nextTab); setSettingsOpen(true); }
       else router.push(nextTab === "recognition" ? "/workspace" : `/workspace?view=${nextTab}`);
@@ -110,6 +111,13 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
 
   return <>
     <PreviewNav mode={mode} onStart={() => navigate("recognition")} onNavigate={navigate} calendarActive={tab === "calendar"} onFeedback={() => openFeedback()} onSettings={() => { setPendingTab(null); setSettingsOpen(true); }} />
+    {state.cloudError && <div role="alert" className="precision-cloud-alert">
+      <span>{state.cloudError}</span>
+      <span className="flex gap-2">
+        {!state.hydrated && <button type="button" onClick={() => void state.retrySync()}>{text("重试", "Retry")}</button>}
+        <button type="button" onClick={state.clearCloudError} aria-label={text("关闭提示", "Dismiss")}>{text("知道了", "Dismiss")}</button>
+      </span>
+    </div>}
     <main>
       {mode === "landing" && <PrecisionHero animated onStart={() => navigate("recognition")} />}
       {mode === "workspace" && <div className="precision-tools precision-tools--workspace max-w-7xl mx-auto px-6">
@@ -128,7 +136,8 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
               profile={state.profile} day={state.day} targets={state.targets} totals={state.totals} gaps={state.gaps} foods={state.foods} todayLabel={state.todayLabel}
               onNavigate={(view) => view === "settings" ? setSettingsOpen(true) : navigate(view)}
               onDayChange={state.setDay} onAddFoods={(foods) => { state.addFoods(foods); navigate("recognition", true); }}
-              onRemoveFood={state.removeFood} onSaveFood={state.saveFoodToCalendar} onClearDrafts={state.clearDraftFoods} />
+              onRemoveFood={state.removeFood} onSaveFood={state.saveFoodToCalendar} onClearDrafts={state.clearDraftFoods}
+              score={state.todayScore} flows={state.todayFlows} cloud={state.cloudMode} busyFoodIds={state.busyFoodIds} allowDeleteSaved={state.cloudMode} />
           </div>
           {visited.current.has("recommend") && <section id="recommend" role="region" aria-labelledby="tab-recommend" aria-label={labels.recommend} hidden={tab !== "recommend"} className="precision-functional-section">
             <Recommendations preview portalTarget={document.querySelector(".precision-preview")} profile={state.profile} day={state.day} gaps={state.gaps} targets={state.targets} totals={state.totals} foods={state.savedFoods}
@@ -137,7 +146,8 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
           {visited.current.has("calendar") && <section id="calendar" role="region" aria-labelledby="calendar-access" aria-label={labels.calendar} hidden={tab !== "calendar"} className="precision-functional-section">
             <TrainingCalendar profile={state.profile} day={state.selectedDay} foods={state.selectedFoods} records={state.records} currentDateKey={state.currentDateKey}
               selectedDateKey={state.selectedDateKey} onSelectDate={state.setSelectedDateKey} targets={state.selectedTargets} totals={state.selectedTotals} todayLabel={state.todayLabel}
-              onDayChange={state.selectedDateKey === state.currentDateKey ? state.setDay : undefined} />
+              onDayChange={state.selectedDateKey === state.currentDateKey ? state.setDay : undefined}
+              score={state.cloudMode ? state.selectedScore : undefined} status={state.selectedStatus} />
           </section>}
         </div>}
       </div>}
@@ -147,8 +157,9 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
     {feedbackOpen && <Feedback invitation={feedbackInvitation} onClose={() => setFeedbackOpen(false)} />}
     {auth.loginOpen && <LoginDialog onClose={() => { auth.closeLogin(); setLoginIntent(null); }} />}
     {settingsOpen && <PreviewDialog title={t("本地系统设置")} wide onClose={() => { setSettingsOpen(false); setPendingTab(null); }}>
-      <ProfilePanel profile={state.profile} day={state.day} onBack={() => { setSettingsOpen(false); setPendingTab(null); }} onSave={(profile, day) => {
-        state.completeProfile(profile, day); setSettingsOpen(false);
+      <ProfilePanel profile={state.profile} day={state.day} onBack={() => { setSettingsOpen(false); setPendingTab(null); }} onSave={async (profile, day) => {
+        if (!await state.completeProfile(profile, day)) return;
+        setSettingsOpen(false);
         if (mode === "landing" && pendingTab) router.push(pendingTab === "recognition" ? "/workspace" : `/workspace?view=${pendingTab}`);
         else if (pendingTab) { visited.current.add(pendingTab); setTab(pendingTab); setFocusRequest({ target: pendingTab }); }
         setPendingTab(null);
