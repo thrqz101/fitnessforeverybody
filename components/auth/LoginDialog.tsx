@@ -60,6 +60,9 @@ export function LoginDialog({ onClose }: { onClose: () => void }) {
   return <PreviewDialog title={text("登录 Fitness for Everybody", "Sign in to Fitness for Everybody")} onClose={onClose}>
     {step === "email" ? <form className="precision-feedback-form" onSubmit={sendCode} noValidate>
       <p className="text-sm text-zinc-500 leading-relaxed">{text("输入邮箱，我们会发送一个 6 位验证码。无需密码，首次登录会自动创建账号。", "Enter your email and we'll send a 6-digit code. No password needed; your account is created on first sign-in.")}</p>
+      <p className="text-xs text-zinc-500 leading-relaxed">{text(
+        "登录后我们会保存你的身体资料、输入的食物描述和饮食记录，用于计算营养并在多台设备间同步。你可以随时在「账号与数据」里删除。",
+        "After signing in we store your body profile, the food descriptions you type and your food log to calculate nutrition and sync across devices. You can delete everything any time under Account & data.")}</p>
       <label>{text("邮箱", "Email")}
         <input type="email" name="email" autoComplete="email" inputMode="email" required value={email} onChange={(event) => setEmail(event.target.value)} aria-invalid={error === "invalid_email"} aria-describedby={error ? "login-error" : undefined} />
       </label>

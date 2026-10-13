@@ -11,7 +11,8 @@ type AuthState = {
   loginOpen: boolean;
   openLogin: () => void;
   closeLogin: () => void;
-  signOut: () => Promise<void>;
+  /** Default 'local' signs out this device only; 'global' also revokes every other session. */
+  signOut: (scope?: "local" | "global") => Promise<void>;
 };
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -33,8 +34,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => data.subscription.unsubscribe();
   }, [supabase]);
 
-  const signOut = useCallback(async () => {
-    await supabase?.auth.signOut();
+  const signOut = useCallback(async (scope: "local" | "global" = "local") => {
+    await supabase?.auth.signOut({ scope });
   }, [supabase]);
 
   const value = useMemo<AuthState>(() => ({
