@@ -1,3 +1,7 @@
+<p align="center">
+  <a href="https://fitnessforeverybody.app"><img alt="Fitness for Everybody logo" src="docs/images/logo.png" width="112"></a>
+</p>
+
 <h1 align="center">Fitness for Everybody</h1>
 
 <h3 align="center">
