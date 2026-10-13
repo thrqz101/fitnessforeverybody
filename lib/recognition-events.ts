@@ -12,6 +12,8 @@ export type RecognitionResult = {
   isFoodRelated?: boolean;
   message?: string;
   needsConfig?: boolean;
+  /** Stable error code from the backend (e.g. unauthenticated, processing, rate_limited). */
+  code?: string;
   provider?: string;
   foods?: FoodLogItem[];
 };

@@ -1,4 +1,6 @@
 import { streamRecognition, type ProgressReporter } from "@/lib/recognition-events";
+import { beginCloudRecognition, type CloudRun } from "@/lib/cloud/recognition";
+import { persistRecognition } from "@/lib/cloud/recognition-persist";
 import { safeExternalUrl, type SearchReference } from "@/lib/search-evidence";
 import { buildSearchEvidence } from "@/lib/agent/search-evidence";
 import { hasNonstandardPortion, selectRuleFoodRoute } from "@/lib/agent/food-router";
@@ -156,6 +158,7 @@ async function recognizeFood(request: Request, report?: ProgressReporter, signal
   };
   let language: Language = "zh";
   let routing: RoutingMeta | undefined;
+  let cloud: CloudRun | null = null;
   const requestStarted = Date.now();
   const timings: Record<TimingStage, number> = { brandMatch: 0, localLookup: 0, routing: 0, search: 0, searchLlm: 0, estimateLlm: 0, repairLlm: 0, normalize: 0 };
   let llmCalls = 0;
@@ -172,7 +175,15 @@ async function recognizeFood(request: Request, report?: ProgressReporter, signal
     try { return operation(); }
     finally { timings[stage] += Date.now() - started; }
   }
-  const respond = (body: Record<string, unknown>, init?: ResponseInit) => {
+  const respond = async (rawBody: Record<string, unknown>, rawInit?: ResponseInit) => {
+    let body = rawBody;
+    let init = rawInit;
+    if (cloud) {
+      // The result is only reported once it is stored; a failed save must never look like success.
+      const persisted = await persistRecognition(cloud.admin, cloud.userId, cloud.requestId, rawBody, routing?.effectiveRoute ?? null, language);
+      body = persisted.body;
+      if (!persisted.ok) init = { status: persisted.status };
+    }
     const successful = body.ok === true && body.isFoodRelated === true && Array.isArray(body.foods) && body.foods.length > 0;
     progress("result", successful ? "complete" : body.ok === false ? "error" : "warning",
       successful ? "识别完成，结果已准备好" : body.ok === false ? "识别暂未完成，请重试" : "需要补充具体的食物信息",
@@ -194,6 +205,10 @@ async function recognizeFood(request: Request, report?: ProgressReporter, signal
     const description = String(form.get("description") ?? "").trim();
     language = normalizeLanguage(form.get("lang"));
     progress("input", "complete", "已收到食物描述", "Food description received");
+
+    const started = await beginCloudRecognition(form, description, language);
+    if (started.mode === "reply") return started.response;
+    if (started.mode === "run") cloud = started.run;
 
     if (isVagueFoodDescription(description)) {
       return respond({

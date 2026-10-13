@@ -71,6 +71,9 @@ export type FoodLogItem = {
   warningEn?: string;
   sourceLabelZh?: string;
   sourceLabelEn?: string;
+  /** Present only for entries stored in the cloud backend. */
+  cloud?: boolean;
+  entryDate?: string;
 };
 
 export type Recommendation = {
@@ -90,4 +93,12 @@ export type DayRecord = {
   dateKey: string;
   day: DayState;
   foods: FoodLogItem[];
+  /** Cloud-only metadata: the goal snapshot and server-computed results for that Beijing day. */
+  targets?: MacroTotals | null;
+  totals?: MacroTotals;
+  flows?: number;
+  score?: number | null;
+  finalized?: boolean;
+  effective?: boolean | null;
+  migrated?: boolean;
 };
