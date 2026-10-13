@@ -1,0 +1,4091 @@
+{
+  "version": 1,
+  "mappings": [
+    {
+      "id": "rice-raw",
+      "name": "大米（生）",
+      "nameEn": "Rice, white, long grain, unenriched, raw",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "大米",
+        "生大米",
+        "raw white rice"
+      ],
+      "dataSet": "foundation",
+      "fdcId": 2512381,
+      "ndbId": "20444",
+      "sourceDescription": "Rice, white, long grain, unenriched, raw",
+      "sourcePublishedAt": "2023-04-20"
+    },
+    {
+      "id": "rice-cooked",
+      "name": "米饭（熟）",
+      "nameEn": "Rice, white, long-grain, regular, unenriched, cooked without salt",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "米饭",
+        "白米饭",
+        "熟米饭",
+        "大米饭",
+        "rice cooked",
+        "cooked rice",
+        "cooked white rice"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169757,
+      "ndbId": "20445",
+      "sourceDescription": "Rice, white, long-grain, regular, unenriched, cooked without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "rice-brown-raw",
+      "name": "糙米（生）",
+      "nameEn": "Rice, brown, long grain, unenriched, raw",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "糙米",
+        "生糙米"
+      ],
+      "dataSet": "foundation",
+      "fdcId": 2512380,
+      "ndbId": "20036",
+      "sourceDescription": "Rice, brown, long grain, unenriched, raw",
+      "sourcePublishedAt": "2023-04-20"
+    },
+    {
+      "id": "rice-brown-cooked",
+      "name": "糙米饭（熟）",
+      "nameEn": "Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program)",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "糙米饭",
+        "熟糙米"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169704,
+      "ndbId": "20037",
+      "sourceDescription": "Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program)",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "rice-glutinous-raw",
+      "name": "糯米（生）",
+      "nameEn": "Rice, white, glutinous, unenriched, uncooked",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "糯米",
+        "生糯米"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168883,
+      "ndbId": "20054",
+      "sourceDescription": "Rice, white, glutinous, unenriched, uncooked",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "rice-glutinous-cooked",
+      "name": "糯米饭（熟）",
+      "nameEn": "Rice, white, glutinous, unenriched, cooked",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "糯米饭",
+        "熟糯米"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169711,
+      "ndbId": "20055",
+      "sourceDescription": "Rice, white, glutinous, unenriched, cooked",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "millet-raw",
+      "name": "小米（生）",
+      "nameEn": "Millet, raw",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "小米",
+        "生小米"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169702,
+      "ndbId": "20031",
+      "sourceDescription": "Millet, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "millet-cooked",
+      "name": "小米（煮熟，不含额外粥水）",
+      "nameEn": "Millet, cooked",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟小米"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168871,
+      "ndbId": "20032",
+      "sourceDescription": "Millet, cooked",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "millet-flour",
+      "name": "小米粉",
+      "nameEn": "Millet flour",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "millet flour"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172023,
+      "ndbId": "20647",
+      "sourceDescription": "Millet flour",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "oats",
+      "name": "燕麦片（干）",
+      "nameEn": "Oats, whole grain, rolled, old fashioned",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "燕麦片",
+        "干燕麦片",
+        "rolled oats"
+      ],
+      "dataSet": "foundation",
+      "fdcId": 2346396,
+      "ndbId": "20038",
+      "sourceDescription": "Oats, whole grain, rolled, old fashioned",
+      "sourcePublishedAt": "2022-10-28"
+    },
+    {
+      "id": "steel-cut-oats",
+      "name": "钢切燕麦（干）",
+      "nameEn": "Oats, whole grain, steel cut",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "钢切燕麦",
+        "steel cut oats"
+      ],
+      "dataSet": "foundation",
+      "fdcId": 2346397,
+      "ndbId": "100282",
+      "sourceDescription": "Oats, whole grain, steel cut",
+      "sourcePublishedAt": "2022-10-28"
+    },
+    {
+      "id": "oat-bran",
+      "name": "燕麦麸（生）",
+      "nameEn": "Oat bran, raw",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "燕麦麸"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168872,
+      "ndbId": "20033",
+      "sourceDescription": "Oat bran, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "oat-bran-cooked",
+      "name": "燕麦麸（煮熟）",
+      "nameEn": "Oat bran, cooked",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟燕麦麸"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168873,
+      "ndbId": "20034",
+      "sourceDescription": "Oat bran, cooked",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "flour-white",
+      "name": "小麦粉（白面粉）",
+      "nameEn": "Wheat flour, white, all-purpose, unenriched",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "小麦粉",
+        "面粉",
+        "白面粉",
+        "普通面粉",
+        "wheat flour"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169761,
+      "ndbId": "20481",
+      "sourceDescription": "Wheat flour, white, all-purpose, unenriched",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "flour-whole",
+      "name": "全麦粉",
+      "nameEn": "Wheat flour, whole-grain (Includes foods for USDA's Food Distribution Program)",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "全麦面粉",
+        "whole wheat flour"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168893,
+      "ndbId": "20080",
+      "sourceDescription": "Wheat flour, whole-grain (Includes foods for USDA's Food Distribution Program)",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "bread-white",
+      "name": "白面包",
+      "nameEn": "Bread, white, commercially prepared (includes soft bread crumbs)",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "白吐司",
+        "white bread"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174924,
+      "ndbId": "18069",
+      "sourceDescription": "Bread, white, commercially prepared (includes soft bread crumbs)",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "bread-whole",
+      "name": "全麦面包",
+      "nameEn": "Bread, whole-wheat, commercially prepared",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "全麦吐司",
+        "whole wheat bread"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172688,
+      "ndbId": "18075",
+      "sourceDescription": "Bread, whole-wheat, commercially prepared",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "noodles-egg-dry",
+      "name": "鸡蛋面（干）",
+      "nameEn": "Noodles, egg, dry, unenriched",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "干鸡蛋面",
+        "dry egg noodles"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169755,
+      "ndbId": "20409",
+      "sourceDescription": "Noodles, egg, dry, unenriched",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "noodles-egg-cooked",
+      "name": "鸡蛋面（煮熟，无盐）",
+      "nameEn": "Noodles, egg, unenriched, cooked, without added salt",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟鸡蛋面",
+        "cooked egg noodles"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168926,
+      "ndbId": "20410",
+      "sourceDescription": "Noodles, egg, unenriched, cooked, without added salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "soba-dry",
+      "name": "荞麦面（干）",
+      "nameEn": "Noodles, japanese, soba, dry",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "干荞麦面"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168906,
+      "ndbId": "20114",
+      "sourceDescription": "Noodles, japanese, soba, dry",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "soba-cooked",
+      "name": "荞麦面（煮熟）",
+      "nameEn": "Noodles, japanese, soba, cooked",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟荞麦面"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168907,
+      "ndbId": "20115",
+      "sourceDescription": "Noodles, japanese, soba, cooked",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "somen-dry",
+      "name": "素面（干，小麦面条）",
+      "nameEn": "Noodles, japanese, somen, dry",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "干素面"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168908,
+      "ndbId": "20116",
+      "sourceDescription": "Noodles, japanese, somen, dry",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "somen-cooked",
+      "name": "素面（煮熟，小麦面条）",
+      "nameEn": "Noodles, japanese, somen, cooked",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟素面"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168909,
+      "ndbId": "20117",
+      "sourceDescription": "Noodles, japanese, somen, cooked",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "mung-noodles",
+      "name": "绿豆粉丝（干）",
+      "nameEn": "Noodles, chinese, cellophane or long rice (mung beans), dehydrated",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "干绿豆粉丝",
+        "绿豆粉丝"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174258,
+      "ndbId": "16082",
+      "sourceDescription": "Noodles, chinese, cellophane or long rice (mung beans), dehydrated",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "corn-raw",
+      "name": "甜玉米（生，可食部）",
+      "nameEn": "Corn, sweet, yellow, raw",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "甜玉米",
+        "生玉米",
+        "raw sweet corn"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169998,
+      "ndbId": "11167",
+      "sourceDescription": "Corn, sweet, yellow, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "corn-cooked",
+      "name": "甜玉米（煮熟，无盐）",
+      "nameEn": "Corn, sweet, yellow, cooked, boiled, drained, without salt",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟玉米",
+        "煮玉米"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169999,
+      "ndbId": "11168",
+      "sourceDescription": "Corn, sweet, yellow, cooked, boiled, drained, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "cornmeal",
+      "name": "玉米粉（全谷）",
+      "nameEn": "Cornmeal, whole-grain, yellow",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "全谷玉米粉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169697,
+      "ndbId": "20020",
+      "sourceDescription": "Cornmeal, whole-grain, yellow",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "buckwheat",
+      "name": "荞麦（生）",
+      "nameEn": "Buckwheat",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "荞麦"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170286,
+      "ndbId": "20008",
+      "sourceDescription": "Buckwheat",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "quinoa-raw",
+      "name": "藜麦（生）",
+      "nameEn": "Quinoa, uncooked",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "藜麦",
+        "生藜麦"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168874,
+      "ndbId": "20035",
+      "sourceDescription": "Quinoa, uncooked",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "quinoa-cooked",
+      "name": "藜麦（煮熟）",
+      "nameEn": "Quinoa, cooked",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟藜麦"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168917,
+      "ndbId": "20137",
+      "sourceDescription": "Quinoa, cooked",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "barley",
+      "name": "大麦（珍珠麦，干）",
+      "nameEn": "Barley, pearled, raw",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "珍珠麦"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170284,
+      "ndbId": "20005",
+      "sourceDescription": "Barley, pearled, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "barley-cooked",
+      "name": "大麦（珍珠麦，煮熟）",
+      "nameEn": "Barley, pearled, cooked",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟珍珠麦"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170285,
+      "ndbId": "20006",
+      "sourceDescription": "Barley, pearled, cooked",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "potato-raw",
+      "name": "土豆（生，含皮）",
+      "nameEn": "Potatoes, flesh and skin, raw",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "土豆",
+        "马铃薯",
+        "生土豆",
+        "raw potato"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170026,
+      "ndbId": "11352",
+      "sourceDescription": "Potatoes, flesh and skin, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "potato-boiled",
+      "name": "土豆（水煮，去皮）",
+      "nameEn": "Potatoes, boiled, cooked without skin, flesh, without salt",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "水煮土豆",
+        "煮土豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170440,
+      "ndbId": "11367",
+      "sourceDescription": "Potatoes, boiled, cooked without skin, flesh, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "sweet-potato-raw",
+      "name": "红薯（生）",
+      "nameEn": "Sweet potato, raw, unprepared (Includes foods for USDA's Food Distribution Program)",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "红薯",
+        "番薯",
+        "生红薯"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168482,
+      "ndbId": "11507",
+      "sourceDescription": "Sweet potato, raw, unprepared (Includes foods for USDA's Food Distribution Program)",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "sweet-potato-boiled",
+      "name": "红薯（水煮，去皮）",
+      "nameEn": "Sweet potato, cooked, boiled, without skin",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "水煮红薯"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168484,
+      "ndbId": "11510",
+      "sourceDescription": "Sweet potato, cooked, boiled, without skin",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "sweet-potato-baked",
+      "name": "红薯（烤熟，无盐）",
+      "nameEn": "Sweet potato, cooked, baked in skin, flesh, without salt",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "烤红薯"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168483,
+      "ndbId": "11508",
+      "sourceDescription": "Sweet potato, cooked, baked in skin, flesh, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "yam",
+      "name": "薯蓣（Yam，生）",
+      "nameEn": "Yam, raw",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "yam raw"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170071,
+      "ndbId": "11601",
+      "sourceDescription": "Yam, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "taro",
+      "name": "芋头（生）",
+      "nameEn": "Taro, raw",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "芋头",
+        "生芋头"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169308,
+      "ndbId": "11518",
+      "sourceDescription": "Taro, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "soybean-dry",
+      "name": "黄豆（干）",
+      "nameEn": "Soybeans, mature seeds, raw",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "黄豆",
+        "干黄豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174270,
+      "ndbId": "16108",
+      "sourceDescription": "Soybeans, mature seeds, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "soybean-cooked",
+      "name": "黄豆（煮熟，无盐）",
+      "nameEn": "Soybeans, mature cooked, boiled, without salt",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟黄豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174271,
+      "ndbId": "16109",
+      "sourceDescription": "Soybeans, mature cooked, boiled, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "edamame-raw",
+      "name": "毛豆（生，可食部）",
+      "nameEn": "Soybeans, green, raw",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "毛豆",
+        "生毛豆",
+        "edamame raw"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169282,
+      "ndbId": "11450",
+      "sourceDescription": "Soybeans, green, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "edamame-cooked",
+      "name": "毛豆（煮熟，无盐）",
+      "nameEn": "Soybeans, green, cooked, boiled, drained, without salt",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟毛豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169283,
+      "ndbId": "11451",
+      "sourceDescription": "Soybeans, green, cooked, boiled, drained, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "soybean-sprouts",
+      "name": "黄豆芽（生）",
+      "nameEn": "Soybeans, mature seeds, sprouted, raw",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "黄豆芽"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169284,
+      "ndbId": "11452",
+      "sourceDescription": "Soybeans, mature seeds, sprouted, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "mung-dry",
+      "name": "绿豆（干）",
+      "nameEn": "Mung beans, mature seeds, raw",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "绿豆",
+        "干绿豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174256,
+      "ndbId": "16080",
+      "sourceDescription": "Mung beans, mature seeds, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "mung-cooked",
+      "name": "绿豆（煮熟，无盐）",
+      "nameEn": "Mung beans, mature seeds, cooked, boiled, without salt",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟绿豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174257,
+      "ndbId": "16081",
+      "sourceDescription": "Mung beans, mature seeds, cooked, boiled, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "mung-sprouts",
+      "name": "绿豆芽（生）",
+      "nameEn": "Mung beans, mature seeds, sprouted, raw",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "绿豆芽",
+        "豆芽"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169957,
+      "ndbId": "11043",
+      "sourceDescription": "Mung beans, mature seeds, sprouted, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "adzuki-dry",
+      "name": "红豆（干）",
+      "nameEn": "Beans, adzuki, mature seeds, raw",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "红豆",
+        "赤小豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173727,
+      "ndbId": "16001",
+      "sourceDescription": "Beans, adzuki, mature seeds, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "adzuki-cooked",
+      "name": "红豆（煮熟，无盐）",
+      "nameEn": "Beans, adzuki, mature seeds, cooked, boiled, without salt",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟红豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173728,
+      "ndbId": "16002",
+      "sourceDescription": "Beans, adzuki, mature seeds, cooked, boiled, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "black-bean-dry",
+      "name": "黑芸豆（干）",
+      "nameEn": "Beans, black, mature seeds, raw",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "黑芸豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173734,
+      "ndbId": "16014",
+      "sourceDescription": "Beans, black, mature seeds, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "black-bean-cooked",
+      "name": "黑芸豆（煮熟，无盐）",
+      "nameEn": "Beans, black, mature seeds, cooked, boiled, without salt",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟黑芸豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173735,
+      "ndbId": "16015",
+      "sourceDescription": "Beans, black, mature seeds, cooked, boiled, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chickpea-dry",
+      "name": "鹰嘴豆（干）",
+      "nameEn": "Chickpeas (garbanzo beans, bengal gram), mature seeds, raw",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "鹰嘴豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173756,
+      "ndbId": "16056",
+      "sourceDescription": "Chickpeas (garbanzo beans, bengal gram), mature seeds, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chickpea-cooked",
+      "name": "鹰嘴豆（煮熟，无盐）",
+      "nameEn": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟鹰嘴豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173757,
+      "ndbId": "16057",
+      "sourceDescription": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "lentil-dry",
+      "name": "扁豆（小扁豆，干）",
+      "nameEn": "Lentils, raw",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "小扁豆",
+        "lentils raw"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172420,
+      "ndbId": "16069",
+      "sourceDescription": "Lentils, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "lentil-cooked",
+      "name": "扁豆（小扁豆，煮熟）",
+      "nameEn": "Lentils, mature seeds, cooked, boiled, without salt",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟小扁豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172421,
+      "ndbId": "16070",
+      "sourceDescription": "Lentils, mature seeds, cooked, boiled, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "peas-raw",
+      "name": "豌豆（鲜）",
+      "nameEn": "Peas, green, raw",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "鲜豌豆",
+        "豌豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170419,
+      "ndbId": "11304",
+      "sourceDescription": "Peas, green, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "peas-cooked",
+      "name": "豌豆（煮熟，无盐）",
+      "nameEn": "Peas, green, cooked, boiled, drained, without salt",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟豌豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170420,
+      "ndbId": "11305",
+      "sourceDescription": "Peas, green, cooked, boiled, drained, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "tofu-firm",
+      "name": "豆腐（硬，钙盐和卤水凝固）",
+      "nameEn": "Tofu, firm, prepared with calcium sulfate and magnesium chloride (nigari)",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "硬豆腐",
+        "firm tofu"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172448,
+      "ndbId": "16126",
+      "sourceDescription": "Tofu, firm, prepared with calcium sulfate and magnesium chloride (nigari)",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "tofu-soft",
+      "name": "豆腐（软，钙盐和卤水凝固）",
+      "nameEn": "Tofu, soft, prepared with calcium sulfate and magnesium chloride (nigari)",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "软豆腐",
+        "嫩豆腐",
+        "soft tofu"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172449,
+      "ndbId": "16127",
+      "sourceDescription": "Tofu, soft, prepared with calcium sulfate and magnesium chloride (nigari)",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "tofu-regular",
+      "name": "豆腐（常规，钙盐凝固）",
+      "nameEn": "Tofu, raw, regular, prepared with calcium sulfate",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "豆腐",
+        "常规豆腐",
+        "tofu"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172476,
+      "ndbId": "16427",
+      "sourceDescription": "Tofu, raw, regular, prepared with calcium sulfate",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "tofu-hard",
+      "name": "豆腐（硬，卤水凝固）",
+      "nameEn": "Tofu, hard, prepared with nigari",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "卤水硬豆腐"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174291,
+      "ndbId": "16160",
+      "sourceDescription": "Tofu, hard, prepared with nigari",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "soy-milk",
+      "name": "豆奶（无糖，强化钙及维生素）",
+      "nameEn": "Soymilk (all flavors), unsweetened, with added calcium, vitamins A and D",
+      "category": "legume",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "无糖强化豆奶"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 175215,
+      "ndbId": "16222",
+      "sourceDescription": "Soymilk (all flavors), unsweetened, with added calcium, vitamins A and D",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chicken-breast-raw",
+      "name": "鸡胸肉（去皮，生）",
+      "nameEn": "Chicken, breast, boneless, skinless, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生鸡胸肉",
+        "鸡胸肉生",
+        "鸡胸肉（生）",
+        "raw chicken breast",
+        "鸡胸肉"
+      ],
+      "dataSet": "foundation",
+      "fdcId": 2646170,
+      "ndbId": "100304",
+      "sourceDescription": "Chicken, breast, boneless, skinless, raw",
+      "sourcePublishedAt": "2023-10-26"
+    },
+    {
+      "id": "chicken-breast-cooked",
+      "name": "鸡胸肉（去皮，烤熟）",
+      "nameEn": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟鸡胸肉",
+        "鸡胸肉熟",
+        "鸡胸肉（熟）",
+        "烤鸡胸肉",
+        "cooked chicken breast",
+        "鸡胸肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171477,
+      "ndbId": "5064",
+      "sourceDescription": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chicken-breast-stewed",
+      "name": "鸡胸肉（去皮，炖熟）",
+      "nameEn": "Chicken, broilers or fryers, breast, meat only, cooked, stewed",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "炖鸡胸肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171478,
+      "ndbId": "5065",
+      "sourceDescription": "Chicken, broilers or fryers, breast, meat only, cooked, stewed",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chicken-whole-raw",
+      "name": "鸡肉（综合去皮，生）",
+      "nameEn": "Chicken, broilers or fryers, meat only, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生鸡肉",
+        "raw chicken meat",
+        "鸡肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171052,
+      "ndbId": "5011",
+      "sourceDescription": "Chicken, broilers or fryers, meat only, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chicken-whole-roast",
+      "name": "鸡肉（综合去皮，烤熟）",
+      "nameEn": "Chicken, broilers or fryers, meat only, cooked, roasted",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "烤熟鸡肉",
+        "鸡肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171054,
+      "ndbId": "5013",
+      "sourceDescription": "Chicken, broilers or fryers, meat only, cooked, roasted",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chicken-thigh-skin-raw",
+      "name": "鸡腿肉（带皮，生）",
+      "nameEn": "Chicken, broilers or fryers, thigh, meat and skin, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "带皮生鸡腿肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172385,
+      "ndbId": "5091",
+      "sourceDescription": "Chicken, broilers or fryers, thigh, meat and skin, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chicken-thigh-cooked",
+      "name": "鸡腿肉（去皮，烤熟）",
+      "nameEn": "Chicken, broilers or fryers, thigh, meat only, cooked, roasted",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "去皮熟鸡腿肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172388,
+      "ndbId": "5098",
+      "sourceDescription": "Chicken, broilers or fryers, thigh, meat only, cooked, roasted",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chicken-wing-raw",
+      "name": "鸡翅（带皮，可食部，生）",
+      "nameEn": "Chicken, broilers or fryers, wing, meat and skin, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生鸡翅",
+        "鸡翅"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172390,
+      "ndbId": "5100",
+      "sourceDescription": "Chicken, broilers or fryers, wing, meat and skin, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chicken-liver",
+      "name": "鸡肝（生）",
+      "nameEn": "Chicken, liver, all classes, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "鸡肝",
+        "生鸡肝"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171060,
+      "ndbId": "5027",
+      "sourceDescription": "Chicken, liver, all classes, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "duck-meat",
+      "name": "鸭肉（家鸭，去皮，生）",
+      "nameEn": "Duck, domesticated, meat only, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生鸭肉",
+        "去皮鸭肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172410,
+      "ndbId": "5141",
+      "sourceDescription": "Duck, domesticated, meat only, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "duck-skin",
+      "name": "鸭肉（家鸭，带皮，生）",
+      "nameEn": "Duck, domesticated, meat and skin, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "带皮鸭肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172408,
+      "ndbId": "5139",
+      "sourceDescription": "Duck, domesticated, meat and skin, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "goose",
+      "name": "鹅肉（家鹅，去皮，生）",
+      "nameEn": "Goose, domesticated, meat only, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "去皮鹅肉",
+        "鹅肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172413,
+      "ndbId": "5148",
+      "sourceDescription": "Goose, domesticated, meat only, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "turkey-breast",
+      "name": "火鸡胸肉（去皮，生）",
+      "nameEn": "Turkey, whole, breast, meat only, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生火鸡胸肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171098,
+      "ndbId": "5219",
+      "sourceDescription": "Turkey, whole, breast, meat only, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "beef-tenderloin",
+      "name": "牛里脊（去外部脂肪，生）",
+      "nameEn": "Beef, loin, tenderloin steak, boneless, separable lean only, trimmed to 0\" fat, all grades, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "牛里脊",
+        "生牛里脊"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171767,
+      "ndbId": "23372",
+      "sourceDescription": "Beef, loin, tenderloin steak, boneless, separable lean only, trimmed to 0\" fat, all grades, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "beef-brisket",
+      "name": "牛胸肉（瘦肉，生）",
+      "nameEn": "Beef, brisket, whole, separable lean only, all grades, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "瘦牛胸肉",
+        "生牛胸肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168607,
+      "ndbId": "13023",
+      "sourceDescription": "Beef, brisket, whole, separable lean only, all grades, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "beef-brisket-fat",
+      "name": "牛胸肉（肥瘦，生）",
+      "nameEn": "Beef, brisket, whole, separable lean and fat, trimmed to 1/8\" fat, all grades, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "肥瘦牛胸肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168664,
+      "ndbId": "13803",
+      "sourceDescription": "Beef, brisket, whole, separable lean and fat, trimmed to 1/8\" fat, all grades, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "beef-minced",
+      "name": "牛肉末（90%瘦，生）",
+      "nameEn": "Beef, ground, 90% lean meat / 10% fat, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生牛肉末",
+        "90%瘦牛肉末"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174030,
+      "ndbId": "23562",
+      "sourceDescription": "Beef, ground, 90% lean meat / 10% fat, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "beef-liver",
+      "name": "牛肝（生）",
+      "nameEn": "Beef, variety meats and by-products, liver, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "牛肝"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169451,
+      "ndbId": "13325",
+      "sourceDescription": "Beef, variety meats and by-products, liver, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "pork-tenderloin",
+      "name": "猪里脊（瘦，生）",
+      "nameEn": "Pork, fresh, loin, tenderloin, separable lean only, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "猪里脊",
+        "生猪里脊",
+        "里脊肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168249,
+      "ndbId": "10060",
+      "sourceDescription": "Pork, fresh, loin, tenderloin, separable lean only, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "pork-tenderloin-roast",
+      "name": "猪里脊（瘦，烤熟）",
+      "nameEn": "Pork, fresh, loin, tenderloin, separable lean only, cooked, roasted",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟猪里脊",
+        "烤猪里脊"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168250,
+      "ndbId": "10061",
+      "sourceDescription": "Pork, fresh, loin, tenderloin, separable lean only, cooked, roasted",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "pork-belly",
+      "name": "猪五花肉（生）",
+      "nameEn": "Pork, fresh, belly, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "五花肉",
+        "猪五花肉",
+        "生五花肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 167812,
+      "ndbId": "10005",
+      "sourceDescription": "Pork, fresh, belly, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "pork-liver",
+      "name": "猪肝（生）",
+      "nameEn": "Pork, fresh, variety meats and by-products, liver, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "猪肝"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 167862,
+      "ndbId": "10110",
+      "sourceDescription": "Pork, fresh, variety meats and by-products, liver, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "rabbit",
+      "name": "兔肉（家兔，生）",
+      "nameEn": "Game meat, rabbit, domesticated, composite of cuts, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "兔肉",
+        "生兔肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172521,
+      "ndbId": "17177",
+      "sourceDescription": "Game meat, rabbit, domesticated, composite of cuts, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "salmon-raw",
+      "name": "三文鱼（养殖大西洋鲑，生）",
+      "nameEn": "Fish, salmon, Atlantic, farmed, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生三文鱼",
+        "生大西洋鲑"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 175167,
+      "ndbId": "15236",
+      "sourceDescription": "Fish, salmon, Atlantic, farmed, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "salmon-cooked",
+      "name": "三文鱼（养殖大西洋鲑，熟）",
+      "nameEn": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟三文鱼",
+        "烤三文鱼"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 175168,
+      "ndbId": "15237",
+      "sourceDescription": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "tuna",
+      "name": "黄鳍金枪鱼（生）",
+      "nameEn": "Fish, tuna, fresh, yellowfin, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生黄鳍金枪鱼"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 175159,
+      "ndbId": "15127",
+      "sourceDescription": "Fish, tuna, fresh, yellowfin, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "cod",
+      "name": "大西洋鳕鱼（生）",
+      "nameEn": "Fish, cod, Atlantic, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生大西洋鳕鱼"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171955,
+      "ndbId": "15015",
+      "sourceDescription": "Fish, cod, Atlantic, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "tilapia",
+      "name": "罗非鱼（生）",
+      "nameEn": "Fish, tilapia, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "罗非鱼",
+        "生罗非鱼"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 175176,
+      "ndbId": "15261",
+      "sourceDescription": "Fish, tilapia, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "carp",
+      "name": "鲤鱼（生）",
+      "nameEn": "Fish, carp, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "鲤鱼",
+        "生鲤鱼"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171952,
+      "ndbId": "15008",
+      "sourceDescription": "Fish, carp, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "sea-bass",
+      "name": "海鲈鱼（混合种，生）",
+      "nameEn": "Fish, sea bass, mixed species, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "海鲈鱼",
+        "生海鲈鱼"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 175142,
+      "ndbId": "15091",
+      "sourceDescription": "Fish, sea bass, mixed species, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "sardine",
+      "name": "沙丁鱼（油浸罐头，沥干）",
+      "nameEn": "Fish, sardine, Atlantic, canned in oil, drained solids with bone",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "油浸沙丁鱼罐头"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 175139,
+      "ndbId": "15088",
+      "sourceDescription": "Fish, sardine, Atlantic, canned in oil, drained solids with bone",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "trout",
+      "name": "虹鳟鱼（养殖，生）",
+      "nameEn": "Fish, trout, rainbow, farmed, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生虹鳟鱼"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173717,
+      "ndbId": "15240",
+      "sourceDescription": "Fish, trout, rainbow, farmed, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "mackerel",
+      "name": "大西洋鲭鱼（生）",
+      "nameEn": "Fish, mackerel, Atlantic, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生大西洋鲭鱼"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 175119,
+      "ndbId": "15046",
+      "sourceDescription": "Fish, mackerel, Atlantic, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "eel",
+      "name": "鳗鱼（混合种，生）",
+      "nameEn": "Fish, eel, mixed species, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "鳗鱼",
+        "生鳗鱼"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174193,
+      "ndbId": "15025",
+      "sourceDescription": "Fish, eel, mixed species, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "shrimp-raw",
+      "name": "虾仁（生）",
+      "nameEn": "Crustaceans, shrimp, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "虾仁",
+        "生虾仁",
+        "raw shrimp"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 175179,
+      "ndbId": "15270",
+      "sourceDescription": "Crustaceans, shrimp, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "shrimp-cooked",
+      "name": "虾仁（熟）",
+      "nameEn": "Crustaceans, shrimp, cooked",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟虾仁",
+        "cooked shrimp"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 175180,
+      "ndbId": "15271",
+      "sourceDescription": "Crustaceans, shrimp, cooked",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "crab",
+      "name": "蓝蟹肉（生）",
+      "nameEn": "Crustaceans, crab, blue, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生蓝蟹肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174204,
+      "ndbId": "15139",
+      "sourceDescription": "Crustaceans, crab, blue, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "lobster",
+      "name": "美洲龙虾肉（生）",
+      "nameEn": "Crustaceans, lobster, northern, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生美洲龙虾肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174208,
+      "ndbId": "15147",
+      "sourceDescription": "Crustaceans, lobster, northern, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "squid",
+      "name": "鱿鱼（生）",
+      "nameEn": "Mollusks, squid, mixed species, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "鱿鱼",
+        "生鱿鱼"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174223,
+      "ndbId": "15175",
+      "sourceDescription": "Mollusks, squid, mixed species, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "cuttlefish",
+      "name": "墨鱼（生）",
+      "nameEn": "Mollusks, cuttlefish, mixed species, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "墨鱼",
+        "生墨鱼"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174215,
+      "ndbId": "15163",
+      "sourceDescription": "Mollusks, cuttlefish, mixed species, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "octopus",
+      "name": "章鱼（生）",
+      "nameEn": "Mollusks, octopus, common, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "章鱼",
+        "生章鱼"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174218,
+      "ndbId": "15166",
+      "sourceDescription": "Mollusks, octopus, common, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "scallop",
+      "name": "扇贝肉（生）",
+      "nameEn": "Mollusks, scallop, mixed species, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "扇贝",
+        "生扇贝肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174220,
+      "ndbId": "15172",
+      "sourceDescription": "Mollusks, scallop, mixed species, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "clam",
+      "name": "蛤蜊肉（混合种，生）",
+      "nameEn": "Mollusks, clam, mixed species, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "蛤蜊",
+        "蛤蜊肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174214,
+      "ndbId": "15157",
+      "sourceDescription": "Mollusks, clam, mixed species, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "mussel",
+      "name": "贻贝肉（蓝贻贝，生）",
+      "nameEn": "Mollusks, mussel, blue, raw",
+      "category": "seafood",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "蓝贻贝肉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174216,
+      "ndbId": "15164",
+      "sourceDescription": "Mollusks, mussel, blue, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "egg-raw",
+      "name": "鸡蛋（生，可食部）",
+      "nameEn": "Egg, whole, raw, fresh",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生鸡蛋",
+        "raw egg"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171287,
+      "ndbId": "1123",
+      "sourceDescription": "Egg, whole, raw, fresh",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "egg-boiled",
+      "name": "鸡蛋（水煮，可食部）",
+      "nameEn": "Egg, whole, cooked, hard-boiled",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "水煮蛋",
+        "煮鸡蛋",
+        "白煮蛋",
+        "boiled egg"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173424,
+      "ndbId": "1129",
+      "sourceDescription": "Egg, whole, cooked, hard-boiled",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "egg-white",
+      "name": "鸡蛋白（生）",
+      "nameEn": "Egg, white, raw, fresh",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生蛋白",
+        "鸡蛋白"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172183,
+      "ndbId": "1124",
+      "sourceDescription": "Egg, white, raw, fresh",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "egg-yolk",
+      "name": "鸡蛋黄（生）",
+      "nameEn": "Egg, yolk, raw, fresh",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生蛋黄",
+        "鸡蛋黄"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172184,
+      "ndbId": "1125",
+      "sourceDescription": "Egg, yolk, raw, fresh",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "quail-egg",
+      "name": "鹌鹑蛋（生，可食部）",
+      "nameEn": "Egg, quail, whole, fresh, raw",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生鹌鹑蛋"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172191,
+      "ndbId": "1140",
+      "sourceDescription": "Egg, quail, whole, fresh, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "duck-egg",
+      "name": "鸭蛋（生，可食部）",
+      "nameEn": "Egg, duck, whole, fresh, raw",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生鸭蛋"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172189,
+      "ndbId": "1138",
+      "sourceDescription": "Egg, duck, whole, fresh, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "milk-whole",
+      "name": "全脂牛奶",
+      "nameEn": "Milk, whole, 3.25% milkfat, with added vitamin D",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "全脂奶",
+        "whole milk"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171265,
+      "ndbId": "1077",
+      "sourceDescription": "Milk, whole, 3.25% milkfat, with added vitamin D",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "milk-lowfat",
+      "name": "低脂牛奶（1%乳脂）",
+      "nameEn": "Milk, lowfat, fluid, 1% milkfat, with added vitamin A and vitamin D",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "低脂牛奶",
+        "lowfat milk"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170872,
+      "ndbId": "1082",
+      "sourceDescription": "Milk, lowfat, fluid, 1% milkfat, with added vitamin A and vitamin D",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "milk-skim",
+      "name": "脱脂牛奶",
+      "nameEn": "Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "脱脂奶",
+        "skim milk"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171269,
+      "ndbId": "1085",
+      "sourceDescription": "Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "yogurt-plain",
+      "name": "原味全脂酸奶（无添加糖）",
+      "nameEn": "Yogurt, plain, whole milk",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "原味全脂酸奶"
+      ],
+      "dataSet": "foundation",
+      "fdcId": 2259793,
+      "ndbId": "1116",
+      "sourceDescription": "Yogurt, plain, whole milk",
+      "sourcePublishedAt": "2022-04-28"
+    },
+    {
+      "id": "greek-yogurt",
+      "name": "希腊酸奶（原味，脱脂）",
+      "nameEn": "Yogurt, Greek, plain, nonfat",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "原味脱脂希腊酸奶"
+      ],
+      "dataSet": "foundation",
+      "fdcId": 330137,
+      "ndbId": "1256",
+      "sourceDescription": "Yogurt, Greek, plain, nonfat",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "cheddar",
+      "name": "切达奶酪",
+      "nameEn": "Cheese, cheddar",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "切达芝士"
+      ],
+      "dataSet": "foundation",
+      "fdcId": 328637,
+      "ndbId": "1009",
+      "sourceDescription": "Cheese, cheddar",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "mozzarella",
+      "name": "马苏里拉奶酪（全脂）",
+      "nameEn": "Cheese, mozzarella, whole milk",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "全脂马苏里拉芝士"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170845,
+      "ndbId": "1026",
+      "sourceDescription": "Cheese, mozzarella, whole milk",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "butter",
+      "name": "黄油（无盐）",
+      "nameEn": "Butter, without salt",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "无盐黄油"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173430,
+      "ndbId": "1145",
+      "sourceDescription": "Butter, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "cream",
+      "name": "淡奶油（稀奶油）",
+      "nameEn": "Cream, fluid, light whipping",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "稀奶油"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170858,
+      "ndbId": "1052",
+      "sourceDescription": "Cream, fluid, light whipping",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "napa",
+      "name": "大白菜",
+      "nameEn": "Cabbage, chinese (pe-tsai), raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "白菜",
+        "大白菜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169979,
+      "ndbId": "11119",
+      "sourceDescription": "Cabbage, chinese (pe-tsai), raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "bok-choy",
+      "name": "小白菜（青梗菜）",
+      "nameEn": "Cabbage, chinese (pak-choi), raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "小白菜",
+        "青梗菜",
+        "bok choy"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170390,
+      "ndbId": "11116",
+      "sourceDescription": "Cabbage, chinese (pak-choi), raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "spinach",
+      "name": "菠菜",
+      "nameEn": "Spinach, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "菠菜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168462,
+      "ndbId": "11457",
+      "sourceDescription": "Spinach, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "lettuce",
+      "name": "生菜（绿叶）",
+      "nameEn": "Lettuce, green leaf, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "绿叶生菜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169249,
+      "ndbId": "11253",
+      "sourceDescription": "Lettuce, green leaf, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "amaranth",
+      "name": "苋菜",
+      "nameEn": "Amaranth leaves, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "苋菜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168385,
+      "ndbId": "11003",
+      "sourceDescription": "Amaranth leaves, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "gai-lan",
+      "name": "芥蓝",
+      "nameEn": "Broccoli, chinese, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "芥蓝"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169404,
+      "ndbId": "11994",
+      "sourceDescription": "Broccoli, chinese, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "crown-daisy",
+      "name": "茼蒿",
+      "nameEn": "Chrysanthemum, garland, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "茼蒿"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169995,
+      "ndbId": "11157",
+      "sourceDescription": "Chrysanthemum, garland, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "celery",
+      "name": "芹菜",
+      "nameEn": "Celery, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "芹菜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169988,
+      "ndbId": "11143",
+      "sourceDescription": "Celery, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "cilantro",
+      "name": "香菜",
+      "nameEn": "Coriander (cilantro) leaves, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "香菜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169997,
+      "ndbId": "11165",
+      "sourceDescription": "Coriander (cilantro) leaves, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chives",
+      "name": "细香葱（Chives，生）",
+      "nameEn": "Chives, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "chives raw"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169994,
+      "ndbId": "11156",
+      "sourceDescription": "Chives, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "broccoli",
+      "name": "西兰花",
+      "nameEn": "Broccoli, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "西兰花",
+        "broccoli"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170379,
+      "ndbId": "11090",
+      "sourceDescription": "Broccoli, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "cauliflower",
+      "name": "菜花",
+      "nameEn": "Cauliflower, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "菜花",
+        "花菜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169986,
+      "ndbId": "11135",
+      "sourceDescription": "Cauliflower, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "tomato",
+      "name": "番茄（生）",
+      "nameEn": "Tomatoes, red, ripe, raw, year round average",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "番茄",
+        "西红柿",
+        "生番茄",
+        "tomato",
+        "tomatoes"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170457,
+      "ndbId": "11529",
+      "sourceDescription": "Tomatoes, red, ripe, raw, year round average",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "cucumber",
+      "name": "黄瓜（含皮）",
+      "nameEn": "Cucumber, with peel, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "黄瓜",
+        "cucumber"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168409,
+      "ndbId": "11205",
+      "sourceDescription": "Cucumber, with peel, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "eggplant",
+      "name": "茄子",
+      "nameEn": "Eggplant, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "茄子",
+        "eggplant"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169228,
+      "ndbId": "11209",
+      "sourceDescription": "Eggplant, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "carrot",
+      "name": "胡萝卜",
+      "nameEn": "Carrots, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "胡萝卜",
+        "carrot"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170393,
+      "ndbId": "11124",
+      "sourceDescription": "Carrots, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "daikon",
+      "name": "白萝卜（东方萝卜）",
+      "nameEn": "Radishes, oriental, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "白萝卜",
+        "daikon"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168451,
+      "ndbId": "11430",
+      "sourceDescription": "Radishes, oriental, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "pumpkin",
+      "name": "南瓜",
+      "nameEn": "Pumpkin, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "南瓜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168448,
+      "ndbId": "11422",
+      "sourceDescription": "Pumpkin, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "winter-melon",
+      "name": "冬瓜",
+      "nameEn": "Waxgourd, (chinese preserving melon), raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "冬瓜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170069,
+      "ndbId": "11593",
+      "sourceDescription": "Waxgourd, (chinese preserving melon), raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "bitter-melon",
+      "name": "苦瓜",
+      "nameEn": "Balsam-pear (bitter gourd), pods, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "苦瓜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168393,
+      "ndbId": "11024",
+      "sourceDescription": "Balsam-pear (bitter gourd), pods, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "luffa",
+      "name": "丝瓜",
+      "nameEn": "Gourd, dishcloth (towelgourd), raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "丝瓜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168414,
+      "ndbId": "11220",
+      "sourceDescription": "Gourd, dishcloth (towelgourd), raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "zucchini",
+      "name": "西葫芦（含皮）",
+      "nameEn": "Squash, summer, zucchini, includes skin, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "西葫芦",
+        "zucchini"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169291,
+      "ndbId": "11477",
+      "sourceDescription": "Squash, summer, zucchini, includes skin, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "green-pepper",
+      "name": "青甜椒",
+      "nameEn": "Peppers, sweet, green, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "青椒",
+        "青甜椒"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170427,
+      "ndbId": "11333",
+      "sourceDescription": "Peppers, sweet, green, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "red-pepper",
+      "name": "红甜椒",
+      "nameEn": "Peppers, sweet, red, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "红椒",
+        "红甜椒"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170108,
+      "ndbId": "11821",
+      "sourceDescription": "Peppers, sweet, red, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chili",
+      "name": "红辣椒",
+      "nameEn": "Peppers, hot chili, red, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "红辣椒",
+        "辣椒"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170106,
+      "ndbId": "11819",
+      "sourceDescription": "Peppers, hot chili, red, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "onion",
+      "name": "洋葱",
+      "nameEn": "Onions, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "洋葱",
+        "onion"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170000,
+      "ndbId": "11282",
+      "sourceDescription": "Onions, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "garlic",
+      "name": "大蒜",
+      "nameEn": "Garlic, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "大蒜",
+        "蒜",
+        "garlic"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169230,
+      "ndbId": "11215",
+      "sourceDescription": "Garlic, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "ginger",
+      "name": "生姜",
+      "nameEn": "Ginger root, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生姜",
+        "姜",
+        "ginger"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169231,
+      "ndbId": "11216",
+      "sourceDescription": "Ginger root, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "lotus",
+      "name": "莲藕",
+      "nameEn": "Lotus root, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "莲藕",
+        "藕"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169250,
+      "ndbId": "11254",
+      "sourceDescription": "Lotus root, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "bamboo",
+      "name": "竹笋",
+      "nameEn": "Bamboo shoots, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "竹笋"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169210,
+      "ndbId": "11026",
+      "sourceDescription": "Bamboo shoots, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "green-bean",
+      "name": "四季豆",
+      "nameEn": "Beans, snap, green, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "四季豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169961,
+      "ndbId": "11052",
+      "sourceDescription": "Beans, snap, green, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "yardlong-bean",
+      "name": "豇豆（长豆角）",
+      "nameEn": "Yardlong bean, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "豇豆",
+        "长豆角"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169222,
+      "ndbId": "11199",
+      "sourceDescription": "Yardlong bean, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "snow-peas",
+      "name": "荷兰豆",
+      "nameEn": "Peas, edible-podded, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "荷兰豆"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170010,
+      "ndbId": "11300",
+      "sourceDescription": "Peas, edible-podded, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "okra",
+      "name": "秋葵",
+      "nameEn": "Okra, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "秋葵"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169260,
+      "ndbId": "11278",
+      "sourceDescription": "Okra, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "celtuce",
+      "name": "莴笋",
+      "nameEn": "Celtuce, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "莴笋"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169990,
+      "ndbId": "11145",
+      "sourceDescription": "Celtuce, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "red-cabbage",
+      "name": "紫甘蓝",
+      "nameEn": "Cabbage, red, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "紫甘蓝"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169977,
+      "ndbId": "11112",
+      "sourceDescription": "Cabbage, red, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "cabbage",
+      "name": "包菜（圆白菜）",
+      "nameEn": "Cabbage, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "包菜",
+        "圆白菜",
+        "卷心菜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169975,
+      "ndbId": "11109",
+      "sourceDescription": "Cabbage, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "beet",
+      "name": "甜菜根",
+      "nameEn": "Beets, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "甜菜根"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169145,
+      "ndbId": "11080",
+      "sourceDescription": "Beets, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "spring-onion",
+      "name": "小葱（含葱绿）",
+      "nameEn": "Onions, spring or scallions (includes tops and bulb), raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "小葱",
+        "香葱",
+        "葱花"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170005,
+      "ndbId": "11291",
+      "sourceDescription": "Onions, spring or scallions (includes tops and bulb), raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "mustard-green",
+      "name": "芥菜",
+      "nameEn": "Mustard greens, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "芥菜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169256,
+      "ndbId": "11270",
+      "sourceDescription": "Mustard greens, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "asparagus",
+      "name": "芦笋",
+      "nameEn": "Asparagus, raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "芦笋"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168389,
+      "ndbId": "11011",
+      "sourceDescription": "Asparagus, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "leek",
+      "name": "韭葱（Leek，生）",
+      "nameEn": "Leeks, (bulb and lower leaf-portion), raw",
+      "category": "vegetable",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "leek raw"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169246,
+      "ndbId": "11246",
+      "sourceDescription": "Leeks, (bulb and lower leaf-portion), raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "mushroom",
+      "name": "双孢蘑菇（白蘑菇，鲜）",
+      "nameEn": "Mushrooms, white, raw",
+      "category": "mushroom_algae",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "白蘑菇",
+        "双孢蘑菇",
+        "white mushroom"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169251,
+      "ndbId": "11260",
+      "sourceDescription": "Mushrooms, white, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "shiitake-fresh",
+      "name": "香菇（鲜）",
+      "nameEn": "Mushrooms, shiitake, raw",
+      "category": "mushroom_algae",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "鲜香菇",
+        "香菇"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169242,
+      "ndbId": "11238",
+      "sourceDescription": "Mushrooms, shiitake, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "shiitake-dry",
+      "name": "香菇（干）",
+      "nameEn": "Mushrooms, shiitake, dried",
+      "category": "mushroom_algae",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "干香菇"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168436,
+      "ndbId": "11268",
+      "sourceDescription": "Mushrooms, shiitake, dried",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "enoki",
+      "name": "金针菇（鲜）",
+      "nameEn": "Mushrooms, enoki, raw",
+      "category": "mushroom_algae",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "金针菇"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169382,
+      "ndbId": "11950",
+      "sourceDescription": "Mushrooms, enoki, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "oyster-mushroom",
+      "name": "平菇（鲜）",
+      "nameEn": "Mushrooms, oyster, raw",
+      "category": "mushroom_algae",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "平菇"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168580,
+      "ndbId": "11987",
+      "sourceDescription": "Mushrooms, oyster, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "wood-ear-dry",
+      "name": "黑木耳（云耳，干）",
+      "nameEn": "Fungi, Cloud ears, dried",
+      "category": "mushroom_algae",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "干黑木耳",
+        "干木耳"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168581,
+      "ndbId": "11988",
+      "sourceDescription": "Fungi, Cloud ears, dried",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "kelp",
+      "name": "海带（鲜）",
+      "nameEn": "Seaweed, kelp, raw",
+      "category": "mushroom_algae",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "鲜海带"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168457,
+      "ndbId": "11445",
+      "sourceDescription": "Seaweed, kelp, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "wakame",
+      "name": "裙带菜（鲜）",
+      "nameEn": "Seaweed, wakame, raw",
+      "category": "mushroom_algae",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "鲜裙带菜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170496,
+      "ndbId": "11669",
+      "sourceDescription": "Seaweed, wakame, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "nori",
+      "name": "紫菜（Laver，鲜）",
+      "nameEn": "Seaweed, laver, raw",
+      "category": "mushroom_algae",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "鲜紫菜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168458,
+      "ndbId": "11446",
+      "sourceDescription": "Seaweed, laver, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "apple",
+      "name": "苹果（含皮）",
+      "nameEn": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "苹果",
+        "apple"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171688,
+      "ndbId": "9003",
+      "sourceDescription": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "banana",
+      "name": "香蕉（去皮）",
+      "nameEn": "Bananas, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "香蕉",
+        "banana"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173944,
+      "ndbId": "9040",
+      "sourceDescription": "Bananas, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "pear",
+      "name": "梨",
+      "nameEn": "Pears, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "梨",
+        "pear"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169118,
+      "ndbId": "9252",
+      "sourceDescription": "Pears, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "grape",
+      "name": "葡萄（红或绿）",
+      "nameEn": "Grapes, red or green (European type, such as Thompson seedless), raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "葡萄",
+        "grapes"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174683,
+      "ndbId": "9132",
+      "sourceDescription": "Grapes, red or green (European type, such as Thompson seedless), raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "orange",
+      "name": "橙子",
+      "nameEn": "Oranges, raw, all commercial varieties",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "橙子",
+        "橙",
+        "orange"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169097,
+      "ndbId": "9200",
+      "sourceDescription": "Oranges, raw, all commercial varieties",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "tangerine",
+      "name": "橘子",
+      "nameEn": "Tangerines, (mandarin oranges), raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "橘子",
+        "桔子"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169105,
+      "ndbId": "9218",
+      "sourceDescription": "Tangerines, (mandarin oranges), raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "pomelo",
+      "name": "柚子",
+      "nameEn": "Pummelo, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "柚子",
+        "pomelo"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 167754,
+      "ndbId": "9295",
+      "sourceDescription": "Pummelo, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "grapefruit",
+      "name": "西柚（粉红或红肉）",
+      "nameEn": "Grapefruit, raw, pink and red, all areas",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "西柚",
+        "葡萄柚"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174673,
+      "ndbId": "9112",
+      "sourceDescription": "Grapefruit, raw, pink and red, all areas",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "lemon",
+      "name": "柠檬（去皮）",
+      "nameEn": "Lemons, raw, without peel",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "柠檬"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 167746,
+      "ndbId": "9150",
+      "sourceDescription": "Lemons, raw, without peel",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "peach",
+      "name": "桃",
+      "nameEn": "Peaches, yellow, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "桃",
+        "桃子"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169928,
+      "ndbId": "9236",
+      "sourceDescription": "Peaches, yellow, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "nectarine",
+      "name": "油桃",
+      "nameEn": "Nectarines, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "油桃"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169914,
+      "ndbId": "9191",
+      "sourceDescription": "Nectarines, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "plum",
+      "name": "李子",
+      "nameEn": "Plums, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "李子"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169949,
+      "ndbId": "9279",
+      "sourceDescription": "Plums, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "apricot",
+      "name": "杏",
+      "nameEn": "Apricots, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "杏"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171697,
+      "ndbId": "9021",
+      "sourceDescription": "Apricots, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "strawberry",
+      "name": "草莓",
+      "nameEn": "Strawberries, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "草莓",
+        "strawberry"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 167762,
+      "ndbId": "9316",
+      "sourceDescription": "Strawberries, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "blueberry",
+      "name": "蓝莓",
+      "nameEn": "Blueberries, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "蓝莓",
+        "blueberry"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171711,
+      "ndbId": "9050",
+      "sourceDescription": "Blueberries, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "raspberry",
+      "name": "树莓",
+      "nameEn": "Raspberries, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "树莓"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 167755,
+      "ndbId": "9302",
+      "sourceDescription": "Raspberries, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "mulberry",
+      "name": "桑葚",
+      "nameEn": "Mulberries, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "桑葚"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169913,
+      "ndbId": "9190",
+      "sourceDescription": "Mulberries, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "watermelon",
+      "name": "西瓜",
+      "nameEn": "Watermelon, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "西瓜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 167765,
+      "ndbId": "9326",
+      "sourceDescription": "Watermelon, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "cantaloupe",
+      "name": "哈密瓜（Cantaloupe）",
+      "nameEn": "Melons, cantaloupe, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "cantaloupe"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169092,
+      "ndbId": "9181",
+      "sourceDescription": "Melons, cantaloupe, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "honeydew",
+      "name": "蜜瓜（Honeydew）",
+      "nameEn": "Melons, honeydew, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "蜜瓜",
+        "honeydew"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169911,
+      "ndbId": "9184",
+      "sourceDescription": "Melons, honeydew, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "mango",
+      "name": "芒果",
+      "nameEn": "Mangos, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "芒果",
+        "mango"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169910,
+      "ndbId": "9176",
+      "sourceDescription": "Mangos, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "pineapple",
+      "name": "菠萝",
+      "nameEn": "Pineapple, raw, all varieties",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "菠萝",
+        "pineapple"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169124,
+      "ndbId": "9266",
+      "sourceDescription": "Pineapple, raw, all varieties",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "papaya",
+      "name": "木瓜",
+      "nameEn": "Papayas, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "木瓜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169926,
+      "ndbId": "9226",
+      "sourceDescription": "Papayas, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "kiwi",
+      "name": "猕猴桃（绿肉）",
+      "nameEn": "Kiwifruit, green, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "猕猴桃",
+        "奇异果",
+        "kiwi"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168153,
+      "ndbId": "9148",
+      "sourceDescription": "Kiwifruit, green, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "lychee",
+      "name": "荔枝",
+      "nameEn": "Litchis, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "荔枝"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169086,
+      "ndbId": "9164",
+      "sourceDescription": "Litchis, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "longan",
+      "name": "龙眼",
+      "nameEn": "Longans, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "龙眼",
+        "桂圆鲜果"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169089,
+      "ndbId": "9172",
+      "sourceDescription": "Longans, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "cherry",
+      "name": "樱桃",
+      "nameEn": "Cherries, sweet, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "樱桃",
+        "车厘子"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171719,
+      "ndbId": "9070",
+      "sourceDescription": "Cherries, sweet, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "jujube",
+      "name": "鲜枣",
+      "nameEn": "Jujube, raw",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "鲜枣"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168151,
+      "ndbId": "9146",
+      "sourceDescription": "Jujube, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "raisin",
+      "name": "葡萄干（深色，无籽）",
+      "nameEn": "Raisins, dark, seedless (Includes foods for USDA's Food Distribution Program)",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "葡萄干"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168165,
+      "ndbId": "9298",
+      "sourceDescription": "Raisins, dark, seedless (Includes foods for USDA's Food Distribution Program)",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "avocado",
+      "name": "牛油果",
+      "nameEn": "Avocados, raw, all commercial varieties",
+      "category": "fruit",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "牛油果",
+        "avocado"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171705,
+      "ndbId": "9037",
+      "sourceDescription": "Avocados, raw, all commercial varieties",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "peanut",
+      "name": "花生（生）",
+      "nameEn": "Peanuts, all types, raw",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生花生",
+        "花生"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172430,
+      "ndbId": "16087",
+      "sourceDescription": "Peanuts, all types, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "peanut-roast",
+      "name": "花生（干烤，无盐）",
+      "nameEn": "Peanuts, all types, dry-roasted, without salt",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "无盐熟花生"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173806,
+      "ndbId": "16390",
+      "sourceDescription": "Peanuts, all types, dry-roasted, without salt",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "almond",
+      "name": "杏仁（巴旦木）",
+      "nameEn": "Nuts, almonds",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "巴旦木",
+        "almond"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170567,
+      "ndbId": "12061",
+      "sourceDescription": "Nuts, almonds",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "walnut",
+      "name": "核桃仁",
+      "nameEn": "Nuts, walnuts, english",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "核桃",
+        "核桃仁"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170187,
+      "ndbId": "12155",
+      "sourceDescription": "Nuts, walnuts, english",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "cashew",
+      "name": "腰果（生）",
+      "nameEn": "Nuts, cashew nuts, raw",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生腰果",
+        "腰果"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170162,
+      "ndbId": "12087",
+      "sourceDescription": "Nuts, cashew nuts, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "pistachio",
+      "name": "开心果（生）",
+      "nameEn": "Nuts, pistachio nuts, raw",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生开心果"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170184,
+      "ndbId": "12151",
+      "sourceDescription": "Nuts, pistachio nuts, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "hazelnut",
+      "name": "榛子",
+      "nameEn": "Nuts, hazelnuts or filberts",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "榛子"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170581,
+      "ndbId": "12120",
+      "sourceDescription": "Nuts, hazelnuts or filberts",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chestnut",
+      "name": "板栗（生）",
+      "nameEn": "Nuts, chestnuts, chinese, raw",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生板栗",
+        "板栗"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170164,
+      "ndbId": "12093",
+      "sourceDescription": "Nuts, chestnuts, chinese, raw",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "pumpkin-seed",
+      "name": "南瓜籽仁（干）",
+      "nameEn": "Seeds, pumpkin and squash seed kernels, dried",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "南瓜籽仁"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170556,
+      "ndbId": "12014",
+      "sourceDescription": "Seeds, pumpkin and squash seed kernels, dried",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "sunflower-seed",
+      "name": "葵花籽仁（干）",
+      "nameEn": "Seeds, sunflower seed kernels, dried",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "葵花籽仁"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170562,
+      "ndbId": "12036",
+      "sourceDescription": "Seeds, sunflower seed kernels, dried",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chia",
+      "name": "奇亚籽（干）",
+      "nameEn": "Seeds, chia seeds, dried",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "奇亚籽"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170554,
+      "ndbId": "12006",
+      "sourceDescription": "Seeds, chia seeds, dried",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "flax",
+      "name": "亚麻籽",
+      "nameEn": "Seeds, flaxseed",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "亚麻籽"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169414,
+      "ndbId": "12220",
+      "sourceDescription": "Seeds, flaxseed",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "sesame",
+      "name": "芝麻（全籽，干）",
+      "nameEn": "Seeds, sesame seeds, whole, dried",
+      "category": "nuts_seeds",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "干芝麻"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 170150,
+      "ndbId": "12023",
+      "sourceDescription": "Seeds, sesame seeds, whole, dried",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "oil-canola",
+      "name": "菜籽油（Canola）",
+      "nameEn": "Oil, canola",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "菜籽油",
+        "canola oil"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172336,
+      "ndbId": "4582",
+      "sourceDescription": "Oil, canola",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "oil-soybean",
+      "name": "大豆油",
+      "nameEn": "Oil, soybean, salad or cooking",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "豆油",
+        "大豆油"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171411,
+      "ndbId": "4044",
+      "sourceDescription": "Oil, soybean, salad or cooking",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "oil-olive",
+      "name": "橄榄油（烹调用）",
+      "nameEn": "Oil, olive, salad or cooking",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "橄榄油",
+        "olive oil"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171413,
+      "ndbId": "4053",
+      "sourceDescription": "Oil, olive, salad or cooking",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "oil-peanut",
+      "name": "花生油",
+      "nameEn": "Oil, peanut, salad or cooking",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "花生油"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171410,
+      "ndbId": "4042",
+      "sourceDescription": "Oil, peanut, salad or cooking",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "oil-corn",
+      "name": "玉米油",
+      "nameEn": "Oil, corn, industrial and retail, all purpose salad or cooking",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "玉米油"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171029,
+      "ndbId": "4518",
+      "sourceDescription": "Oil, corn, industrial and retail, all purpose salad or cooking",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "oil-sesame",
+      "name": "芝麻油",
+      "nameEn": "Oil, sesame, salad or cooking",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "芝麻油",
+        "香油"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171016,
+      "ndbId": "4058",
+      "sourceDescription": "Oil, sesame, salad or cooking",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "lard",
+      "name": "猪油",
+      "nameEn": "Lard",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "猪油"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171401,
+      "ndbId": "4002",
+      "sourceDescription": "Lard",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "sugar",
+      "name": "白砂糖",
+      "nameEn": "Sugars, granulated",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "白砂糖",
+        "白糖",
+        "sugar"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169655,
+      "ndbId": "19335",
+      "sourceDescription": "Sugars, granulated",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "brown-sugar",
+      "name": "红糖（Brown sugar）",
+      "nameEn": "Sugars, brown",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "brown sugar"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168833,
+      "ndbId": "19334",
+      "sourceDescription": "Sugars, brown",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "honey",
+      "name": "蜂蜜",
+      "nameEn": "Honey",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "蜂蜜"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169640,
+      "ndbId": "19296",
+      "sourceDescription": "Honey",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "salt",
+      "name": "食盐",
+      "nameEn": "Salt, table",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "盐",
+        "食盐"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173468,
+      "ndbId": "2047",
+      "sourceDescription": "Salt, table",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "soy-sauce",
+      "name": "酱油（酿造，小麦及大豆）",
+      "nameEn": "Soy sauce made from soy and wheat (shoyu)",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "酱油",
+        "soy sauce"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174277,
+      "ndbId": "16123",
+      "sourceDescription": "Soy sauce made from soy and wheat (shoyu)",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "vinegar",
+      "name": "白醋（蒸馏醋）",
+      "nameEn": "Vinegar, distilled",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "白醋",
+        "蒸馏醋",
+        "distilled vinegar"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 172237,
+      "ndbId": "2053",
+      "sourceDescription": "Vinegar, distilled",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "corn-starch",
+      "name": "玉米淀粉",
+      "nameEn": "Cornstarch",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "玉米淀粉"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 169698,
+      "ndbId": "20027",
+      "sourceDescription": "Cornstarch",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "potato-flour",
+      "name": "马铃薯粉",
+      "nameEn": "Potato flour",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "土豆粉",
+        "potato flour"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168446,
+      "ndbId": "11413",
+      "sourceDescription": "Potato flour",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "oyster-sauce",
+      "name": "蚝油",
+      "nameEn": "Sauce, oyster, ready-to-serve",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "蚝油",
+        "oyster sauce"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 174529,
+      "ndbId": "6176",
+      "sourceDescription": "Sauce, oyster, ready-to-serve",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "ketchup",
+      "name": "番茄酱（Ketchup）",
+      "nameEn": "Catsup",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "番茄沙司",
+        "ketchup"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 168556,
+      "ndbId": "11935",
+      "sourceDescription": "Catsup",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "chili-sauce",
+      "name": "辣椒酱（瓶装热辣酱）",
+      "nameEn": "Sauce, hot chile, sriracha",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "processed",
+      "aliases": [
+        "sriracha"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 171186,
+      "ndbId": "6631",
+      "sourceDescription": "Sauce, hot chile, sriracha",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "yeast",
+      "name": "干酵母",
+      "nameEn": "Leavening agents, yeast, baker's, active dry",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "dried",
+      "aliases": [
+        "干酵母"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 175043,
+      "ndbId": "18375",
+      "sourceDescription": "Leavening agents, yeast, baker's, active dry",
+      "sourcePublishedAt": "2019-04-01"
+    },
+    {
+      "id": "water",
+      "name": "饮用水",
+      "nameEn": "Beverages, water, tap, drinking",
+      "category": "oil_condiment",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "水",
+        "饮用水"
+      ],
+      "dataSet": "sr_legacy",
+      "fdcId": 173647,
+      "ndbId": "14411",
+      "sourceDescription": "Beverages, water, tap, drinking",
+      "sourcePublishedAt": "2019-04-01"
+    }
+  ],
+  "pending": [
+    {
+      "id": "water-spinach",
+      "name": "空心菜",
+      "selector": "^Swamp\\ cabbage,\\ raw$",
+      "reason": "No unique reviewed source match",
+      "candidates": []
+    },
+    {
+      "name": "米醋",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "紫薯",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "中国山药",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "北豆腐（特定中国制作工艺）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "南豆腐（特定中国制作工艺）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "内酯豆腐",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "豆腐干",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "豆腐皮",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "腐竹（干）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "腐竹（泡发）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "黑大豆",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "无糖豆浆（非强化）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "鸡腿肉（去皮，生）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "鸭胸肉（家鸭，去皮）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "鸭腿肉",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "牛腩（中国分割定义）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "猪后腿瘦肉",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "猪排骨（生，可食部）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "羊腿肉",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "瘦羊肉",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "鲫鱼",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "草鱼",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "鲅鱼（中国常见品种）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "带鱼",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "黄鱼",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "河虾",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "中国韭菜",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "油麦菜",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "上海青（具体栽培种）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "娃娃菜（具体栽培种）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "杏鲍菇",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "银耳",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "海带（干）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "紫菜（干）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "火龙果",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "黑芝麻（单独品种）",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    },
+    {
+      "name": "豆瓣酱",
+      "reason": "No reviewed matching species/cut/preparation record selected; not enabled"
+    }
+  ]
+}

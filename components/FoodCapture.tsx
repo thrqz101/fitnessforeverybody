@@ -1,5 +1,9 @@
 "use client";
 
+import { RecognitionProgress } from "@/components/RecognitionProgress";
+import { requestFoodAi } from "@/lib/recognition-client";
+import { useRecognitionProgress } from "@/lib/use-recognition-progress";
+
 import { Check, Keyboard, Plus, RotateCcw, Shuffle, Trash2, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
 import { foodCatalog, type FoodCatalogItem } from "@/lib/food-catalog";
@@ -22,6 +26,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
   const [manualDescription, setManualDescription] = useState("");
   const [exampleSeed, setExampleSeed] = useState(0);
   const [isRecognizing, setIsRecognizing] = useState(false);
+  const progress = useRecognitionProgress();
   const manualExamples = useMemo(() => buildManualExamples(exampleSeed, language), [exampleSeed, language]);
   const stagedTotals = useMemo(
     () =>
@@ -39,6 +44,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
   );
 
   async function runAiRecognition() {
+    if (isRecognizing) return;
     if (manualDescription.trim().length < 6) {
       setNotice(t("先写一下你吃了什么喔，比如品牌、套餐、配菜、饮料和大概份量。"));
       return;
@@ -46,15 +52,18 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
     const form = new FormData();
     form.append("description", manualDescription.trim());
     form.append("lang", language);
+    let requestProgress = progress.begin();
+    setStagedFoods([]);
     setIsRecognizing(true);
     setNotice(t("正在让 AI 理解你的食物描述..."));
 
     try {
-      let aiResult = await requestFoodAi(form, language);
+      let aiResult = await requestFoodAi(form, language, requestProgress);
 
       if (!aiResult.ok && aiResult.retryable) {
         setNotice(t("第一次没接稳，正在自动重试一次..."));
-        aiResult = await requestFoodAi(form, language);
+        requestProgress = progress.begin(true);
+        aiResult = await requestFoodAi(form, language, requestProgress);
       }
 
       if (!aiResult.ok || !aiResult.result?.ok) {
@@ -137,7 +146,7 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
           <p className="font-bold text-ink">{t("写清楚品牌、套餐、主食、配菜、饮料和大概份量，估算会更准。")}</p>
         </div>
 
-        {notice ? (
+        {notice && !isRecognizing ? (
           <div className="mt-5 rounded-[18px] border border-coral/25 bg-coral/10 px-3 py-2 text-sm font-bold text-coral">
             {notice}
           </div>
@@ -223,6 +232,8 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
           </button>
         </section>
 
+        <RecognitionProgress steps={progress.steps} running={isRecognizing} foods={stagedFoods} />
+
         {stagedFoods.length === 0 ? (
           <div className="rounded-[18px] border border-dashed border-ink/18 bg-paper p-8 text-center">
             <Plus className="mx-auto text-ink/35" size={34} aria-hidden="true" />
@@ -292,9 +303,8 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
                         onChange={(event) => updateFood(food.id, { name: event.target.value })}
                       />
                     </label>
-                    <p className="mt-2 text-xs text-ink/48">{t("来源")}：{getLocalizedFoodField(food, "sourceLabel", language) || t("AI 识别")}</p>
                     <p className="mt-1 text-xs font-bold text-moss">
-                      {t(getRecognitionLabel(food))}
+                      {getRecognitionLabel(food, language)}
                     </p>
                   </div>
                   <label className="grid min-w-0 gap-1.5 text-sm font-bold text-ink">
@@ -335,61 +345,6 @@ export function FoodCapture({ onAddFoods, onBack }: FoodCaptureProps) {
       </section>
     </div>
   );
-}
-
-type FoodAiResult = {
-  ok?: boolean;
-  isFoodRelated?: boolean;
-  message?: string;
-  needsConfig?: boolean;
-  foods?: FoodLogItem[];
-};
-
-async function requestFoodAi(form: FormData, language: Language): Promise<{
-  ok: boolean;
-  retryable: boolean;
-  message?: string;
-  result?: FoodAiResult;
-}> {
-  try {
-    const response = await fetch("/api/food-ai", {
-      method: "POST",
-      body: form
-    });
-    const retryable = response.status === 408 || response.status === 429 || response.status >= 500;
-    let result: FoodAiResult;
-
-    try {
-      result = await response.json();
-    } catch {
-      return {
-        ok: false,
-        retryable,
-        message: retryable
-          ? pick(language, "AI 第一次响应有点慢，正在再试一次。", "The AI response is a bit slow. Retrying...")
-          : pick(language, "AI 返回内容有点乱，可以再点一次试试。", "The AI response was garbled. Try again.")
-      };
-    }
-
-    if (!response.ok || !result.ok) {
-      return {
-        ok: false,
-        retryable: !result.needsConfig && retryable,
-        message: result.message || (retryable
-          ? pick(language, "AI 第一次没接稳，正在再试一次。", "The first attempt failed. Retrying...")
-          : pick(language, "AI 这次没算准，可以再点一次试试。", "The AI couldn't calculate this time. Try again.")),
-        result
-      };
-    }
-
-    return { ok: true, retryable: false, result };
-  } catch {
-    return {
-      ok: false,
-      retryable: true,
-      message: pick(language, "AI 第一次没接稳，正在再试一次。", "The first attempt failed. Retrying...")
-    };
-  }
 }
 
 function withRetryHint(message: string, language: Language) {
@@ -511,17 +466,10 @@ function joinList(items: string[], language: Language) {
   return `${translated.slice(0, -1).join("、")}和${translated[translated.length - 1]}`;
 }
 
-function getRecognitionLabel(food: FoodLogItem) {
-  const brand = food.brand?.trim() ?? "";
-  const hasRecognizedBrand = Boolean(brand) && !/未识别|未知|无品牌|行业平均|同品类平均|餐饮行业平均/.test(brand);
-
-  if (food.recognitionMode === "industry-average") {
-    return hasRecognizedBrand
-      ? "已识别品牌，未查到官方营养表，按公开资料或同品类份量估算"
-      : "未识别出明确品牌，已用同品类份量估算";
-  }
-
-  return hasRecognizedBrand ? "按品牌 + 产品组合估算" : "已识别食物，按同品类份量估算";
+function getRecognitionLabel(food: FoodLogItem, language: Language) {
+  return food.searchEvidence
+    ? pick(language, "已结合联网资料整理营养", "Nutrition organized using web references")
+    : pick(language, "已按食物与份量整理营养", "Nutrition organized for the food and portion");
 }
 
 function positiveModulo(value: number, divisor: number) {

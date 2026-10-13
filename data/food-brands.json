@@ -1,0 +1,5556 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-13",
+  "description": "中国优先及国际连锁品牌识别目录；不包含营养数值。legacy 标记是原有兼容数据，新增条目须有核验来源。",
+  "brands": [
+    {
+      "brand": "肯德基",
+      "aliases": [
+        "kfc",
+        "开封菜"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [
+        "香辣鸡腿堡",
+        "新奥尔良烤翅",
+        "原味鸡",
+        "薯条",
+        "可乐"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分",
+        "汉堡",
+        "炸鸡",
+        "套餐"
+      ],
+      "estimateHint": "搜不到营养表时按西式快餐汉堡/炸鸡套餐估算，炸物脂肪偏高。",
+      "id": "brand-e000e3d7a2d1",
+      "nameZh": "肯德基",
+      "nameEn": "KFC",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.kfc.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://ir.yumchina.com/zh-hant/our-brands/",
+          "kind": "official_group"
+        },
+        {
+          "url": "https://www.kfc.com.cn/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "contextRequiredNames": [],
+      "origin": "baseline",
+      "officialWebsite": "https://www.kfc.com.cn/"
+    },
+    {
+      "brand": "麦当劳",
+      "aliases": [
+        "mcdonald",
+        "mcdonalds",
+        "麦记",
+        "金拱门"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [
+        "巨无霸",
+        "麦辣鸡腿堡",
+        "板烧鸡腿堡",
+        "薯条",
+        "麦旋风"
+      ],
+      "searchTerms": [
+        "官方营养",
+        "菜单",
+        "汉堡",
+        "套餐",
+        "热量"
+      ],
+      "estimateHint": "优先用官方营养表；套餐要拆汉堡、薯条、饮料。",
+      "id": "brand-5dded3ff536b",
+      "nameZh": "麦当劳",
+      "nameEn": "McDonald’s",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.mcdonalds.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.mcdonalds.com.cn/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "contextRequiredNames": [],
+      "origin": "baseline",
+      "officialWebsite": "https://www.mcdonalds.com.cn/"
+    },
+    {
+      "brand": "汉堡王",
+      "aliases": [
+        "burger king",
+        "BK"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [
+        "皇堡",
+        "天椒皇堡",
+        "薯条",
+        "洋葱圈",
+        "烤鸡块"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分",
+        "皇堡",
+        "套餐"
+      ],
+      "estimateHint": "牛肉汉堡脂肪通常高于鸡肉汉堡，套餐要拆分。",
+      "id": "brand-0062105826f0",
+      "nameZh": "汉堡王",
+      "nameEn": "Burger King",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.rbi.com/English/brands/default.aspx",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "塔斯汀",
+      "aliases": [
+        "塔斯汀中国汉堡"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [
+        "中国汉堡",
+        "鸡腿中国汉堡",
+        "烤翅",
+        "薯条"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "热量",
+        "中国汉堡",
+        "营养成分"
+      ],
+      "estimateHint": "按中式汉堡和炸鸡小食估算，酱料和炸物上调脂肪。",
+      "id": "brand-f91106f32689",
+      "nameZh": "塔斯汀",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "华莱士",
+      "aliases": [
+        "华莱士炸鸡汉堡",
+        "wallace"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [
+        "香辣鸡腿堡",
+        "鸡肉卷",
+        "炸鸡",
+        "薯条"
+      ],
+      "searchTerms": [
+        "菜单",
+        "热量",
+        "炸鸡汉堡",
+        "套餐"
+      ],
+      "estimateHint": "搜不到营养表时按平价炸鸡汉堡行业平均估算。",
+      "id": "brand-4f622b401f55",
+      "nameZh": "华莱士",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "德克士",
+      "aliases": [
+        "dicos"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [
+        "脆皮炸鸡",
+        "鸡腿饭",
+        "汉堡",
+        "薯条"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分",
+        "鸡腿饭",
+        "炸鸡"
+      ],
+      "estimateHint": "鸡腿饭要按米饭和炸鸡/烤鸡拆分。",
+      "id": "brand-70102cb339e9",
+      "nameZh": "德克士",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "必胜客",
+      "aliases": [
+        "pizza hut"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [
+        "披萨",
+        "意面",
+        "鸡翅",
+        "沙拉"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分",
+        "披萨",
+        "意面"
+      ],
+      "estimateHint": "披萨按片数估算，芝士和肉类会显著增加脂肪。",
+      "id": "brand-424bcf415912",
+      "nameZh": "必胜客",
+      "nameEn": "Pizza Hut",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://ir.yumchina.com/zh-hant/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "达美乐",
+      "aliases": [
+        "domino",
+        "Domino's",
+        "达美乐披萨",
+        "Domino’s Pizza"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [
+        "披萨",
+        "鸡翅",
+        "芝士面包",
+        "意面"
+      ],
+      "searchTerms": [
+        "菜单",
+        "披萨",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "披萨按尺寸和片数估算，默认一人 2-4 片。",
+      "id": "brand-f87ea48b9d9c",
+      "nameZh": "达美乐",
+      "nameEn": "Domino’s Pizza",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "赛百味",
+      "aliases": [
+        "subway"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [
+        "6 寸三明治",
+        "金枪鱼三明治",
+        "火鸡胸三明治",
+        "沙拉"
+      ],
+      "searchTerms": [
+        "官方营养",
+        "三明治",
+        "热量",
+        "菜单"
+      ],
+      "estimateHint": "酱料和芝士会明显改变脂肪，没写酱料时按常规酱估。",
+      "id": "brand-ca8cdb722242",
+      "nameZh": "赛百味",
+      "nameEn": "Subway",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [
+        "Subway"
+      ],
+      "origin": "baseline"
+    },
+    {
+      "brand": "吉野家",
+      "aliases": [
+        "yoshinoya"
+      ],
+      "category": "chinese_fast_food",
+      "commonProducts": [
+        "牛肉饭",
+        "双拼饭",
+        "鸡肉饭",
+        "味噌汤"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "牛肉饭",
+        "营养成分",
+        "热量"
+      ],
+      "estimateHint": "牛肉饭按米饭 250-320g 加牛肉浇头估算。",
+      "id": "brand-0e9353412cf1",
+      "nameZh": "吉野家",
+      "nameEn": "Yoshinoya",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "老乡鸡",
+      "aliases": [
+        "老乡鸡快餐"
+      ],
+      "category": "chinese_fast_food",
+      "commonProducts": [
+        "鸡汤",
+        "鸡腿饭",
+        "蒸蛋",
+        "农家小炒肉",
+        "米饭"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分",
+        "中式快餐",
+        "米饭"
+      ],
+      "estimateHint": "按中式快餐一荤一素一饭估算，汤类单独拆分。",
+      "id": "brand-4b292a82915b",
+      "nameZh": "老乡鸡",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "乡村基",
+      "aliases": [
+        "乡村基快餐",
+        "csc"
+      ],
+      "category": "chinese_fast_food",
+      "commonProducts": [
+        "双拼饭",
+        "鸡腿饭",
+        "小炒肉饭",
+        "汤"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分",
+        "中式快餐",
+        "盖饭"
+      ],
+      "estimateHint": "按中式快餐盖饭或套餐估算，米饭默认 250-320g。",
+      "id": "brand-174e0a7adb61",
+      "nameZh": "乡村基",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "真功夫",
+      "aliases": [
+        "真功夫快餐"
+      ],
+      "category": "chinese_fast_food",
+      "commonProducts": [
+        "蒸饭",
+        "排骨饭",
+        "鸡腿饭",
+        "蒸蛋",
+        "汤"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分",
+        "蒸饭",
+        "套餐"
+      ],
+      "estimateHint": "蒸饭类脂肪相对可控，但酱汁和肉皮要计入。",
+      "id": "brand-490a9cb2e08b",
+      "nameZh": "真功夫",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "永和大王",
+      "aliases": [
+        "永和",
+        "Yonghe King"
+      ],
+      "category": "chinese_fast_food",
+      "commonProducts": [
+        "豆浆",
+        "油条",
+        "卤肉饭",
+        "饭团",
+        "面"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分",
+        "豆浆",
+        "油条",
+        "卤肉饭"
+      ],
+      "estimateHint": "早餐要拆豆浆、油条、饭团；油条脂肪偏高。",
+      "id": "brand-4471cfab7e74",
+      "nameZh": "永和大王",
+      "nameEn": "Yonghe King",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "南城香",
+      "aliases": [
+        "南城香快餐"
+      ],
+      "category": "chinese_fast_food",
+      "commonProducts": [
+        "早餐",
+        "馄饨",
+        "盖饭",
+        "小碗菜",
+        "羊肉串"
+      ],
+      "searchTerms": [
+        "菜单",
+        "热量",
+        "小碗菜",
+        "早餐",
+        "盖饭"
+      ],
+      "estimateHint": "按北京快餐/早餐店份量估算，小碗菜多人分享时要按食用比例。",
+      "id": "brand-155bf93597c3",
+      "nameZh": "南城香",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "大米先生",
+      "aliases": [
+        "大米先生快餐"
+      ],
+      "category": "chinese_fast_food",
+      "commonProducts": [
+        "小碗菜",
+        "米饭",
+        "红烧肉",
+        "青菜",
+        "汤"
+      ],
+      "searchTerms": [
+        "菜单",
+        "小碗菜",
+        "营养成分",
+        "米饭"
+      ],
+      "estimateHint": "小碗菜要按单份菜和米饭拆分，默认米饭 200-300g。",
+      "id": "brand-4d5c18012574",
+      "nameZh": "大米先生",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "小菜园",
+      "aliases": [
+        "小菜园新徽菜",
+        "小菜园徽菜"
+      ],
+      "category": "casual_dining",
+      "commonProducts": [
+        "徽菜",
+        "臭鳜鱼",
+        "小炒肉",
+        "米饭",
+        "汤"
+      ],
+      "searchTerms": [
+        "菜单",
+        "徽菜",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "正餐点菜默认多人分享，用户没写份量时按个人实际食用比例估。",
+      "id": "brand-5d5d2ac02f7d",
+      "nameZh": "小菜园",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "西贝",
+      "aliases": [
+        "西贝莜面村"
+      ],
+      "category": "casual_dining",
+      "commonProducts": [
+        "莜面",
+        "羊肉串",
+        "牛大骨",
+        "黄米凉糕"
+      ],
+      "searchTerms": [
+        "菜单",
+        "莜面",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "西北菜面食和肉类较多，主食和肉类要拆分。",
+      "id": "brand-2ef76587069b",
+      "nameZh": "西贝",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "紫光园",
+      "aliases": [
+        "紫光园清真",
+        "紫光园快餐"
+      ],
+      "category": "casual_dining",
+      "commonProducts": [
+        "小吃",
+        "炒菜",
+        "牛肉面",
+        "烤鸭",
+        "米饭"
+      ],
+      "searchTerms": [
+        "菜单",
+        "热量",
+        "清真",
+        "小吃"
+      ],
+      "estimateHint": "按清真中式正餐/快餐估算，点菜需按个人食用量。",
+      "id": "brand-099ae8510faa",
+      "nameZh": "紫光园",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "和府捞面",
+      "aliases": [
+        "和府",
+        "和府面"
+      ],
+      "category": "noodles_rice",
+      "commonProducts": [
+        "草本汤面",
+        "牛肉面",
+        "拌面",
+        "小食"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分",
+        "面",
+        "热量"
+      ],
+      "estimateHint": "一碗面默认主食熟重 250-350g，浇头另算。",
+      "id": "brand-c18e2b9cf5e7",
+      "nameZh": "和府捞面",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "陈香贵",
+      "aliases": [
+        "陈香贵兰州牛肉面"
+      ],
+      "category": "noodles_rice",
+      "commonProducts": [
+        "兰州牛肉面",
+        "牛肉",
+        "小菜",
+        "鸡蛋"
+      ],
+      "searchTerms": [
+        "菜单",
+        "牛肉面",
+        "营养成分",
+        "热量"
+      ],
+      "estimateHint": "按兰州牛肉面估算，面条碳水为主，牛肉提供蛋白。",
+      "id": "brand-3d6936d8ca97",
+      "nameZh": "陈香贵",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "马记永",
+      "aliases": [
+        "马记永兰州牛肉面"
+      ],
+      "category": "noodles_rice",
+      "commonProducts": [
+        "兰州牛肉面",
+        "牛肉",
+        "小菜",
+        "卤蛋"
+      ],
+      "searchTerms": [
+        "菜单",
+        "牛肉面",
+        "营养成分",
+        "热量"
+      ],
+      "estimateHint": "按兰州牛肉面行业平均估算，面量大时碳水上调。",
+      "id": "brand-56a55d19a119",
+      "nameZh": "马记永",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "李先生",
+      "aliases": [
+        "李先生牛肉面"
+      ],
+      "category": "noodles_rice",
+      "commonProducts": [
+        "牛肉面",
+        "牛肉饭",
+        "小菜",
+        "卤蛋"
+      ],
+      "searchTerms": [
+        "菜单",
+        "牛肉面",
+        "营养成分",
+        "热量"
+      ],
+      "estimateHint": "面饭类按主食、牛肉、小菜拆分。",
+      "id": "brand-87bdfc2dd7fa",
+      "nameZh": "李先生",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [
+        "李先生"
+      ],
+      "origin": "baseline"
+    },
+    {
+      "brand": "遇见小面",
+      "aliases": [
+        "遇见小面重庆小面"
+      ],
+      "category": "noodles_rice",
+      "commonProducts": [
+        "重庆小面",
+        "豌杂面",
+        "酸辣粉",
+        "小食"
+      ],
+      "searchTerms": [
+        "菜单",
+        "重庆小面",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "小面油辣子会增加脂肪，豌杂面蛋白和脂肪都更高。",
+      "id": "brand-23a41a95f2fe",
+      "nameZh": "遇见小面",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "五爷拌面",
+      "aliases": [
+        "五爷"
+      ],
+      "category": "noodles_rice",
+      "commonProducts": [
+        "拌面",
+        "牛肉拌面",
+        "鸡排",
+        "小菜"
+      ],
+      "searchTerms": [
+        "菜单",
+        "拌面",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "拌面默认碳水较高，酱料和炸物另算。",
+      "id": "brand-9e2f0ff7e201",
+      "nameZh": "五爷拌面",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "魏家凉皮",
+      "aliases": [
+        "魏家",
+        "魏家凉皮肉夹馍",
+        "魏家肉夹馍"
+      ],
+      "category": "noodles_rice",
+      "commonProducts": [
+        "凉皮",
+        "米皮",
+        "肉夹馍",
+        "擀面皮",
+        "冰峰"
+      ],
+      "searchTerms": [
+        "官网",
+        "菜单",
+        "公众号",
+        "小程序",
+        "凉皮",
+        "肉夹馍",
+        "热量"
+      ],
+      "estimateHint": "凉皮/米皮按一份 350-450g、碳水 70-100g 估；肉夹馍单独拆分。",
+      "id": "brand-e655c749f20a",
+      "nameZh": "魏家凉皮",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "阿香米线",
+      "aliases": [
+        "阿香",
+        "阿香米线过桥米线"
+      ],
+      "category": "noodles_rice",
+      "commonProducts": [
+        "米线",
+        "番茄米线",
+        "麻辣米线",
+        "肥牛米线"
+      ],
+      "searchTerms": [
+        "菜单",
+        "米线",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "米线默认主食熟重 250-350g，汤底和肥牛另算。",
+      "id": "brand-182845f89571",
+      "nameZh": "阿香米线",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "蒙自源",
+      "aliases": [
+        "蒙自源过桥米线"
+      ],
+      "category": "noodles_rice",
+      "commonProducts": [
+        "过桥米线",
+        "番茄米线",
+        "酸辣米线"
+      ],
+      "searchTerms": [
+        "菜单",
+        "过桥米线",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "米线按主食、肉片、汤底、小料拆分。",
+      "id": "brand-2191fd66545c",
+      "nameZh": "蒙自源",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "袁记云饺",
+      "aliases": [
+        "袁记",
+        "袁记饺子",
+        "袁记水饺"
+      ],
+      "category": "noodles_rice",
+      "commonProducts": [
+        "云饺",
+        "水饺",
+        "馄饨",
+        "饺子"
+      ],
+      "searchTerms": [
+        "菜单",
+        "云饺",
+        "水饺",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "按数量估算，普通饺子 20-25g/个，10-15 个是一人份。",
+      "id": "brand-166e6f4eee61",
+      "nameZh": "袁记云饺",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "喜家德",
+      "aliases": [
+        "喜家德水饺",
+        "喜家德虾仁水饺"
+      ],
+      "category": "noodles_rice",
+      "commonProducts": [
+        "水饺",
+        "虾仁水饺",
+        "凉菜",
+        "汤"
+      ],
+      "searchTerms": [
+        "菜单",
+        "水饺",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "水饺按个数和馅料估算，虾仁水饺蛋白略高。",
+      "id": "brand-8ff7d1cc8681",
+      "nameZh": "喜家德",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "吉祥馄饨",
+      "aliases": [
+        "吉祥馄饨面"
+      ],
+      "category": "noodles_rice",
+      "commonProducts": [
+        "馄饨",
+        "大馄饨",
+        "小馄饨",
+        "面"
+      ],
+      "searchTerms": [
+        "菜单",
+        "馄饨",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "馄饨按大小和数量估算，汤底热量通常较低。",
+      "id": "brand-9d0c9f4cbcf3",
+      "nameZh": "吉祥馄饨",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "海底捞",
+      "aliases": [
+        "海底捞火锅",
+        "捞派",
+        "Haidilao"
+      ],
+      "category": "hotpot",
+      "commonProducts": [
+        "番茄锅",
+        "毛肚",
+        "肥牛",
+        "虾滑",
+        "捞面"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分",
+        "火锅",
+        "菜品热量"
+      ],
+      "estimateHint": "火锅要按锅底、蘸料、肉类、主食和蔬菜拆分。",
+      "id": "brand-d2a1ae2c5da1",
+      "nameZh": "海底捞",
+      "nameEn": "Haidilao",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "巴奴",
+      "aliases": [
+        "巴奴毛肚火锅"
+      ],
+      "category": "hotpot",
+      "commonProducts": [
+        "毛肚",
+        "牛肉",
+        "菌汤锅",
+        "蔬菜"
+      ],
+      "searchTerms": [
+        "菜单",
+        "毛肚火锅",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "毛肚热量不高，油碟/麻酱/牛肉才是热量大头。",
+      "id": "brand-a29a463a28f4",
+      "nameZh": "巴奴",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "呷哺呷哺",
+      "aliases": [
+        "呷哺",
+        "xiabu"
+      ],
+      "category": "hotpot",
+      "commonProducts": [
+        "单人锅",
+        "肥牛",
+        "蔬菜",
+        "麻酱"
+      ],
+      "searchTerms": [
+        "菜单",
+        "单人火锅",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "单人火锅按套餐菜量估算，蘸料要单独计。",
+      "id": "brand-c1bcf76a04d6",
+      "nameZh": "呷哺呷哺",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "凑凑",
+      "aliases": [
+        "凑凑火锅",
+        "凑凑茶憩"
+      ],
+      "category": "hotpot",
+      "commonProducts": [
+        "火锅",
+        "肥牛",
+        "虾滑",
+        "奶茶"
+      ],
+      "searchTerms": [
+        "菜单",
+        "火锅",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "火锅和茶饮要拆开，茶饮按糖度估。",
+      "id": "brand-6180dd86bc0d",
+      "nameZh": "凑凑",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "小龙坎",
+      "aliases": [
+        "小龙坎火锅"
+      ],
+      "category": "hotpot",
+      "commonProducts": [
+        "牛油锅",
+        "毛肚",
+        "肥牛",
+        "酥肉"
+      ],
+      "searchTerms": [
+        "菜单",
+        "火锅",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "川渝牛油锅底和酥肉会显著提高脂肪。",
+      "id": "brand-2705c24fc581",
+      "nameZh": "小龙坎",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "朱光玉",
+      "aliases": [
+        "朱光玉火锅馆"
+      ],
+      "category": "hotpot",
+      "commonProducts": [
+        "火锅",
+        "毛肚",
+        "牛肉",
+        "小吃"
+      ],
+      "searchTerms": [
+        "菜单",
+        "火锅",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "按川渝火锅估算，油碟和小吃另算。",
+      "id": "brand-733036cadc3c",
+      "nameZh": "朱光玉",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "杨国福麻辣烫",
+      "aliases": [
+        "杨国福",
+        "杨国福麻辣烫麻辣拌"
+      ],
+      "category": "malatang",
+      "commonProducts": [
+        "麻辣烫",
+        "麻辣拌",
+        "宽粉",
+        "丸子",
+        "蔬菜"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "麻辣烫",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "按称重食材估算，有宽粉/丸子/麻酱时热量上调。",
+      "id": "brand-40aa3353cfba",
+      "nameZh": "杨国福麻辣烫",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "张亮麻辣烫",
+      "aliases": [
+        "张亮",
+        "张亮麻辣烫麻辣拌"
+      ],
+      "category": "malatang",
+      "commonProducts": [
+        "麻辣烫",
+        "麻辣拌",
+        "宽粉",
+        "豆制品",
+        "蔬菜"
+      ],
+      "searchTerms": [
+        "菜单",
+        "麻辣烫",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "按一碗 350-550g 固体食材估算，主食类另加碳水。",
+      "id": "brand-1a290d6f21a0",
+      "nameZh": "张亮麻辣烫",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [
+        "张亮"
+      ],
+      "origin": "baseline"
+    },
+    {
+      "brand": "觅姐麻辣烫",
+      "aliases": [
+        "觅姐",
+        "觅姐麻辣拌"
+      ],
+      "category": "malatang",
+      "commonProducts": [
+        "麻辣烫",
+        "麻辣拌",
+        "冒菜",
+        "宽粉"
+      ],
+      "searchTerms": [
+        "菜单",
+        "麻辣烫",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "按麻辣烫行业平均估算，称重份量越大热量越高。",
+      "id": "brand-a38a63314140",
+      "nameZh": "觅姐麻辣烫",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "蜜雪冰城",
+      "aliases": [
+        "蜜雪",
+        "mxbc",
+        "MIXUE"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "冰鲜柠檬水",
+        "雪王大圣代",
+        "珍珠奶茶",
+        "冰淇淋"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "热量",
+        "营养成分",
+        "奶茶",
+        "冰淇淋"
+      ],
+      "estimateHint": "茶饮按杯型、糖度、奶盖、小料拆分。",
+      "id": "brand-8f2042eab9d1",
+      "nameZh": "蜜雪冰城",
+      "nameEn": "MIXUE",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "瑞幸咖啡",
+      "aliases": [
+        "瑞幸",
+        "luckin",
+        "Luckin Coffee"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "拿铁",
+        "生椰拿铁",
+        "美式",
+        "厚乳拿铁"
+      ],
+      "searchTerms": [
+        "官方营养",
+        "菜单",
+        "咖啡",
+        "热量"
+      ],
+      "estimateHint": "咖啡按奶、糖浆、奶油和杯型估算。",
+      "id": "brand-268d99ac6deb",
+      "nameZh": "瑞幸咖啡",
+      "nameEn": "Luckin Coffee",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "库迪咖啡",
+      "aliases": [
+        "库迪",
+        "cotti",
+        "Cotti Coffee"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "拿铁",
+        "生椰拿铁",
+        "美式",
+        "燕麦拿铁"
+      ],
+      "searchTerms": [
+        "菜单",
+        "咖啡",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "咖啡按奶量和糖浆估算，没写糖度按正常糖。",
+      "id": "brand-940625af3cca",
+      "nameZh": "库迪咖啡",
+      "nameEn": "Cotti Coffee",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "星巴克",
+      "aliases": [
+        "starbucks",
+        "星爸爸"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "拿铁",
+        "星冰乐",
+        "美式",
+        "蛋糕",
+        "三明治"
+      ],
+      "searchTerms": [
+        "官方营养",
+        "菜单",
+        "咖啡",
+        "热量"
+      ],
+      "estimateHint": "优先用官方营养；星冰乐和蛋糕糖脂较高。",
+      "id": "brand-12fa26bd12ff",
+      "nameZh": "星巴克",
+      "nameEn": "Starbucks",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "幸运咖",
+      "aliases": [
+        "幸运咖啡",
+        "Lucky Cup"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "拿铁",
+        "美式",
+        "柠檬茶",
+        "冰淇淋"
+      ],
+      "searchTerms": [
+        "菜单",
+        "咖啡",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "按平价咖啡/茶饮估算，糖浆和奶油另计。",
+      "id": "brand-870f8967331e",
+      "nameZh": "幸运咖",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "古茗",
+      "aliases": [
+        "古茗茶饮"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "云岭茉莉白",
+        "水果茶",
+        "奶茶",
+        "芝士茶"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "奶茶",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "奶茶按杯型、糖度、奶盖、小料拆分。",
+      "id": "brand-b922665809dc",
+      "nameZh": "古茗",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "茶百道",
+      "aliases": [
+        "茶百道茶饮",
+        "ChaPanda"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "豆乳玉麒麟",
+        "杨枝甘露",
+        "水果茶",
+        "奶茶"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "奶茶",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "水果茶糖分和小料要计入，奶茶按正常糖估。",
+      "id": "brand-a00a43bb5c22",
+      "nameZh": "茶百道",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "霸王茶姬",
+      "aliases": [
+        "茶姬",
+        "CHAGEE"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "伯牙绝弦",
+        "桂馥兰香",
+        "青青糯山",
+        "奶茶"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "奶茶",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "原叶鲜奶茶按奶量和糖度估算，没写糖度按标准糖。",
+      "id": "brand-1a8656cbf3d9",
+      "nameZh": "霸王茶姬",
+      "nameEn": "CHAGEE",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "沪上阿姨",
+      "aliases": [
+        "沪上阿姨鲜果茶"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "血糯米奶茶",
+        "水果茶",
+        "杨枝甘露",
+        "奶茶"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "奶茶",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "血糯米、芋泥、椰果等小料要单独增加碳水。",
+      "id": "brand-de6fc12ba541",
+      "nameZh": "沪上阿姨",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "益禾堂",
+      "aliases": [
+        "益禾堂奶茶"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "烤奶",
+        "奶茶",
+        "柠檬茶",
+        "水果茶"
+      ],
+      "searchTerms": [
+        "菜单",
+        "奶茶",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "烤奶类糖脂较高，按正常糖估并提醒可微调。",
+      "id": "brand-da10b1fff5cd",
+      "nameZh": "益禾堂",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "甜啦啦",
+      "aliases": [
+        "甜啦啦奶茶"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "水果茶",
+        "奶茶",
+        "柠檬水",
+        "冰淇淋"
+      ],
+      "searchTerms": [
+        "菜单",
+        "奶茶",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "按平价茶饮估算，糖度和小料决定主要波动。",
+      "id": "brand-524699f7e681",
+      "nameZh": "甜啦啦",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "喜茶",
+      "aliases": [
+        "HEYTEA"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "多肉葡萄",
+        "芝芝莓莓",
+        "轻乳茶",
+        "果茶"
+      ],
+      "searchTerms": [
+        "官方营养",
+        "菜单",
+        "奶茶",
+        "热量"
+      ],
+      "estimateHint": "水果茶和芝士奶盖要拆分，没写糖度按标准糖。",
+      "id": "brand-81bf02c412d7",
+      "nameZh": "喜茶",
+      "nameEn": "HEYTEA",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "奈雪",
+      "aliases": [
+        "奈雪的茶",
+        "nayuki",
+        "Naixue"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "霸气水果茶",
+        "奶茶",
+        "欧包",
+        "蛋糕"
+      ],
+      "searchTerms": [
+        "官方菜单",
+        "奶茶",
+        "欧包",
+        "热量"
+      ],
+      "estimateHint": "茶饮和烘焙要拆开，欧包按重量估算。",
+      "id": "brand-6f6846c8b7a5",
+      "nameZh": "奈雪",
+      "nameEn": "Naixue",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "书亦烧仙草",
+      "aliases": [
+        "书亦"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "烧仙草",
+        "奶茶",
+        "芋圆",
+        "珍珠"
+      ],
+      "searchTerms": [
+        "菜单",
+        "烧仙草",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "烧仙草小料较多，碳水按小料数量上调。",
+      "id": "brand-1c9be135d7e0",
+      "nameZh": "书亦烧仙草",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "茶颜悦色",
+      "aliases": [
+        "茶颜"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [
+        "幽兰拿铁",
+        "声声乌龙",
+        "奶茶"
+      ],
+      "searchTerms": [
+        "菜单",
+        "奶茶",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "按原叶奶茶估算，奶油顶和坚果碎要单独计。",
+      "id": "brand-0e5b151ae7e0",
+      "nameZh": "茶颜悦色",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "正新鸡排",
+      "aliases": [
+        "正新",
+        "正新鸡排炸串"
+      ],
+      "category": "snack_bakery",
+      "commonProducts": [
+        "鸡排",
+        "鸡柳",
+        "烤肠",
+        "炸串"
+      ],
+      "searchTerms": [
+        "菜单",
+        "鸡排",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "油炸小吃脂肪偏高，按份量和裹粉估算。",
+      "id": "brand-e4735990975c",
+      "nameZh": "正新鸡排",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "绝味鸭脖",
+      "aliases": [
+        "绝味",
+        "绝味卤味"
+      ],
+      "category": "snack_bakery",
+      "commonProducts": [
+        "鸭脖",
+        "鸭锁骨",
+        "鸭翅",
+        "藕片",
+        "豆干"
+      ],
+      "searchTerms": [
+        "菜单",
+        "卤味",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "卤味按重量估算，鸭脖骨头多可食部分低。",
+      "id": "brand-a04a71cc46f4",
+      "nameZh": "绝味鸭脖",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "周黑鸭",
+      "aliases": [
+        "周黑鸭卤味"
+      ],
+      "category": "snack_bakery",
+      "commonProducts": [
+        "鸭脖",
+        "鸭翅",
+        "鸭锁骨",
+        "藕片",
+        "豆干"
+      ],
+      "searchTerms": [
+        "菜单",
+        "卤味",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "甜辣卤味糖和钠偏高，按可食重量估算。",
+      "id": "brand-0c520c928ffe",
+      "nameZh": "周黑鸭",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "紫燕百味鸡",
+      "aliases": [
+        "紫燕"
+      ],
+      "category": "snack_bakery",
+      "commonProducts": [
+        "夫妻肺片",
+        "百味鸡",
+        "凉菜",
+        "卤味"
+      ],
+      "searchTerms": [
+        "菜单",
+        "卤味",
+        "凉菜",
+        "热量"
+      ],
+      "estimateHint": "凉拌卤味按重量估算，油拌菜脂肪上调。",
+      "id": "brand-a316509e5ef4",
+      "nameZh": "紫燕百味鸡",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "夸父炸串",
+      "aliases": [
+        "夸父"
+      ],
+      "category": "snack_bakery",
+      "commonProducts": [
+        "炸串",
+        "鸡肉串",
+        "里脊串",
+        "蔬菜串"
+      ],
+      "searchTerms": [
+        "菜单",
+        "炸串",
+        "热量",
+        "营养成分"
+      ],
+      "estimateHint": "炸串按串数和食材估算，裹粉和油炸显著增加脂肪。",
+      "id": "brand-ee766ae299c5",
+      "nameZh": "夸父炸串",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "全家",
+      "aliases": [
+        "全家便利店",
+        "familymart"
+      ],
+      "category": "convenience",
+      "commonProducts": [
+        "饭团",
+        "便当",
+        "关东煮",
+        "三明治",
+        "咖啡"
+      ],
+      "searchTerms": [
+        "便利店",
+        "便当",
+        "饭团",
+        "营养成分",
+        "热量"
+      ],
+      "estimateHint": "便利店包装食品优先按包装营养表，否则按同品类估。",
+      "id": "brand-23a40150f287",
+      "nameZh": "全家",
+      "nameEn": "FamilyMart",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [
+        "全家"
+      ],
+      "origin": "baseline"
+    },
+    {
+      "brand": "罗森",
+      "aliases": [
+        "罗森便利店",
+        "lawson"
+      ],
+      "category": "convenience",
+      "commonProducts": [
+        "饭团",
+        "便当",
+        "关东煮",
+        "甜品",
+        "三明治"
+      ],
+      "searchTerms": [
+        "便利店",
+        "便当",
+        "饭团",
+        "营养成分",
+        "热量"
+      ],
+      "estimateHint": "包装食品优先按营养表；甜品糖脂较高。",
+      "id": "brand-8a233b971739",
+      "nameZh": "罗森",
+      "nameEn": "Lawson",
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "brand": "7-Eleven",
+      "aliases": [
+        "711",
+        "七十一便利店"
+      ],
+      "category": "convenience",
+      "commonProducts": [
+        "饭团",
+        "便当",
+        "关东煮",
+        "三明治",
+        "咖啡"
+      ],
+      "searchTerms": [
+        "便利店",
+        "便当",
+        "饭团",
+        "营养成分",
+        "热量"
+      ],
+      "estimateHint": "便利店食品按包装标识优先，没有则按行业平均估。",
+      "id": "brand-8758d9938685",
+      "nameZh": "7-Eleven",
+      "nameEn": null,
+      "scope": "china_priority",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "legacy",
+      "sources": [],
+      "verifiedAt": null,
+      "contextRequiredNames": [],
+      "origin": "baseline"
+    },
+    {
+      "id": "brand-bf702a78dbeb",
+      "brand": "老娘舅",
+      "nameZh": "老娘舅",
+      "nameEn": null,
+      "aliases": [
+        "老娘舅快餐",
+        "Laoniangjiu"
+      ],
+      "contextRequiredNames": [
+        "老娘舅"
+      ],
+      "category": "chinese_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://static.sse.com.cn/stock/disclosure/announcement/c/202302/001559_20230228_POO1.pdf",
+          "kind": "exchange_disclosure"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-3d79d5c17b07",
+      "brand": "宏状元",
+      "nameZh": "宏状元",
+      "nameEn": "Hong Zhuang Yuan",
+      "aliases": [
+        "Hong Zhuang Yuan"
+      ],
+      "contextRequiredNames": [],
+      "category": "chinese_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-f4867d19e55b",
+      "brand": "杨铭宇黄焖鸡米饭",
+      "nameZh": "杨铭宇黄焖鸡米饭",
+      "nameEn": null,
+      "aliases": [
+        "杨铭宇",
+        "Yang’s Braised Chicken Rice"
+      ],
+      "contextRequiredNames": [],
+      "category": "chinese_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.ymyhmj.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.ymyhmj.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.ymyhmj.com/"
+    },
+    {
+      "id": "brand-03e3d0780c6d",
+      "brand": "面点王",
+      "nameZh": "面点王",
+      "nameEn": null,
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "noodles_rice",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.mdw.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.mdw.com.cn/qyjj",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-7b565f7138ef",
+      "brand": "味千拉面",
+      "nameZh": "味千拉面",
+      "nameEn": "Ajisen Ramen",
+      "aliases": [
+        "味千",
+        "Ajisen Ramen",
+        "Ajisen"
+      ],
+      "contextRequiredNames": [],
+      "category": "noodles_rice",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "JP",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.ajisen.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.ajisen.com.cn/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.ajisen.com.cn/"
+    },
+    {
+      "id": "brand-944470116824",
+      "brand": "九毛九",
+      "nameZh": "九毛九",
+      "nameEn": "Jiumaojiu",
+      "aliases": [
+        "九毛九西北菜",
+        "Jiumaojiu"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://jiumaojiu.com/brand/index.aspx",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-f9ef45683af1",
+      "brand": "太二酸菜鱼",
+      "nameZh": "太二酸菜鱼",
+      "nameEn": "Tai Er",
+      "aliases": [
+        "太二",
+        "新太二",
+        "新太二鲜料川菜",
+        "Tai Er",
+        "Tai Er Sauerkraut Fish"
+      ],
+      "contextRequiredNames": [
+        "太二",
+        "新太二"
+      ],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://jiumaojiu.com/brand/index.aspx",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-fe8b07636551",
+      "brand": "怂重庆火锅厂",
+      "nameZh": "怂重庆火锅厂",
+      "nameEn": null,
+      "aliases": [
+        "怂火锅厂",
+        "怂火锅",
+        "Song Hot Pot"
+      ],
+      "contextRequiredNames": [],
+      "category": "hotpot",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://jiumaojiu.com/brand/index.aspx",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-762be447c21e",
+      "brand": "山的山外面",
+      "nameZh": "山的山外面",
+      "nameEn": null,
+      "aliases": [
+        "山外面酸汤火锅"
+      ],
+      "contextRequiredNames": [],
+      "category": "hotpot",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://jiumaojiu.com/brand/index.aspx",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-d6f82693d4f6",
+      "brand": "绿茶餐厅",
+      "nameZh": "绿茶餐厅",
+      "nameEn": null,
+      "aliases": [
+        "Green Tea Restaurant"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.china-greentea.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.china-greentea.com.cn/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.china-greentea.com.cn/"
+    },
+    {
+      "id": "brand-e5fffd0a9ecd",
+      "brand": "陶陶居",
+      "nameZh": "陶陶居",
+      "nameEn": null,
+      "aliases": [
+        "Tao Tao Ju"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.gzr.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.gzr.com.cn/product/taotaoju/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-300c07c9e137",
+      "brand": "广州酒家",
+      "nameZh": "广州酒家",
+      "nameEn": null,
+      "aliases": [
+        "Guangzhou Restaurant"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.gzr.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.gzr.com.cn/xinwenzhongxin/qiyexinwen/4078.html",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-13cbd422bf52",
+      "brand": "全聚德",
+      "nameZh": "全聚德",
+      "nameEn": null,
+      "aliases": [
+        "Quanjude"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.quanjude.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.quanjude.com.cn/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.quanjude.com.cn/"
+    },
+    {
+      "id": "brand-1c8e54de9cc3",
+      "brand": "便宜坊",
+      "nameZh": "便宜坊",
+      "nameEn": null,
+      "aliases": [
+        "Bianyifang"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.bianyifang.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.bianyifang.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.bianyifang.com/"
+    },
+    {
+      "id": "brand-958ca35b26ea",
+      "brand": "半天妖烤鱼",
+      "nameZh": "半天妖烤鱼",
+      "nameEn": null,
+      "aliases": [
+        "半天妖"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.bantianyaozg.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.bantianyaozg.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.bantianyaozg.com/"
+    },
+    {
+      "id": "brand-3a6362913a79",
+      "brand": "探鱼",
+      "nameZh": "探鱼",
+      "nameEn": null,
+      "aliases": [
+        "探鱼烤鱼",
+        "Tanyu"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "tanyuchina.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://tanyuchina.com/brand",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-180ab3a04ce5",
+      "brand": "鱼你在一起",
+      "nameZh": "鱼你在一起",
+      "nameEn": null,
+      "aliases": [
+        "YONNY"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.yunizaiyiqi.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.yunizaiyiqi.com/news-list_detail/58.html",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-109dc7861eb3",
+      "brand": "费大厨",
+      "nameZh": "费大厨",
+      "nameEn": null,
+      "aliases": [
+        "费大厨辣椒炒肉"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.feidachu.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.feidachu.com.cn/h-col-103.html",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-0691e3419145",
+      "brand": "蛙来哒",
+      "nameZh": "蛙来哒",
+      "nameEn": null,
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.walaida.net"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.walaida.net/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.walaida.net/"
+    },
+    {
+      "id": "brand-9829337dc564",
+      "brand": "木屋烧烤",
+      "nameZh": "木屋烧烤",
+      "nameEn": null,
+      "aliases": [
+        "Muwu BBQ"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.muwubbq.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.muwubbq.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.muwubbq.com/"
+    },
+    {
+      "id": "brand-7d1779c623a3",
+      "brand": "黄记煌",
+      "nameZh": "黄记煌",
+      "nameEn": null,
+      "aliases": [
+        "黄记煌三汁焖锅",
+        "Huang Ji Huang"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://ir.yumchina.com/zh-hant/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-1f2382ea264b",
+      "brand": "小肥羊",
+      "nameZh": "小肥羊",
+      "nameEn": null,
+      "aliases": [
+        "Little Sheep"
+      ],
+      "contextRequiredNames": [],
+      "category": "hotpot",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://ir.yumchina.com/zh-hant/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-ef28b2d06023",
+      "brand": "德庄",
+      "nameZh": "德庄",
+      "nameEn": null,
+      "aliases": [
+        "德庄火锅",
+        "Dezhuang"
+      ],
+      "contextRequiredNames": [],
+      "category": "hotpot",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.cqdz.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.cqdz.cn/catering/index/index/about_id/24.html",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-4b793d33ae1e",
+      "brand": "刘一手",
+      "nameZh": "刘一手",
+      "nameEn": null,
+      "aliases": [
+        "刘一手火锅",
+        "Liuyishou"
+      ],
+      "contextRequiredNames": [],
+      "category": "hotpot",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.liuyishouna.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.liuyishouna.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.liuyishouna.com/"
+    },
+    {
+      "id": "brand-e6355bb6d286",
+      "brand": "大龙燚",
+      "nameZh": "大龙燚",
+      "nameEn": null,
+      "aliases": [
+        "大龙燚火锅",
+        "Da Long Yi"
+      ],
+      "contextRequiredNames": [],
+      "category": "hotpot",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.dalongyi.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.dalongyi.com/newsdetail/680722701974765568.html",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-5d2d86ecba86",
+      "brand": "CoCo都可",
+      "nameZh": "CoCo都可",
+      "nameEn": "CoCo Bubble Tea",
+      "aliases": [
+        "CoCo",
+        "CoCo Fresh Tea & Juice",
+        "CoCo Bubble Tea",
+        "都可奶茶"
+      ],
+      "contextRequiredNames": [
+        "CoCo"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.coco-tea.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.coco-tea.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.coco-tea.com/"
+    },
+    {
+      "id": "brand-2d167c2a8bf2",
+      "brand": "一点点",
+      "nameZh": "一点点",
+      "nameEn": "ALittle Tea",
+      "aliases": [
+        "1点点",
+        "ALittle Tea"
+      ],
+      "contextRequiredNames": [
+        "一点点",
+        "1点点"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.alittle-tea.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.alittle-tea.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.alittle-tea.com/"
+    },
+    {
+      "id": "brand-9ec46dc8ba01",
+      "brand": "茶话弄",
+      "nameZh": "茶话弄",
+      "nameEn": "ChaHalo",
+      "aliases": [
+        "ChaHalo"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.chahuanong.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.chahuanong.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.chahuanong.com/"
+    },
+    {
+      "id": "brand-c7b2358b0e8c",
+      "brand": "柠季",
+      "nameZh": "柠季",
+      "nameEn": null,
+      "aliases": [
+        "柠季柠檬茶",
+        "NINGJI"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "ningjitea.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://ningjitea.com/news.html",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-ff916e138945",
+      "brand": "LINLEE林里",
+      "nameZh": "LINLEE林里",
+      "nameEn": "LINLEE林里",
+      "aliases": [
+        "LINLEE",
+        "林里柠檬茶"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.linlee.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.linlee.com.cn/en/about",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-21da2b93478e",
+      "brand": "挪瓦咖啡",
+      "nameZh": "挪瓦咖啡",
+      "nameEn": "NOWWA Coffee",
+      "aliases": [
+        "挪瓦",
+        "NOWWA Coffee",
+        "NOWWA"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.nowwacafe.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.nowwacafe.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.nowwacafe.com/"
+    },
+    {
+      "id": "brand-a664bdb16ac4",
+      "brand": "Manner Coffee",
+      "nameZh": null,
+      "nameEn": "Manner Coffee",
+      "aliases": [
+        "MANNER"
+      ],
+      "contextRequiredNames": [
+        "MANNER"
+      ],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.wearemanner.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.wearemanner.com/?trk=public_post_comment-text",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.wearemanner.com/"
+    },
+    {
+      "id": "brand-70a1cbd6f976",
+      "brand": "M Stand",
+      "nameZh": null,
+      "nameEn": "M Stand",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.mstandcoffee.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.mstandcoffee.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.mstandcoffee.com/"
+    },
+    {
+      "id": "brand-e1e6388008b7",
+      "brand": "Peet’s Coffee",
+      "nameZh": "皮爷咖啡",
+      "nameEn": "Peet’s Coffee",
+      "aliases": [
+        "Peet’s",
+        "皮爷咖啡",
+        "皮爷"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.peets.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.peets.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.peets.com/"
+    },
+    {
+      "id": "brand-db0ef8c34817",
+      "brand": "Costa Coffee",
+      "nameZh": null,
+      "nameEn": "Costa Coffee",
+      "aliases": [
+        "COSTA"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "GB",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.coca-colacompany.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.coca-colacompany.com/brands/coffee-tea/costa-coffee",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-6413aad67f2a",
+      "brand": "Tims天好咖啡",
+      "nameZh": "Tims天好咖啡",
+      "nameEn": "Tim Hortons",
+      "aliases": [
+        "Tim Hortons",
+        "Tims",
+        "天好咖啡"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CA",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.timschina.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.timschina.com/Product/Index",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-3d3f9712c0b3",
+      "brand": "Lavazza",
+      "nameZh": "拉瓦萨",
+      "nameEn": "Lavazza",
+      "aliases": [
+        "拉瓦萨",
+        "拉瓦薩"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "IT",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://ir.yumchina.com/zh-hant/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-4d691da35344",
+      "brand": "太平洋咖啡",
+      "nameZh": "太平洋咖啡",
+      "nameEn": "Pacific Coffee",
+      "aliases": [
+        "Pacific Coffee"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "pccapph5.pacificcoffee.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://pccapph5.pacificcoffee.com.cn/h5/service.html",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-0ad40036cb87",
+      "brand": "85度C",
+      "nameZh": "85度C",
+      "nameEn": "85°C Bakery Cafe",
+      "aliases": [
+        "85°C",
+        "85C Bakery Cafe"
+      ],
+      "contextRequiredNames": [],
+      "category": "snack_bakery",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "TW",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.85cafe.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.85cafe.com/HomePage",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-a3dd393a7873",
+      "brand": "巴黎贝甜",
+      "nameZh": "巴黎贝甜",
+      "nameEn": "Paris Baguette",
+      "aliases": [
+        "Paris Baguette"
+      ],
+      "contextRequiredNames": [],
+      "category": "snack_bakery",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "KR",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "pbchina.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://pbchina.cn/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://pbchina.cn/"
+    },
+    {
+      "id": "brand-80bd3f8b3ccb",
+      "brand": "鲍师傅",
+      "nameZh": "鲍师傅",
+      "nameEn": null,
+      "aliases": [
+        "鲍师傅糕点"
+      ],
+      "contextRequiredNames": [],
+      "category": "snack_bakery",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.baosfpastry.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.baosfpastry.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.baosfpastry.com/"
+    },
+    {
+      "id": "brand-5f49a7cd9270",
+      "brand": "幸福西饼",
+      "nameZh": "幸福西饼",
+      "nameEn": null,
+      "aliases": [
+        "幸福西饼蛋糕"
+      ],
+      "contextRequiredNames": [],
+      "category": "snack_bakery",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.xfxb.net"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.xfxb.net/about-us",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-7dc8855bbcb0",
+      "brand": "元祖",
+      "nameZh": "元祖",
+      "nameEn": null,
+      "aliases": [
+        "元祖食品",
+        "Ganso"
+      ],
+      "contextRequiredNames": [],
+      "category": "snack_bakery",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.ganso.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.ganso.com.cn/guanyuwomen.html",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-577a42718ef7",
+      "brand": "便利蜂",
+      "nameZh": "便利蜂",
+      "nameEn": null,
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "convenience",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.bianlifeng.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.bianlifeng.com/terms/service.html",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-755b477e468d",
+      "brand": "红旗连锁",
+      "nameZh": "红旗连锁",
+      "nameEn": null,
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "convenience",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://static.cninfo.com.cn/finalpage/enpage/002697_1.pdf",
+          "kind": "exchange_disclosure"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-fb4870e16604",
+      "brand": "Today今天便利店",
+      "nameZh": "Today今天便利店",
+      "nameEn": "Today今天便利店",
+      "aliases": [
+        "Today便利店",
+        "今天便利店",
+        "Today Convenience Store"
+      ],
+      "contextRequiredNames": [],
+      "category": "convenience",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.today36524.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.today36524.com/about",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-3f1621a817e5",
+      "brand": "十足便利店",
+      "nameZh": "十足便利店",
+      "nameEn": null,
+      "aliases": [
+        "十足"
+      ],
+      "contextRequiredNames": [
+        "十足"
+      ],
+      "category": "convenience",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "china_priority",
+      "homeMarket": "CN",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "cnshizu.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://cnshizu.com/about.html",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-c655d276e580",
+      "brand": "Taco Bell",
+      "nameZh": "塔可钟",
+      "nameEn": "Taco Bell",
+      "aliases": [
+        "塔可钟",
+        "塔可鐘"
+      ],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://ir.yumchina.com/zh-hant/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-65bcedbf01b1",
+      "brand": "Popeyes",
+      "nameZh": null,
+      "nameEn": "Popeyes",
+      "aliases": [
+        "Popeyes Louisiana Kitchen"
+      ],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.rbi.com/English/brands/default.aspx",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-d61391afcd9b",
+      "brand": "Firehouse Subs",
+      "nameZh": null,
+      "nameEn": "Firehouse Subs",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.rbi.com/English/brands/default.aspx",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-d39b458456bd",
+      "brand": "Wendy’s",
+      "nameZh": null,
+      "nameEn": "Wendy’s",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "order.wendys.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://order.wendys.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-93046104fbbd",
+      "brand": "Chick-fil-A",
+      "nameZh": null,
+      "nameEn": "Chick-fil-A",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.chick-fil-a.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.chick-fil-a.com/locations",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-028b46e388b8",
+      "brand": "Chipotle",
+      "nameZh": null,
+      "nameEn": "Chipotle",
+      "aliases": [
+        "Chipotle Mexican Grill"
+      ],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.chipotle.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.chipotle.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.chipotle.com/"
+    },
+    {
+      "id": "brand-8dc447ad613c",
+      "brand": "Shake Shack",
+      "nameZh": null,
+      "nameEn": "Shake Shack",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "investor.shakeshack.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://investor.shakeshack.com/overview/default.aspx",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-2805f793d2ad",
+      "brand": "Five Guys",
+      "nameZh": null,
+      "nameEn": "Five Guys",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.fiveguys.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.fiveguys.com/?sc_lang=en",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.fiveguys.com/"
+    },
+    {
+      "id": "brand-84d18017291d",
+      "brand": "In-N-Out Burger",
+      "nameZh": null,
+      "nameEn": "In-N-Out Burger",
+      "aliases": [
+        "In-N-Out"
+      ],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.in-n-out.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.in-n-out.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.in-n-out.com/"
+    },
+    {
+      "id": "brand-652acf4b1014",
+      "brand": "Jollibee",
+      "nameZh": null,
+      "nameEn": "Jollibee",
+      "aliases": [
+        "Jollibee Chickenjoy"
+      ],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "PH",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-c5bd922a5bb3",
+      "brand": "Panda Express",
+      "nameZh": "熊猫快餐",
+      "nameEn": "Panda Express",
+      "aliases": [
+        "熊猫快餐"
+      ],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-90bf4bbf7f94",
+      "brand": "Arby’s",
+      "nameZh": null,
+      "nameEn": "Arby’s",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://inspirebrands.com/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-c50827b671f6",
+      "brand": "Buffalo Wild Wings",
+      "nameZh": null,
+      "nameEn": "Buffalo Wild Wings",
+      "aliases": [
+        "BWW"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://inspirebrands.com/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-77ae1dbb8c43",
+      "brand": "Jimmy John’s",
+      "nameZh": null,
+      "nameEn": "Jimmy John’s",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://inspirebrands.com/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-b1b7375e3af1",
+      "brand": "SONIC Drive-In",
+      "nameZh": null,
+      "nameEn": "SONIC Drive-In",
+      "aliases": [
+        "SONIC"
+      ],
+      "contextRequiredNames": [
+        "SONIC"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://inspirebrands.com/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-4b66cf3c6eab",
+      "brand": "Papa Johns",
+      "nameZh": "棒约翰",
+      "nameEn": "Papa Johns",
+      "aliases": [
+        "棒约翰"
+      ],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "ir.papajohns.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://ir.papajohns.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-f884ef680523",
+      "brand": "Little Caesars",
+      "nameZh": null,
+      "nameEn": "Little Caesars",
+      "aliases": [
+        "Little Caesars Pizza"
+      ],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "littlecaesars.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://littlecaesars.com/en-us/?os=0",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-6efeb8b7df60",
+      "brand": "Panera Bread",
+      "nameZh": null,
+      "nameEn": "Panera Bread",
+      "aliases": [
+        "Panera"
+      ],
+      "contextRequiredNames": [
+        "Panera"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.panerabread.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.panerabread.com/en-us/popular-links.html",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-ddaeb0017665",
+      "brand": "Pret A Manger",
+      "nameZh": null,
+      "nameEn": "Pret A Manger",
+      "aliases": [
+        "Pret"
+      ],
+      "contextRequiredNames": [
+        "Pret"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "GB",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.pret.co.uk"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.pret.co.uk/en-GB",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-bb56ccc50a70",
+      "brand": "Nando’s",
+      "nameZh": null,
+      "nameEn": "Nando’s",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "ZA",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.nandos.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.nandos.com/restaurants/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-f033c5b4b747",
+      "brand": "Wingstop",
+      "nameZh": null,
+      "nameEn": "Wingstop",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "ir.wingstop.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://ir.wingstop.com/financials/quarterly-results/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-e05efaf7b85a",
+      "brand": "Texas Chicken",
+      "nameZh": null,
+      "nameEn": "Texas Chicken",
+      "aliases": [
+        "Texas Fried Chicken"
+      ],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "texaschicken.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://texaschicken.com/en",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-c3c92da86cc8",
+      "brand": "Carl’s Jr.",
+      "nameZh": null,
+      "nameEn": "Carl’s Jr.",
+      "aliases": [
+        "Carl’s Junior"
+      ],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.carlsjr.jp"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.carlsjr.jp/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.carlsjr.jp/"
+    },
+    {
+      "id": "brand-72867db60134",
+      "brand": "Hardee’s",
+      "nameZh": null,
+      "nameEn": "Hardee’s",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.hardees.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.hardees.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.hardees.com/"
+    },
+    {
+      "id": "brand-c6b863fed47e",
+      "brand": "A&W Restaurants",
+      "nameZh": null,
+      "nameEn": "A&W Restaurants",
+      "aliases": [
+        "A&W"
+      ],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.awrestaurants.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.awrestaurants.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.awrestaurants.com/"
+    },
+    {
+      "id": "brand-b54271b7d224",
+      "brand": "Dairy Queen",
+      "nameZh": null,
+      "nameEn": "Dairy Queen",
+      "aliases": [
+        "DQ"
+      ],
+      "contextRequiredNames": [
+        "DQ"
+      ],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.dairyqueen.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.dairyqueen.com/en-us/contact-us/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-c5de4e0a377a",
+      "brand": "Tim Ho Wan",
+      "nameZh": "添好运",
+      "nameEn": "Tim Ho Wan",
+      "aliases": [
+        "添好运",
+        "添好運"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": null,
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-a2f320f5cff5",
+      "brand": "Chowking",
+      "nameZh": null,
+      "nameEn": "Chowking",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "PH",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-c7fd441715d5",
+      "brand": "Smashburger",
+      "nameZh": null,
+      "nameEn": "Smashburger",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-55a60bb89a9c",
+      "brand": "Mang Inasal",
+      "nameZh": null,
+      "nameEn": "Mang Inasal",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "PH",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-8a5c1923d0af",
+      "brand": "Dunkin’",
+      "nameZh": null,
+      "nameEn": "Dunkin’",
+      "aliases": [
+        "Dunkin Donuts"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://inspirebrands.com/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-e4839c0fb341",
+      "brand": "Baskin-Robbins",
+      "nameZh": null,
+      "nameEn": "Baskin-Robbins",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "snack_bakery",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://inspirebrands.com/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-f734110669c3",
+      "brand": "Krispy Kreme",
+      "nameZh": null,
+      "nameEn": "Krispy Kreme",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "snack_bakery",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "site.krispykreme.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://site.krispykreme.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-e90d2155ede8",
+      "brand": "The Coffee Bean & Tea Leaf",
+      "nameZh": null,
+      "nameEn": "The Coffee Bean & Tea Leaf",
+      "aliases": [
+        "Coffee Bean and Tea Leaf",
+        "CBTL"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "US",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-5c1460562aea",
+      "brand": "Gong cha",
+      "nameZh": "贡茶",
+      "nameEn": "Gong cha",
+      "aliases": [
+        "贡茶",
+        "貢茶"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "TW",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.gongcha.com.tw"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.gongcha.com.tw/en",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-0366784bd184",
+      "brand": "KOI Thé",
+      "nameZh": null,
+      "nameEn": "KOI Thé",
+      "aliases": [
+        "KOI奶茶"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "TW",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.koithe.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.koithe.com/en/main.php",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-cf327e174072",
+      "brand": "Chatime",
+      "nameZh": "日出茶太",
+      "nameEn": "Chatime",
+      "aliases": [
+        "日出茶太"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "TW",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.chatime.com.tw"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.chatime.com.tw/en/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-e1101b5fb0a6",
+      "brand": "Milksha",
+      "nameZh": "迷客夏",
+      "nameEn": "Milksha",
+      "aliases": [
+        "迷客夏",
+        "Milkshop"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "TW",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-87ca67c264f8",
+      "brand": "Highlands Coffee",
+      "nameZh": null,
+      "nameEn": "Highlands Coffee",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "VN",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-1670937aed9f",
+      "brand": "Compose Coffee",
+      "nameZh": null,
+      "nameEn": "Compose Coffee",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "KR",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-a6abf2b41397",
+      "brand": "Common Man Coffee Roasters",
+      "nameZh": null,
+      "nameEn": "Common Man Coffee Roasters",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "SG",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-b8783a80ed75",
+      "brand": "Tiong Bahru Bakery",
+      "nameZh": null,
+      "nameEn": "Tiong Bahru Bakery",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "snack_bakery",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "SG",
+      "verifiedMarkets": [],
+      "officialDomains": [],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.jollibeegroup.com/our-brands/",
+          "kind": "official_group"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-337e033bf7ff",
+      "brand": "BreadTalk",
+      "nameZh": "面包新语",
+      "nameEn": "BreadTalk",
+      "aliases": [
+        "面包新语",
+        "麵包新語"
+      ],
+      "contextRequiredNames": [],
+      "category": "snack_bakery",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "SG",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.breadtalk.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.breadtalk.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.breadtalk.com/"
+    },
+    {
+      "id": "brand-1baf0bd2d9c7",
+      "brand": "Toast Box",
+      "nameZh": "土司工坊",
+      "nameEn": "Toast Box",
+      "aliases": [
+        "土司工坊"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "SG",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.toastbox.com.sg"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.toastbox.com.sg/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.toastbox.com.sg/"
+    },
+    {
+      "id": "brand-f846848d2c3a",
+      "brand": "Din Tai Fung",
+      "nameZh": "鼎泰丰",
+      "nameEn": "Din Tai Fung",
+      "aliases": [
+        "鼎泰丰",
+        "鼎泰豐"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "TW",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.dintaifung.com.tw"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.dintaifung.com.tw/eng/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-6f685bc40137",
+      "brand": "Sushiro",
+      "nameZh": "寿司郎",
+      "nameEn": "Sushiro",
+      "aliases": [
+        "寿司郎",
+        "壽司郎"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "JP",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "nps.sushiro.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://nps.sushiro.com.cn/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-9ceb2d22dd85",
+      "brand": "Kura Sushi",
+      "nameZh": "藏寿司",
+      "nameEn": "Kura Sushi",
+      "aliases": [
+        "藏寿司",
+        "藏壽司"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "JP",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.kurasushi.co.jp"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.kurasushi.co.jp/eng/ir/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-300c62d7710e",
+      "brand": "Sukiya",
+      "nameZh": "食其家",
+      "nameEn": "Sukiya",
+      "aliases": [
+        "食其家",
+        "すき家"
+      ],
+      "contextRequiredNames": [],
+      "category": "noodles_rice",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "JP",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.zensho.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.zensho.com.cn/brand.html",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-208db0912817",
+      "brand": "MOS Burger",
+      "nameZh": "摩斯汉堡",
+      "nameEn": "MOS Burger",
+      "aliases": [
+        "摩斯汉堡",
+        "摩斯漢堡"
+      ],
+      "contextRequiredNames": [],
+      "category": "western_fast_food",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "JP",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.mos.co.jp"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.mos.co.jp/global/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-0cea3af777f0",
+      "brand": "Saizeriya",
+      "nameZh": "萨莉亚",
+      "nameEn": "Saizeriya",
+      "aliases": [
+        "萨莉亚",
+        "薩莉亞"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "JP",
+      "verifiedMarkets": [
+        "CN"
+      ],
+      "officialDomains": [
+        "www.saizeriya.com.cn"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.saizeriya.com.cn/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.saizeriya.com.cn/"
+    },
+    {
+      "id": "brand-ee522dcfbd70",
+      "brand": "Genki Sushi",
+      "nameZh": "元气寿司",
+      "nameEn": "Genki Sushi",
+      "aliases": [
+        "元气寿司",
+        "元氣壽司"
+      ],
+      "contextRequiredNames": [],
+      "category": "casual_dining",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "JP",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "www.genkisushiusa.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://www.genkisushiusa.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://www.genkisushiusa.com/"
+    },
+    {
+      "id": "brand-161fce6d7d05",
+      "brand": "Boost Juice",
+      "nameZh": null,
+      "nameEn": "Boost Juice",
+      "aliases": [
+        "Boost Juice Bars"
+      ],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "AU",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "boostjuice.com.au"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://boostjuice.com.au/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    },
+    {
+      "id": "brand-6fa2f42322f9",
+      "brand": "ZUS Coffee",
+      "nameZh": null,
+      "nameEn": "ZUS Coffee",
+      "aliases": [],
+      "contextRequiredNames": [],
+      "category": "tea_coffee",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "MY",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "zuscoffee.com"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://zuscoffee.com/",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13",
+      "officialWebsite": "https://zuscoffee.com/"
+    },
+    {
+      "id": "brand-cc4e13498b14",
+      "brand": "J.CO Donuts & Coffee",
+      "nameZh": null,
+      "nameEn": "J.CO Donuts & Coffee",
+      "aliases": [
+        "J.CO"
+      ],
+      "contextRequiredNames": [],
+      "category": "snack_bakery",
+      "commonProducts": [],
+      "searchTerms": [
+        "官方菜单",
+        "营养成分"
+      ],
+      "estimateHint": "优先核对用户所在地区、具体产品和份量；没有匹配营养资料时保留品牌并明确标注行业估算。",
+      "scope": "international_chain",
+      "homeMarket": "ID",
+      "verifiedMarkets": [],
+      "officialDomains": [
+        "jco.id"
+      ],
+      "sourceStatus": "verified",
+      "sources": [
+        {
+          "url": "https://jco.id/links",
+          "kind": "official_brand"
+        }
+      ],
+      "verifiedAt": "2026-10-13",
+      "origin": "expansion-2026-10-13"
+    }
+  ],
+  "pendingBrands": [
+    {
+      "brand": "田老师红烧肉",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "大娘水饺",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "老盛昌",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "巴比馒头",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "庆丰包子铺",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "乔东家",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "满宝馄饨",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "熊大爷",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "真味包子",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "外婆家",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "大董",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "小吊梨汤",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "烤匠",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "湘阁里辣",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "贤合庄",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "茶理宜世",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "Seesaw Coffee",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "好利来",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "多乐之日",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "泸溪河",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "美宜佳",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    },
+    {
+      "brand": "天福便利店",
+      "status": "pending_verification",
+      "reason": "尚未取得足够可靠的品牌官方或交易所来源；不参与运行时匹配。"
+    }
+  ]
+}

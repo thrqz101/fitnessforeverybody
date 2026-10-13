@@ -31,7 +31,8 @@ function buildSystemPrompt(language: Language): string {
     "- 单食物每100g营养 → query_local_food_db 最合适。",
     "- 品牌/门店/包装食品等本地库口径之外 → exa_web_search。",
     "- 罕见菜/自制菜/组合餐 → ask_llm_estimate。",
-    "- 每次调用后回填结果并继续推理，直到得出最终回答，并注明用过的 source（local_db / exa_search / llm_estimate）。",
+    "- 本地工具出现needsClarification时必须确认生熟状态或品种，不可自行选候选第一条。missingNutrients为缺失项，不把0当作确定为零。",
+    "- 每次调用后回填结果，直到得出最终回答。source和dbMeta仅作内部诊断，用户回答不要写数据库、本地库、模型或LLM。只有联网检索成功且已提取可用食品结果时，才附实际取得的网页来源链接。不得编造链接。",
     `本地食品库：version=${dbMeta.version}，条目=${dbMeta.count}，单位=${dbMeta.unit}。`,
     language === "en" ? "Answer in English, concise." : "用中文回答，简洁。"
   ].join("\n");

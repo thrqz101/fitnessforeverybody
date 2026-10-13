@@ -394,7 +394,7 @@ export function Onboarding({
                       trainingStyle: t(profile.trainingStyle),
                       eatingPattern: t(profile.eatingPattern)
                     })}
-                    {t("蛋白质")} {formatMultiplier(recommendedMultipliers.protein, language)}、{t("碳水")} {formatMultiplier(recommendedMultipliers.carbs, language)}、{t("脂肪")} {formatMultiplier(recommendedMultipliers.fat, language)}、{t("膳食纤维")} {formatDailyGrams(recommendedFiberGrams, language)}。{t("热量目标按系统预算计算：{calories} kcal。", { calories: calorieBudget })}
+                    {t("蛋白质")} {formatMultiplier(recommendedMultipliers.protein, language)}、{t("碳水")} {formatMultiplier(recommendedMultipliers.carbs, language)}、{t("脂肪")} {formatMultiplier(recommendedMultipliers.fat, language)}、{t("膳食纤维")} {formatDailyGrams(recommendedFiberGrams, language)}。{t("热量目标随当前营养素同步计算：{calories} kcal。", { calories: estimatedMacroCalories })}
                   </p>
                 </div>
                 <button
@@ -460,8 +460,8 @@ export function Onboarding({
                   </div>
                   <div className="rounded-[18px] bg-white/80 px-3 py-2">
                     <p className="text-xs font-bold text-ink/48">{t(macroLabels.calories.label)}</p>
-                    <p className="mt-1 text-lg font-black text-ink">{calorieBudget}kcal</p>
-                    <p className="mt-1 text-xs font-bold text-ink/42">{t("系统预算")}</p>
+                    <p className="mt-1 text-lg font-black text-ink" data-testid="saved-calorie-target">{estimatedMacroCalories}kcal</p>
+                    <p className="mt-1 text-xs font-bold text-ink/42">{t("按当前营养素计算")}</p>
                   </div>
                 </div>
               </div>
@@ -745,10 +745,10 @@ function CalorieEstimatePanel({
   return (
     <article className="rounded-[18px] border border-ink/10 bg-ink p-4 text-white">
       <p className="text-xs font-black uppercase tracking-[0.14em] text-citrus">Calorie Budget</p>
-      <h3 className="mt-2 text-2xl font-black">{calorieBudget} kcal</h3>
+      <h3 className="mt-2 text-2xl font-black" data-testid="calorie-target">{macroCalories} kcal</h3>
       <p className="mt-2 text-sm font-semibold leading-6 text-white/72">
-        {t("系统热量目标按 BMR、训练计划和饮食目标估算。根据你当前调整后的蛋白质、碳水和脂肪，折算热量为 {macroCalories} kcal，{delta}。", {
-          macroCalories,
+        {t("当前热量按蛋白质 × 4、碳水 × 4、脂肪 × 9 同步计算。系统初始参考预算为 {calorieBudget} kcal，当前目标{delta}。膳食纤维单独设置，不重复计入热量。", {
+          calorieBudget,
           delta: formatCalorieDelta(delta, language)
         })}
       </p>

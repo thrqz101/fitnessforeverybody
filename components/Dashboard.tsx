@@ -1,5 +1,9 @@
 "use client";
 
+import { RecognitionProgress } from "@/components/RecognitionProgress";
+import { requestFoodAi } from "@/lib/recognition-client";
+import { useRecognitionProgress } from "@/lib/use-recognition-progress";
+
 import {
   ArrowRight,
   Check,
@@ -75,7 +79,7 @@ export function Dashboard({
   const [mealDescription, setMealDescription] = useState("");
   const [recognitionNotice, setRecognitionNotice] = useState<RecognitionNoticeState | null>(null);
   const [isRecognizing, setIsRecognizing] = useState(false);
-  const [selectedMacro, setSelectedMacro] = useState<MacroKey>("protein");
+  const progress = useRecognitionProgress();
   const draftFoods = foods.filter((food) => !food.savedToCalendar);
   const savedFoods = foods.filter((food) => food.savedToCalendar);
   const bmr = profile.bmrKcal > 0 ? profile.bmrKcal : estimateBmr(profile);
@@ -84,12 +88,6 @@ export function Dashboard({
     () => Math.round(macroKeys.reduce((sum, macro) => sum + Math.min(completion(animatedTotals[macro], targets[macro]), 100), 0) / macroKeys.length),
     [animatedTotals, targets]
   );
-  const selectedMacroPercent = completion(animatedTotals[selectedMacro], targets[selectedMacro]);
-  const selectedMacroGap = Math.max(0, targets[selectedMacro] - animatedTotals[selectedMacro]);
-  const selectedContributors = [...savedFoods]
-    .filter((food) => food.macros[selectedMacro] > 0)
-    .sort((left, right) => right.macros[selectedMacro] - left.macros[selectedMacro])
-    .slice(0, 3);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -103,6 +101,7 @@ export function Dashboard({
   }, []);
 
   async function recognizeMeal() {
+    if (isRecognizing) return;
     const description = mealDescription.trim();
     if (!description) {
       setRecognitionNotice({ key: "先告诉我你吃了什么，品牌、份量和配菜越具体越好。" });
@@ -112,11 +111,12 @@ export function Dashboard({
     const form = new FormData();
     form.append("description", description);
     form.append("lang", language);
+    const requestProgress = progress.begin();
     setIsRecognizing(true);
     setRecognitionNotice({ key: "AI 正在拆解食材、份量和营养结构…" });
 
     try {
-      const aiResult = await requestFoodAi(form, language);
+      const aiResult = await requestFoodAi(form, language, requestProgress);
       if (!aiResult.ok || !aiResult.result?.ok) {
         setRecognitionNotice({ text: withRetryHint(aiResult.message || aiResult.result?.message || t("AI 这次没算准。"), language) });
         return;
@@ -150,7 +150,7 @@ export function Dashboard({
         <div className="food-hero__veil" />
         <div className="food-hero__content">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="experience-kicker experience-kicker--light"><Sparkles size={14} /> AI Nutrition</span>
+            <span className="experience-kicker experience-kicker--light">AI Nutrition</span>
             <span className="rounded-full border border-white/35 bg-white/15 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
               {todayLabel}
             </span>
@@ -158,11 +158,12 @@ export function Dashboard({
           <h1>{t("记录生活，")}<br />{t("看懂每一餐。")}</h1>
           <p>{t("输入食物、品牌和份量，AI 会识别食材并估算这一餐的营养。")}</p>
 
-          <div className="food-composer">
+          <div className="food-composer" aria-busy={isRecognizing}>
             <div className="food-composer__field">
               <MessageSquareText size={20} aria-hidden="true" />
               <textarea
                 value={mealDescription}
+                disabled={isRecognizing}
                 onChange={(event) => setMealDescription(event.target.value)}
                 placeholder={t("比如：一碗牛肉麻辣烫，加宽粉、豆腐皮和青菜…")}
                 aria-label={t("描述你吃的食物")}
@@ -177,10 +178,11 @@ export function Dashboard({
 
           <div className="food-examples" aria-label={t("食物描述示例")}>
             {quickExamples.map((example) => (
-              <button key={example} type="button" onClick={() => setMealDescription(example)}>{t(example)}</button>
+              <button key={example} type="button" disabled={isRecognizing} onClick={() => setMealDescription(example)}>{t(example)}</button>
             ))}
           </div>
-          {recognitionNotice ? <div className="recognition-toast">{"key" in recognitionNotice ? t(recognitionNotice.key, recognitionNotice.vars) : recognitionNotice.text}</div> : null}
+          <RecognitionProgress steps={progress.steps} running={isRecognizing} foods={foods} />
+          {recognitionNotice && !isRecognizing ? <div className="recognition-toast">{"key" in recognitionNotice ? t(recognitionNotice.key, recognitionNotice.vars) : recognitionNotice.text}</div> : null}
         </div>
       </section>
   );
@@ -236,7 +238,6 @@ export function Dashboard({
     <section id={presentation === "legacy" ? undefined : "overview"} className="experience-section nutrition-story">
         <div className="section-heading">
           <div>
-            <span className="experience-kicker">Live nutrition dashboard</span>
             <h2>{t("今日营养进度")}</h2>
           </div>
           <button type="button" className="text-action" onClick={() => onNavigate("calendar")}>
@@ -244,68 +245,48 @@ export function Dashboard({
           </button>
         </div>
 
-        <div className="nutrition-dashboard">
-          <section className="attainment-card" aria-label={t("今日营养达标率")}>
-            <NutritionOrbit percent={overallProgress} />
-            <div className="attainment-card__copy">
-              <span className="experience-kicker">Daily attainment</span>
-              <h3>{t("今日营养达标率")}</h3>
-              <p>{t(goalLabels[profile.goal])}{t("目标")} · BMR {bmr} kcal · {t(dietStatusLabels[day.dietStatus].label)}</p>
-              <div className="attainment-card__facts">
-                <span><strong>{savedFoods.length}</strong> {t("已计入食物")}</span>
-                <span><strong>{Math.max(0, Math.round(gaps.calories))}</strong> kcal {t("余量")}</span>
-              </div>
-              <div className="mode-switch" aria-label={t("今日模式")}>
-                <button type="button" aria-pressed={day.isTrainingDay} onClick={() => onDayChange({ ...day, isTrainingDay: true })} className={day.isTrainingDay ? "is-active" : ""}>{t("训练日")}</button>
-                <button type="button" aria-pressed={!day.isTrainingDay} onClick={() => onDayChange({ ...day, isTrainingDay: false })} className={!day.isTrainingDay ? "is-active" : ""}>{t("恢复日")}</button>
+        <div className="nutrition-dashboard nutrition-dashboard--report">
+          <section className="nutrition-summary" aria-label={t("今日营养达标率")}>
+            <div className="nutrition-summary__header">
+              <h3>{pick(language, "今日达标", "Daily progress")}</h3>
+              <div className="nutrition-day-switch" aria-label={t("今日模式")}>
+                <button type="button" aria-pressed={day.isTrainingDay} onClick={() => onDayChange({ ...day, isTrainingDay: true })}>{t("训练日")}</button>
+                <button type="button" aria-pressed={!day.isTrainingDay} onClick={() => onDayChange({ ...day, isTrainingDay: false })}>{t("恢复日")}</button>
               </div>
             </div>
+            <div className="nutrition-summary__numbers">
+              <div className="nutrition-summary__attainment">
+                <strong>{overallProgress}<span>%</span></strong>
+                <span>{pick(language, "综合营养达标率", "Overall nutrient progress")}</span>
+              </div>
+              <div className="nutrition-summary__energy">
+                <span>{pick(language, "已摄入热量", "Calories logged")}</span>
+                <strong>{Math.round(animatedTotals.calories)}<small> kcal</small></strong>
+                <span>{pick(language, "每日目标", "Daily target")} {Math.round(targets.calories)} kcal</span>
+              </div>
+            </div>
+            <div className="nutrition-summary__track" role="progressbar" aria-label={t("今日营养达标率")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={overallProgress}>
+              <i style={{ width: `${overallProgress}%` }} />
+            </div>
+            <div className="nutrition-summary__balance">
+              <span>{pick(language, "已计入", "Logged")} <strong>{savedFoods.length}</strong> {pick(language, "项食物", "foods")}</span>
+              <span>{gaps.calories < 0 ? pick(language, "超出目标", "Over target") : pick(language, "剩余", "Remaining")} <strong>{Math.round(Math.abs(gaps.calories))}</strong> kcal</span>
+            </div>
+            <p className="nutrition-summary__context">{t(goalLabels[profile.goal])} · {t(dietStatusLabels[day.dietStatus].label)} · BMR {bmr} kcal</p>
           </section>
 
-          <section className="nutrient-lanes" aria-label={t("选择营养指标")}>
+          <section className="nutrition-metrics" aria-label={pick(language, "营养指标进度", "Nutrient progress")}>
             {macroKeys.map((macro) => (
-              <button
-                key={macro}
-                type="button"
-                className={`nutrient-lane ${selectedMacro === macro ? "is-active" : ""}`}
-                aria-pressed={selectedMacro === macro}
-                onClick={() => setSelectedMacro(macro)}
-              >
-                <span className="nutrient-lane__ring" style={{ background: `conic-gradient(${ringTone[macro]} ${Math.min(completion(animatedTotals[macro], targets[macro]), 100)}%, rgba(29,42,34,.08) 0)` }}>
-                  <i>{completion(animatedTotals[macro], targets[macro])}%</i>
-                </span>
-                <span className="nutrient-lane__copy">
-                  <strong>{t(macroLabels[macro].label)}</strong>
-                  <small>{Math.round(animatedTotals[macro])} / {Math.round(targets[macro])}{macroLabels[macro].unit}</small>
-                </span>
-                <span className="nutrient-lane__bar" aria-hidden="true"><i style={{ width: `${Math.min(completion(animatedTotals[macro], targets[macro]), 100)}%`, background: ringTone[macro] }} /></span>
-                <ChevronRight size={16} aria-hidden="true" />
-              </button>
-            ))}
-          </section>
-
-          <section className="nutrient-focus" aria-live="polite">
-            <div className="nutrient-focus__heading">
-              <span>{t("当前查看")}</span>
-              <strong>{t(macroLabels[selectedMacro].label)}</strong>
-            </div>
-            <div className="nutrient-focus__metric">
-              <strong>{Math.round(animatedTotals[selectedMacro])}<small>{macroLabels[selectedMacro].unit}</small></strong>
-              <span>{t("目标")} {Math.round(targets[selectedMacro])}{macroLabels[selectedMacro].unit}</span>
-            </div>
-            <div className="nutrient-focus__status">
-              <span>{t(getMacroStatus(selectedMacroPercent))}</span>
-              <strong>{selectedMacroGap > 0 ? t("还差 {count}{unit}", { count: Math.round(selectedMacroGap), unit: macroLabels[selectedMacro].unit }) : t("今日目标已达到")}</strong>
-            </div>
-            <div className="nutrient-contributors">
-              <span>{t("主要食物贡献")}</span>
-              {selectedContributors.length ? selectedContributors.map((food) => (
-                <div key={food.id}>
-                  <strong>{getLocalizedFoodField(food, "name", language)}</strong>
-                  <span>{Math.round(food.macros[selectedMacro])}{macroLabels[selectedMacro].unit}</span>
+              <div key={macro} className="nutrition-metric">
+                <div className="nutrition-metric__heading">
+                  <span className="nutrition-metric__name"><i style={{ background: ringTone[macro] }} />{t(macroLabels[macro].label)}</span>
+                  <span className="nutrition-metric__amount"><strong>{Math.round(animatedTotals[macro])}</strong><span> / {Math.round(targets[macro])} {macroLabels[macro].unit}</span></span>
                 </div>
-              )) : <p>{t("计入食物后，这里会显示贡献最大的来源。")}</p>}
-            </div>
+                <div className="nutrition-metric__track" role="progressbar" aria-label={t(macroLabels[macro].label)} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.min(completion(animatedTotals[macro], targets[macro]), 100)} aria-valuetext={`${Math.round(animatedTotals[macro])} / ${Math.round(targets[macro])} ${macroLabels[macro].unit}`}>
+                  <i style={{ width: `${Math.min(completion(animatedTotals[macro], targets[macro]), 100)}%`, background: ringTone[macro] }} />
+                </div>
+              </div>
+            ))}
           </section>
         </div>
       </section>
@@ -338,22 +319,6 @@ export function Dashboard({
       </section>
     </div>
   );
-}
-
-function NutritionOrbit({ percent }: { percent: number }) {
-  const { t } = useI18n();
-  return (
-    <div className="master-orbit" style={{ background: `conic-gradient(var(--preview-orbit-color, #f2ce67) ${Math.min(percent, 100)}%, var(--preview-orbit-track, rgba(255,255,255,.16)) 0)` }}>
-      <div><strong>{percent}%</strong><span>{t("营养达标率")}</span></div>
-    </div>
-  );
-}
-
-function getMacroStatus(percent: number) {
-  if (percent >= 100) return "已达到目标";
-  if (percent >= 70) return "接近今日目标";
-  if (percent >= 35) return "正在稳步补充";
-  return "今天还可以继续补充";
 }
 
 function MealMacroGrid({ food }: { food: FoodLogItem }) {
@@ -411,33 +376,6 @@ function useAnimatedMacroTotals(target: MacroTotals) {
   }, [target]);
 
   return displayed;
-}
-
-type FoodAiResult = {
-  ok?: boolean;
-  isFoodRelated?: boolean;
-  message?: string;
-  needsConfig?: boolean;
-  foods?: FoodLogItem[];
-};
-
-async function requestFoodAi(form: FormData, language: Language): Promise<{ ok: boolean; retryable: boolean; message?: string; result?: FoodAiResult }> {
-  try {
-    const response = await fetch("/api/food-ai", { method: "POST", body: form });
-    const retryable = response.status === 408 || response.status === 429 || response.status >= 500;
-    let result: FoodAiResult;
-    try {
-      result = await response.json();
-    } catch {
-      return { ok: false, retryable, message: retryable ? pick(language, "AI 服务响应太慢或暂时不可用。", "The AI service is slow or temporarily unavailable.") : pick(language, "AI 返回内容无法读取。", "The AI response could not be read.") };
-    }
-    if (!response.ok || !result.ok) {
-      return { ok: false, retryable: !result.needsConfig && retryable, message: result.message || pick(language, "AI 这次没有识别成功。", "The AI couldn't recognize it this time."), result };
-    }
-    return { ok: true, retryable: false, result };
-  } catch {
-    return { ok: false, retryable: true, message: pick(language, "AI 服务连接失败。", "The AI service connection failed.") };
-  }
 }
 
 function withRetryHint(message: string, language: Language) {

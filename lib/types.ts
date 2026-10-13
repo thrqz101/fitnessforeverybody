@@ -1,3 +1,5 @@
+import type { SearchEvidence } from "./search-evidence";
+
 export type Gender = "male" | "female";
 export type GoalType = "muscle" | "fat_loss" | "weight_loss" | "health";
 export type MealType = "breakfast" | "lunch" | "dinner" | "snack" | "midnight";
@@ -56,6 +58,7 @@ export type FoodLogItem = {
   loggedAt: string;
   savedToCalendar?: boolean;
   recognitionBatchId?: string;
+  searchEvidence?: SearchEvidence;
   nameZh?: string;
   nameEn?: string;
   brandZh?: string;

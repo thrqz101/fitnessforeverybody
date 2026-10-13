@@ -5,11 +5,17 @@ import type { FoodLogItem } from "@/lib/types";
 const generatedZhToEn = generatedTranslations as Record<string, string>;
 
 export const zhToEn: Record<string, string> = {
+  "热量目标随当前营养素同步计算：{calories} kcal。": "Calories update with your current nutrient targets: {calories} kcal.",
+  "按当前营养素计算": "Calculated from current nutrients",
+  "当前热量按蛋白质 × 4、碳水 × 4、脂肪 × 9 同步计算。系统初始参考预算为 {calorieBudget} kcal，当前目标{delta}。膳食纤维单独设置，不重复计入热量。": "Calories update as protein × 4 + carbs × 4 + fat × 9. The initial system reference is {calorieBudget} kcal; the current target is {delta}. Fiber is set separately and is not counted twice.",
   "今天": "Today",
   "进度": "Progress",
   "灵感": "Ideas",
   "设置": "Settings",
   "识别与记录": "Log & recognize",
+  "食物识别": "Food recognition",
+  "智能推荐下一餐": "Next meal recommendations",
+  "意见反馈": "Feedback",
   "趋势与日历": "Trends & calendar",
   "聪明吃什么": "Eat smarter",
   "调整目标": "Adjust goals",

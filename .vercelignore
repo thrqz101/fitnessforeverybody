@@ -1,0 +1,16 @@
+.git
+.next
+node_modules
+.vercel
+.env*
+.playwright-mcp
+output
+.vscode
+.trae
+HANDOFF.md
+server
+*.tsbuildinfo
+scripts/nutrition/__pycache__
+data/nutrition-100g.json
+data/nutrition-100g.csv
+data/nutrition-recipes.json

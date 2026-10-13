@@ -33,8 +33,8 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
   const [focusRequest, setFocusRequest] = useState<{ target: ToolTab; records?: boolean } | null>(null);
   const visited = useRef(new Set<ToolTab>(["recognition"]));
   const labels: Record<ToolTab, string> = {
-    recognition: t("识别与记录"),
-    recommend: t("聪明吃什么"), calendar: t("趋势与日历")
+    recognition: t("食物识别"),
+    recommend: t("智能推荐下一餐"), calendar: t("趋势与日历")
   };
 
   const primaryViews: ToolTab[] = ["recognition", "recommend"];
@@ -104,7 +104,7 @@ export function PreviewApp({ mode }: { mode: "landing" | "workspace" }) {
         <div className="precision-tools-heading"><div><p className="precision-eyebrow">{text("你的每日营养空间", "YOUR DAILY NUTRITION SPACE")}</p><h2>{tab === "calendar" ? t("趋势与日历") : text("今天，吃得更明白。", "A little more clarity, every day.")}</h2></div><span className="precision-free-label">{text("全部功能，完全免费", "Every feature. Completely free.")}</span></div>
         <nav className="precision-tabs" aria-label={text("主要功能", "Main tools")}>
           {primaryViews.map((key) => <button key={key} id={`tab-${key}`} aria-current={tab === key ? "page" : undefined} className={tab === key ? "is-active" : ""} onClick={() => navigate(key)}>{labels[key]}</button>)}
-          <button onClick={() => openFeedback()} aria-haspopup="dialog" className="precision-feedback-action"><MessageSquare size={15} />{text("给我反馈", "Give feedback")}</button>
+          <button onClick={() => openFeedback()} aria-haspopup="dialog" className="precision-feedback-action"><MessageSquare size={15} />{text("意见反馈", "Feedback")}</button>
         </nav>
         {!state.hydrated ? <p className="py-20 text-center text-zinc-500">{t("正在准备你的健康空间")}</p> : !state.hasProfile ? <div className="precision-locked-tools">
           {[tab].map((key, index) => <section id={key} key={key} className="precision-locked-card"><div className="precision-locked-icon">{key === "recognition" ? <ScanLine size={26} /> : <LockKeyhole size={22} />}</div><span className="precision-eyebrow">0{index + 1} / {labels[key]}</span><h3>{key === "recognition" ? t("输入食物、品牌和份量，AI 会识别食材并估算这一餐的营养。") : labels[key]}</h3><p>{text("先填写身体资料，再查看属于你的营养目标与记录。", "Set up your profile to see your personal targets and records.")}</p><button className="precision-button" onClick={() => navigate(key)}>{key === "recognition" ? text("开始识别", "Start identifying") : text("填写资料", "Set up profile")}<ArrowRight size={16} /></button></section>)}

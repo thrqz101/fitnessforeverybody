@@ -1,64 +1,519 @@
 {
-  "version": "1.0.0",
-  "source": "curated_reference",
+  "version": "2.0.0",
+  "source": "USDA_FDC_CC0_and_project_reference_recipes",
   "unit": "per_100g",
-  "note": "已提交的极小示例库，用于仓库开箱可跑。真实与完整数据放在 data/nutrition-100g.json（已 gitignore），不会进入 GitHub。数值为参考近似值，生产环境请用权威来源（如 USDA FoodData Central / 中国食物成分表）替换。",
+  "basis": "edible_portion",
+  "units": {
+    "protein": "g",
+    "carbs": "g",
+    "fat": "g",
+    "calories": "kcal",
+    "fiber": "g"
+  },
+  "note": "每100g该状态可食部。中文为项目映射；家常菜为有明确假设的配方计算参考，非实测。来源缺项置0并标记。碳水含膳食纤维，不重复加总。",
+  "sourceArchives": [
+    {
+      "dataset": "sr_legacy",
+      "version": "SR Legacy 2018-04",
+      "url": "https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-04.zip",
+      "sha256": "b80817294b8850530aaedf2e515c02593b1824f763a0ff356e5c2081643e6fd0",
+      "license": "CC0",
+      "importedAt": "2026-10-13"
+    },
+    {
+      "dataset": "foundation",
+      "version": "Foundation Foods 2026-04-30",
+      "url": "https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_foundation_food_csv_2026-04-30.zip",
+      "sha256": "70457ee9d9342f43bda2010318c85f04210c689fdeb9cd2da4c513b0e8dbc655",
+      "license": "CC0",
+      "importedAt": "2026-10-13"
+    }
+  ],
   "foods": [
     {
-      "name": "米饭（熟）",
-      "nameEn": "Cooked white rice",
+      "id": "rice-raw",
+      "name": "大米（生）",
+      "nameEn": "Rice, white, long grain, unenriched, raw",
       "category": "staple",
-      "aliases": ["米饭", "白米饭", "大米饭", "熟米饭", "rice", "white rice"],
-      "per100g": { "protein": 2.7, "carbs": 28.2, "fat": 0.3, "calories": 130, "fiber": 0.4 }
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "大米",
+        "生大米",
+        "raw white rice"
+      ],
+      "basisGrams": 100,
+      "per100g": {
+        "protein": 7.03885,
+        "carbs": 80.31315,
+        "fat": 1.033,
+        "fiber": 0.1488,
+        "calories": 369.637321
+      },
+      "missingNutrients": [],
+      "qualityFlags": [
+        "reference_population_and_variety_may_differ"
+      ],
+      "source": {
+        "name": "USDA FoodData Central",
+        "method": "reference",
+        "dataset": "foundation",
+        "datasetVersion": "Foundation Foods 2026-04-30",
+        "fdcId": 2512381,
+        "ndbId": "20444",
+        "description": "Rice, white, long grain, unenriched, raw",
+        "url": "https://fdc.nal.usda.gov/food-details/2512381/nutrients",
+        "publishedAt": "2023-04-20",
+        "nutrients": {
+          "protein": {
+            "nutrientId": 1003,
+            "sourceAmount": 7.03885,
+            "sourceUnit": "g"
+          },
+          "carbs": {
+            "nutrientId": 1005,
+            "sourceAmount": 80.31315,
+            "sourceUnit": "g"
+          },
+          "fat": {
+            "nutrientId": 1004,
+            "sourceAmount": 1.033,
+            "sourceUnit": "g"
+          },
+          "fiber": {
+            "nutrientId": 1079,
+            "sourceAmount": 0.1488,
+            "sourceUnit": "g"
+          },
+          "calories": {
+            "nutrientId": 2048,
+            "sourceAmount": 369.637321,
+            "sourceUnit": "kcal"
+          }
+        }
+      },
+      "updatedAt": "2026-10-13"
     },
     {
-      "name": "鸡胸肉（熟）",
-      "nameEn": "Cooked chicken breast",
-      "category": "protein",
-      "aliases": ["鸡胸肉", "鸡胸", "chicken breast", "chicken"],
-      "per100g": { "protein": 31, "carbs": 0, "fat": 3.7, "calories": 165, "fiber": 0 }
+      "id": "rice-cooked",
+      "name": "米饭（熟）",
+      "nameEn": "Rice, white, long-grain, regular, unenriched, cooked without salt",
+      "category": "staple",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "米饭",
+        "白米饭",
+        "熟米饭",
+        "大米饭",
+        "rice cooked",
+        "cooked rice",
+        "cooked white rice"
+      ],
+      "basisGrams": 100,
+      "per100g": {
+        "protein": 2.69,
+        "carbs": 28.17,
+        "fat": 0.28,
+        "fiber": 0.4,
+        "calories": 130.0
+      },
+      "missingNutrients": [],
+      "qualityFlags": [
+        "reference_population_and_variety_may_differ"
+      ],
+      "source": {
+        "name": "USDA FoodData Central",
+        "method": "reference",
+        "dataset": "sr_legacy",
+        "datasetVersion": "SR Legacy 2018-04",
+        "fdcId": 169757,
+        "ndbId": "20445",
+        "description": "Rice, white, long-grain, regular, unenriched, cooked without salt",
+        "url": "https://fdc.nal.usda.gov/food-details/169757/nutrients",
+        "publishedAt": "2019-04-01",
+        "nutrients": {
+          "protein": {
+            "nutrientId": 1003,
+            "sourceAmount": 2.69,
+            "sourceUnit": "g"
+          },
+          "carbs": {
+            "nutrientId": 1005,
+            "sourceAmount": 28.17,
+            "sourceUnit": "g"
+          },
+          "fat": {
+            "nutrientId": 1004,
+            "sourceAmount": 0.28,
+            "sourceUnit": "g"
+          },
+          "fiber": {
+            "nutrientId": 1079,
+            "sourceAmount": 0.4,
+            "sourceUnit": "g"
+          },
+          "calories": {
+            "nutrientId": 1008,
+            "sourceAmount": 130.0,
+            "sourceUnit": "kcal"
+          }
+        }
+      },
+      "updatedAt": "2026-10-13"
     },
     {
-      "name": "鸡蛋（熟）",
-      "nameEn": "Cooked egg",
-      "category": "protein",
-      "aliases": ["鸡蛋", "蛋", "egg", "boiled egg"],
-      "per100g": { "protein": 13, "carbs": 1.1, "fat": 11, "calories": 155, "fiber": 0 }
+      "id": "chicken-breast-raw",
+      "name": "鸡胸肉（去皮，生）",
+      "nameEn": "Chicken, breast, boneless, skinless, raw",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生鸡胸肉",
+        "鸡胸肉生",
+        "鸡胸肉（生）",
+        "raw chicken breast",
+        "鸡胸肉"
+      ],
+      "basisGrams": 100,
+      "per100g": {
+        "protein": 22.525,
+        "carbs": 0.0,
+        "fat": 1.934,
+        "fiber": 0,
+        "calories": 112.20227
+      },
+      "missingNutrients": [
+        "fiber"
+      ],
+      "qualityFlags": [
+        "reference_population_and_variety_may_differ",
+        "missing_source_nutrients_zero_filled"
+      ],
+      "source": {
+        "name": "USDA FoodData Central",
+        "method": "reference",
+        "dataset": "foundation",
+        "datasetVersion": "Foundation Foods 2026-04-30",
+        "fdcId": 2646170,
+        "ndbId": "100304",
+        "description": "Chicken, breast, boneless, skinless, raw",
+        "url": "https://fdc.nal.usda.gov/food-details/2646170/nutrients",
+        "publishedAt": "2023-10-26",
+        "nutrients": {
+          "protein": {
+            "nutrientId": 1003,
+            "sourceAmount": 22.525,
+            "sourceUnit": "g"
+          },
+          "carbs": {
+            "nutrientId": 1005,
+            "sourceAmount": 0.0,
+            "sourceUnit": "g"
+          },
+          "fat": {
+            "nutrientId": 1004,
+            "sourceAmount": 1.934,
+            "sourceUnit": "g"
+          },
+          "calories": {
+            "nutrientId": 2048,
+            "sourceAmount": 112.20227,
+            "sourceUnit": "kcal"
+          }
+        }
+      },
+      "updatedAt": "2026-10-13"
     },
     {
-      "name": "全脂牛奶",
-      "nameEn": "Whole milk",
-      "category": "dairy",
-      "aliases": ["牛奶", "全脂奶", "milk", "whole milk"],
-      "per100g": { "protein": 3.3, "carbs": 4.8, "fat": 3.3, "calories": 61, "fiber": 0 }
+      "id": "chicken-breast-cooked",
+      "name": "鸡胸肉（去皮，烤熟）",
+      "nameEn": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
+      "category": "meat",
+      "foodKind": "single_food",
+      "cookingState": "cooked",
+      "aliases": [
+        "熟鸡胸肉",
+        "鸡胸肉熟",
+        "鸡胸肉（熟）",
+        "烤鸡胸肉",
+        "cooked chicken breast",
+        "鸡胸肉"
+      ],
+      "basisGrams": 100,
+      "per100g": {
+        "protein": 31.02,
+        "carbs": 0.0,
+        "fat": 3.57,
+        "fiber": 0.0,
+        "calories": 165.0
+      },
+      "missingNutrients": [],
+      "qualityFlags": [
+        "reference_population_and_variety_may_differ"
+      ],
+      "source": {
+        "name": "USDA FoodData Central",
+        "method": "reference",
+        "dataset": "sr_legacy",
+        "datasetVersion": "SR Legacy 2018-04",
+        "fdcId": 171477,
+        "ndbId": "5064",
+        "description": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
+        "url": "https://fdc.nal.usda.gov/food-details/171477/nutrients",
+        "publishedAt": "2019-04-01",
+        "nutrients": {
+          "protein": {
+            "nutrientId": 1003,
+            "sourceAmount": 31.02,
+            "sourceUnit": "g"
+          },
+          "carbs": {
+            "nutrientId": 1005,
+            "sourceAmount": 0.0,
+            "sourceUnit": "g"
+          },
+          "fat": {
+            "nutrientId": 1004,
+            "sourceAmount": 3.57,
+            "sourceUnit": "g"
+          },
+          "fiber": {
+            "nutrientId": 1079,
+            "sourceAmount": 0.0,
+            "sourceUnit": "g"
+          },
+          "calories": {
+            "nutrientId": 1008,
+            "sourceAmount": 165.0,
+            "sourceUnit": "kcal"
+          }
+        }
+      },
+      "updatedAt": "2026-10-13"
     },
     {
-      "name": "香蕉",
-      "nameEn": "Banana",
-      "category": "fruit",
-      "aliases": ["香蕉", "banana"],
-      "per100g": { "protein": 1.1, "carbs": 23, "fat": 0.3, "calories": 89, "fiber": 2.6 }
+      "id": "egg-raw",
+      "name": "鸡蛋（生，可食部）",
+      "nameEn": "Egg, whole, raw, fresh",
+      "category": "egg_dairy",
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "生鸡蛋",
+        "raw egg"
+      ],
+      "basisGrams": 100,
+      "per100g": {
+        "protein": 12.56,
+        "carbs": 0.72,
+        "fat": 9.51,
+        "fiber": 0.0,
+        "calories": 143.0
+      },
+      "missingNutrients": [],
+      "qualityFlags": [
+        "reference_population_and_variety_may_differ"
+      ],
+      "source": {
+        "name": "USDA FoodData Central",
+        "method": "reference",
+        "dataset": "sr_legacy",
+        "datasetVersion": "SR Legacy 2018-04",
+        "fdcId": 171287,
+        "ndbId": "1123",
+        "description": "Egg, whole, raw, fresh",
+        "url": "https://fdc.nal.usda.gov/food-details/171287/nutrients",
+        "publishedAt": "2019-04-01",
+        "nutrients": {
+          "protein": {
+            "nutrientId": 1003,
+            "sourceAmount": 12.56,
+            "sourceUnit": "g"
+          },
+          "carbs": {
+            "nutrientId": 1005,
+            "sourceAmount": 0.72,
+            "sourceUnit": "g"
+          },
+          "fat": {
+            "nutrientId": 1004,
+            "sourceAmount": 9.51,
+            "sourceUnit": "g"
+          },
+          "fiber": {
+            "nutrientId": 1079,
+            "sourceAmount": 0.0,
+            "sourceUnit": "g"
+          },
+          "calories": {
+            "nutrientId": 1008,
+            "sourceAmount": 143.0,
+            "sourceUnit": "kcal"
+          }
+        }
+      },
+      "updatedAt": "2026-10-13"
     },
     {
-      "name": "西兰花",
-      "nameEn": "Broccoli",
+      "id": "tomato",
+      "name": "番茄（生）",
+      "nameEn": "Tomatoes, red, ripe, raw, year round average",
       "category": "vegetable",
-      "aliases": ["西兰花", "broccoli"],
-      "per100g": { "protein": 2.8, "carbs": 7, "fat": 0.4, "calories": 34, "fiber": 2.6 }
+      "foodKind": "single_food",
+      "cookingState": "raw",
+      "aliases": [
+        "番茄",
+        "西红柿",
+        "生番茄",
+        "tomato",
+        "tomatoes"
+      ],
+      "basisGrams": 100,
+      "per100g": {
+        "protein": 0.88,
+        "carbs": 3.89,
+        "fat": 0.2,
+        "fiber": 1.2,
+        "calories": 18.0
+      },
+      "missingNutrients": [],
+      "qualityFlags": [
+        "reference_population_and_variety_may_differ"
+      ],
+      "source": {
+        "name": "USDA FoodData Central",
+        "method": "reference",
+        "dataset": "sr_legacy",
+        "datasetVersion": "SR Legacy 2018-04",
+        "fdcId": 170457,
+        "ndbId": "11529",
+        "description": "Tomatoes, red, ripe, raw, year round average",
+        "url": "https://fdc.nal.usda.gov/food-details/170457/nutrients",
+        "publishedAt": "2019-04-01",
+        "nutrients": {
+          "protein": {
+            "nutrientId": 1003,
+            "sourceAmount": 0.88,
+            "sourceUnit": "g"
+          },
+          "carbs": {
+            "nutrientId": 1005,
+            "sourceAmount": 3.89,
+            "sourceUnit": "g"
+          },
+          "fat": {
+            "nutrientId": 1004,
+            "sourceAmount": 0.2,
+            "sourceUnit": "g"
+          },
+          "fiber": {
+            "nutrientId": 1079,
+            "sourceAmount": 1.2,
+            "sourceUnit": "g"
+          },
+          "calories": {
+            "nutrientId": 1008,
+            "sourceAmount": 18.0,
+            "sourceUnit": "kcal"
+          }
+        }
+      },
+      "updatedAt": "2026-10-13"
     },
     {
-      "name": "无糖可乐",
-      "nameEn": "Diet cola",
-      "category": "beverage",
-      "aliases": ["无糖可乐", "零度可乐", "diet coke", "zero cola"],
-      "per100g": { "protein": 0, "carbs": 0, "fat": 0, "calories": 0, "fiber": 0 }
+      "id": "recipe-tomato-eggs",
+      "name": "番茄炒蛋",
+      "category": "home_dish",
+      "foodKind": "dish",
+      "cookingState": "cooked",
+      "aliases": [
+        "西红柿炒鸡蛋",
+        "番茄炒鸡蛋",
+        "西红柿炒蛋"
+      ],
+      "basisGrams": 100,
+      "per100g": {
+        "protein": 4.773333,
+        "carbs": 3.6665,
+        "fat": 6.636667,
+        "calories": 92.358333,
+        "fiber": 0.8
+      },
+      "recipeId": "tomato-eggs",
+      "source": {
+        "name": "项目家常参考配方 + USDA 食材数据",
+        "method": "recipe_calculation",
+        "recipeId": "tomato-eggs",
+        "url": "",
+        "description": "家常参考配方；成菜重量为假设值，不是实测。实际用油及含水量会改变每100g营养。",
+        "ingredientFoodIds": [
+          "tomato",
+          "egg-raw",
+          "oil-canola",
+          "sugar",
+          "salt"
+        ]
+      },
+      "missingNutrients": [],
+      "qualityFlags": [
+        "recipe_calculated_not_measured",
+        "assumed_finished_yield",
+        "assumed_macro_retention",
+        "assumed_oil_retention"
+      ],
+      "updatedAt": "2026-10-13"
     },
     {
-      "name": "中薯条",
-      "nameEn": "Medium fries",
-      "category": "fast_food",
-      "aliases": ["薯条", "中薯", "fries", "french fries"],
-      "per100g": { "protein": 2.8, "carbs": 30, "fat": 13, "calories": 250, "fiber": 2.5 }
+      "id": "recipe-yuxiang-pork",
+      "name": "鱼香肉丝（白醋家常配方）",
+      "category": "home_dish",
+      "foodKind": "dish",
+      "cookingState": "cooked",
+      "aliases": [
+        "鱼香肉丝"
+      ],
+      "basisGrams": 100,
+      "per100g": {
+        "protein": 8.870462,
+        "carbs": 8.725462,
+        "fat": 4.793615,
+        "calories": 113.292308,
+        "fiber": 1.88
+      },
+      "recipeId": "yuxiang-pork",
+      "source": {
+        "name": "项目家常参考配方 + USDA 食材数据",
+        "method": "recipe_calculation",
+        "recipeId": "yuxiang-pork",
+        "url": "",
+        "description": "家常参考配方；成菜重量为假设值，不是实测。实际用油及含水量会改变每100g营养。",
+        "ingredientFoodIds": [
+          "pork-tenderloin",
+          "carrot",
+          "green-pepper",
+          "wood-ear-dry",
+          "water",
+          "oil-canola",
+          "sugar",
+          "vinegar",
+          "soy-sauce",
+          "corn-starch",
+          "garlic",
+          "ginger",
+          "chili",
+          "salt"
+        ]
+      },
+      "missingNutrients": [],
+      "qualityFlags": [
+        "recipe_calculated_not_measured",
+        "assumed_finished_yield",
+        "assumed_macro_retention",
+        "assumed_oil_retention"
+      ],
+      "updatedAt": "2026-10-13"
     }
   ]
 }

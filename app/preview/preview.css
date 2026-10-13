@@ -98,7 +98,7 @@
 .precision-preview .nutrition-console .nutrition-story { padding:32px; background:white; border:1px solid #e4e4e7; border-radius:24px; box-shadow:none; }
 .precision-preview .nutrition-console .nutrition-story::after,.precision-preview .progress-overview::after { display:none; }
 .precision-preview .nutrition-console .nutrition-story .section-heading h2 { font-size:30px; }
-.precision-preview .nutrition-dashboard { grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,.9fr); gap:20px; margin-top:28px; }
+.precision-preview .nutrition-dashboard { grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:20px; margin-top:28px; }
 .precision-preview .attainment-card { background:#fafafa; box-shadow:none; border:1px solid #e4e4e7; border-radius:20px; padding:24px 18px; }
 .precision-preview .master-orbit { filter:grayscale(1); box-shadow:none; }
 .precision-preview .master-orbit::before { background:#fafafa; }
@@ -108,7 +108,7 @@
 .precision-preview .mode-switch { border:1px solid #e4e4e7; background:#f4f4f5; }
 .precision-preview .mode-switch button { font-weight:500; }
 .precision-preview .mode-switch button.is-active { background:#315b46; color:white; }
-.precision-preview .nutrient-lane { border-color:#e4e4e7; border-radius:14px; grid-template-columns:40px minmax(60px,auto) minmax(35px,1fr) auto; gap:8px; padding:10px; }
+.precision-preview .nutrient-lane { border-color:#e4e4e7; border-radius:14px; grid-template-columns:40px minmax(60px,auto) minmax(35px,1fr); gap:8px; padding:10px; }
 .precision-preview .nutrient-lane.is-active { background:#f4f4f5; border-color:#a1a1aa; }
 .precision-preview .nutrient-lane:hover { box-shadow:none; }
 .precision-preview .nutrient-lane__ring,.precision-preview .nutrient-lane__bar,.precision-preview .nutrient-focus__ring { filter:grayscale(1); }
@@ -213,7 +213,7 @@
   .precision-preview .nutrition-console .nutrition-story .section-heading h2 { font-size:26px; }
   .precision-preview .nutrition-dashboard { grid-template-columns:1fr; }
   .precision-preview .nutrient-lanes { min-height:350px; }
-  .precision-preview .nutrient-lane { grid-template-columns:44px minmax(65px,auto) minmax(40px,1fr) auto; }
+  .precision-preview .nutrient-lane { grid-template-columns:44px minmax(65px,auto) minmax(40px,1fr); }
   .precision-preview .next-bite-feature h2 { font-size:30px; }
   .precision-preview .next-bite-feature__content { padding:28px; }
   .precision-functional-section { padding-top:56px; }
@@ -375,3 +375,46 @@ html:has(.precision-preview), body:has(.precision-preview) {
   outline:3px solid #4b7b60;
   outline-offset:3px;
 }
+
+/* Keep the food composer surface stable through focus and recognition. */
+.precision-preview .food-composer,
+.precision-preview .food-composer:focus-within { background:#fff; box-shadow:0 3px 14px #315b4605; }
+.precision-preview .food-composer:focus-within { border-color:#8da98f; }
+.precision-preview .food-composer textarea,
+.precision-preview .food-composer textarea:focus,
+.precision-preview .food-composer textarea:focus-visible,
+.precision-preview .food-composer textarea:disabled { background:transparent; outline:none; color:#68796d; opacity:1; -webkit-text-fill-color:#68796d; }
+.precision-preview .food-examples button:disabled { opacity:.65; }
+.precision-preview .nutrition-dashboard--report { grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr); gap:32px; margin-top:22px; }
+.precision-preview .nutrition-story .section-heading h2 { font-size:25px; }
+.precision-preview .nutrition-day-switch button:disabled { opacity:1; }
+@media (max-width:900px) {
+  .precision-preview .nutrition-dashboard--report { grid-template-columns:minmax(0,1fr); gap:26px; }
+}
+@media (max-width:600px) {
+  .precision-preview .nutrition-console .nutrition-story { padding:22px 20px; }
+  .precision-preview .nutrition-story .section-heading { gap:12px; align-items:center; }
+  .precision-preview .nutrition-story .section-heading h2 { font-size:21px; }
+  .precision-preview .nutrition-story .text-action { font-size:11px; }
+  .precision-preview .precision-tabs { gap:4px; }
+  .precision-preview .precision-tabs > button { padding:12px 13px; font-size:13px; }
+}
+
+/* Softer food text and a quiet sage summary, retaining the report layout. */
+.precision-preview .food-composer textarea::placeholder { color:#8a978e; -webkit-text-fill-color:#8a978e; opacity:1; }
+.precision-preview .nutrition-summary { background:#eef3e8; color:#315b46; border:1px solid #dfe7d8; }
+.precision-preview .nutrition-summary__attainment > span,
+.precision-preview .nutrition-summary__energy > span,
+.precision-preview .nutrition-summary__energy small,
+.precision-preview .nutrition-summary__balance { color:#687b6c; }
+.precision-preview .nutrition-summary__balance strong { color:#315b46; }
+.precision-preview .nutrition-summary__energy { border-left-color:#d2ddcd; }
+.precision-preview .nutrition-summary__context { color:#6d7c6e; border-top-color:#d6e0d0; }
+.precision-preview .nutrition-summary__track { background:#dce5d4; }
+.precision-preview .nutrition-summary__track > i { background:#7f9e6d; }
+.precision-preview .nutrition-day-switch { border-color:#d2ddcd; background:#ffffff59; }
+.precision-preview .nutrition-day-switch button { color:#687b6c; }
+.precision-preview .nutrition-day-switch button[aria-pressed="true"] { background:#fff; color:#315b46; box-shadow:0 1px 4px #315b4610; }
+.precision-review-stars { display:inline-flex; align-items:center; gap:3px; color:#b29245; }
+.precision-review-example-label { padding:4px 8px; border:1px solid #e1e7da; border-radius:6px; color:#74836e; background:#f7f9f3; font-size:10px; white-space:nowrap; }
+.precision-review-avatar { display:grid; place-items:center; width:40px; height:40px; flex:none; border-radius:50%; background:#eaf0e4; color:#728567; font-size:15px; }

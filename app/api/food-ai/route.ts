@@ -1,15 +1,23 @@
+import { streamRecognition, type ProgressReporter } from "@/lib/recognition-events";
+import { safeExternalUrl, type SearchReference } from "@/lib/search-evidence";
+import { buildSearchEvidence } from "@/lib/agent/search-evidence";
+import { hasNonstandardPortion, selectRuleFoodRoute } from "@/lib/agent/food-router";
+import { classifyWithJev, effectiveFoodRoute, type RoutingMeta } from "@/lib/agent/jev-router";
 import { foodCatalog, type FoodCatalogItem } from "@/lib/food-catalog";
+import { matchWeightedNutrition, type WeightedNutritionMatch } from "@/lib/nutrition-db";
 import {
   buildFoodBrandSearchQuery,
   findFoodBrandMatches,
   getBrandCatalogPrompt,
-  hasFoodBrandMatch
+  hasFoodBrandMatch,
+  isBrandOnlyDescription
 } from "@/lib/brand-catalog";
 import { normalizeLanguage, normalizeMacroTotals, pick, type Language } from "@/lib/i18n-utils";
 import { translateToEn, translateToZh } from "@/lib/translations";
 import type { FoodLogItem, MacroTotals, MealType } from "@/lib/types";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 type AiFood = {
   name?: string;
@@ -67,7 +75,11 @@ type TavilySearchResult = {
 type TavilySearchPayload = {
   results?: TavilySearchResult[];
   answer?: string;
+  response_time?: number;
 };
+
+type SearchDiagnostics = { depth: string; resultCount: number; status: string; providerMs?: number; invalidParameter?: string };
+type TimingStage = "brandMatch" | "localLookup" | "routing" | "search" | "searchLlm" | "estimateLlm" | "repairLlm" | "normalize";
 
 type ProviderConfig = {
   name: "ccswitch" | "deepseek" | "minimax" | "dashscope";
@@ -93,6 +105,9 @@ function outputLanguageInstruction(language: Language) {
       ? "All user-facing text fields (name, brand, foodType, portionLabel, warning, message) must be written in English."
       : "所有面向用户的字段 name、brand、foodType、portionLabel、warning、message 必须使用中文。";
 
+  if (!["jev", "llm"].includes(process.env.FOOD_ROUTER ?? "rules")) {
+    return `${targetInstruction} 只输出当前语言字段，不输出中英文镜像字段。Keep macro JSON keys as protein, carbs, fat, calories, fiber.`;
+  }
   return `${targetInstruction} Also include bilingual mirror fields for every food: nameZh, nameEn, brandZh, brandEn, foodTypeZh, foodTypeEn, portionLabelZh, portionLabelEn, warningZh, warningEn, sourceLabelZh, sourceLabelEn. The Zh fields must always be Chinese; the En fields must always be English. Keep macro JSON keys as protein, carbs, fat, calories, fiber.`;
 }
 
@@ -129,15 +144,59 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (request.headers.get("accept")?.includes("application/x-ndjson")) {
+    return streamRecognition((report, signal) => recognizeFood(request, report, signal), request.signal);
+  }
+  return recognizeFood(request, undefined, request.signal);
+}
+
+async function recognizeFood(request: Request, report?: ProgressReporter, signal?: AbortSignal) {
+  const progress = (id: string, status: "active" | "complete" | "warning" | "error", labelZh: string, labelEn: string) => {
+    if (!signal?.aborted) report?.({ id, status, labelZh, labelEn });
+  };
   let language: Language = "zh";
+  let routing: RoutingMeta | undefined;
+  const requestStarted = Date.now();
+  const timings: Record<TimingStage, number> = { brandMatch: 0, localLookup: 0, routing: 0, search: 0, searchLlm: 0, estimateLlm: 0, repairLlm: 0, normalize: 0 };
+  let llmCalls = 0;
+  const search: SearchDiagnostics = { depth: process.env.FOOD_SEARCH_DEPTH === "fast" ? "fast" : "basic", resultCount: 0, status: "not_used" };
+  async function measure<T>(stage: TimingStage, operation: () => Promise<T>): Promise<T> {
+    signal?.throwIfAborted();
+    const started = Date.now();
+    if (stage.endsWith("Llm")) llmCalls++;
+    try { return await operation(); }
+    finally { timings[stage] += Date.now() - started; }
+  }
+  function measureSync<T>(stage: TimingStage, operation: () => T): T {
+    const started = Date.now();
+    try { return operation(); }
+    finally { timings[stage] += Date.now() - started; }
+  }
+  const respond = (body: Record<string, unknown>, init?: ResponseInit) => {
+    const successful = body.ok === true && body.isFoodRelated === true && Array.isArray(body.foods) && body.foods.length > 0;
+    progress("result", successful ? "complete" : body.ok === false ? "error" : "warning",
+      successful ? "识别完成，结果已准备好" : body.ok === false ? "识别暂未完成，请重试" : "需要补充具体的食物信息",
+      successful ? "Recognition complete. Results are ready." : body.ok === false ? "Recognition could not finish. Please retry." : "Please provide more specific food information.");
+    const total = Date.now() - requestStarted;
+    const headers = new Headers(init?.headers);
+    headers.set("Server-Timing", [...Object.entries(timings).map(([name, ms]) => `${name};dur=${ms}`), `total;dur=${total}`].join(", "));
+    return Response.json({ ...body, ...(routing ? { routing } : {}), diagnostics: { timingsMs: { ...timings, total }, llmCalls, search } }, { ...init, headers });
+  };
+
+  const attachDiagnostics = async (response: Response) => respond(await response.json(), { status: response.status, headers: response.headers });
+  const missingProviderResponse = () => respond({
+    ok: false, needsConfig: true,
+    message: localized(language, "AI 服务还没配置好。请检查 AI_PROVIDER、模型和服务配置。", "The AI service is not configured. Check the provider, model, and service configuration.")
+  }, { status: 503 });
 
   try {
     const form = await request.formData();
     const description = String(form.get("description") ?? "").trim();
     language = normalizeLanguage(form.get("lang"));
+    progress("input", "complete", "已收到食物描述", "Food description received");
 
     if (isVagueFoodDescription(description)) {
-      return Response.json({
+      return respond({
         ok: true,
         isFoodRelated: false,
         foods: [],
@@ -146,40 +205,82 @@ export async function POST(request: Request) {
     }
 
     if (exceedsExplicitFoodItemLimit(description)) {
-      return buildTooManyFoodsResponse(language);
+      return attachDiagnostics(buildTooManyFoodsResponse(language));
     }
 
     const provider = getProviderConfig();
 
-    if (!provider) {
-      return Response.json(
-        {
-          ok: false,
-          needsConfig: true,
-          message: localized(language, "AI 服务还没配置好。请检查 AI_PROVIDER、CCSWITCH_API_KEY 或 MINIMAX_API_KEY，以及模型名和 Base URL。", "The AI service is not configured. Check AI_PROVIDER, CCSWITCH_API_KEY or MINIMAX_API_KEY, plus the model name and Base URL.")
-        },
-        { status: 503 }
-      );
-    }
-
-    const strictLocalMatches = findStrictLocalFoodMatches(description);
-    const routingResult = await classifyFoodRoute(provider, description, strictLocalMatches, language);
-    const routeDecision = normalizeRouteDecision(
-      routingResult.ok
-        ? routingResult.decision
-        : buildFallbackRouteDecision(description, strictLocalMatches, false, language),
-      description
-    );
+    const ruleRouting = !["jev", "llm"].includes(process.env.FOOD_ROUTER ?? "rules");
+    progress("brand", "active", "正在检查品牌信息…", "Checking brand information…");
+    const brandMatches = measureSync("brandMatch", () => findFoodBrandMatches(description));
+    progress("brand", "complete", brandMatches.length ? `已识别品牌：${brandMatches.map(b => b.brand).join("、")}` : "未匹配到品牌，继续检查食物",
+      brandMatches.length ? `Brand identified: ${brandMatches.map(b => b.nameEn || b.brand).join(", ")}` : "No brand match. Checking the food next.");
+    // Brand lookup always precedes generic food values. Explicit weights use the
+    // verified 100g records; legacy serving templates cannot overwrite them.
+    if (!brandMatches.length) progress("local", "active", "正在匹配食物和份量…", "Matching foods and portions…");
+    const weighted = measureSync("localLookup", () => !brandMatches.length ? matchWeightedNutrition(description) : null);
+    const canUseFixedLocal = !brandMatches.length && !weighted?.hasExplicitMass && !hasNonstandardPortion(description);
+    const strictLocalMatches = measureSync("localLookup", () => weighted?.hasExplicitMass
+      ? weighted.matches.map(match => weightedMatchToStrict(match, language))
+      : canUseFixedLocal ? findStrictLocalFoodMatches(description) : []);
+    if (!brandMatches.length) progress("local", "complete", strictLocalMatches.length ? `已匹配 ${strictLocalMatches.length} 项食物` : "将继续分析食物信息", strictLocalMatches.length ? `Matched ${strictLocalMatches.length} foods` : "Continuing food analysis");
     const hasOnlyStrictLocalMatches =
       strictLocalMatches.length > 0 &&
-      !hasMeaningfulResidualAfterLocal(description, strictLocalMatches);
+      (weighted?.hasExplicitMass ? weighted.complete : !hasMeaningfulResidualAfterLocal(description, strictLocalMatches));
+    const analysisDescription = weighted?.matches.length && !weighted.complete ? weighted.remainingDescription : description;
+    progress("route", "active", "正在选择识别方式…", "Choosing how to recognize this meal…");
+    const routingStarted = Date.now();
+    const jev = process.env.FOOD_ROUTER === "jev"
+      ? await classifyWithJev({
+          description,
+          localCandidates: strictLocalMatches.map((match) => ({ label: match.label, food: match.food })),
+          localCoverageComplete: hasOnlyStrictLocalMatches,
+          brandHints: getBrandCatalogPrompt(description)
+        }, { signal })
+      : null;
+    let routeDecision: AiRouteDecision;
+    if (ruleRouting) {
+      const route = selectRuleFoodRoute({ description, hasBrand: brandMatches.length > 0,
+        brandOnly: isBrandOnlyDescription(description, brandMatches), localCoverageComplete: hasOnlyStrictLocalMatches });
+      routeDecision = { route, isFoodRelated: route !== "not_food" };
+      routing = { router: "rules", selectedRoute: route, effectiveRoute: route,
+        durationMs: Date.now() - routingStarted, fallbackReason: null };
+    } else if (jev?.ok) {
+      const route = effectiveFoodRoute(jev.route, hasOnlyStrictLocalMatches);
+      routeDecision = { route, isFoodRelated: route !== "not_food" };
+      routing = { router: "jev", selectedRoute: jev.route, effectiveRoute: route,
+        confidence: jev.confidence, durationMs: Date.now() - routingStarted, fallbackReason: null };
+    } else {
+      if (!provider) return missingProviderResponse();
+      llmCalls++;
+      const routingResult = await classifyFoodRoute(provider, analysisDescription, strictLocalMatches, language, signal);
+      routeDecision = normalizeRouteDecision(
+        routingResult.ok ? routingResult.decision : buildFallbackRouteDecision(description, strictLocalMatches, false, language),
+        description
+      );
+      const selectedRoute = routeDecision.route!;
+      routeDecision.route = effectiveFoodRoute(selectedRoute, hasOnlyStrictLocalMatches);
+      routing = { router: routingResult.ok ? "llm" : "rules", selectedRoute,
+        effectiveRoute: routeDecision.route, durationMs: Date.now() - routingStarted,
+        fallbackReason: jev && !jev.ok ? jev.reason : null };
+    }
+
+    timings.routing = Date.now() - routingStarted;
+    const routeLabels = {
+      local_exact: ["已完成食物与份量匹配", "Foods and portions matched"],
+      brand_search: ["将联网查找品牌资料", "Looking up public brand information"],
+      ai_estimate: ["将按食物与份量分析营养", "Analyzing nutrition from the food and portion"],
+      not_food: ["需要更具体的食物描述", "A more specific food description is needed"]
+    };
+    const routeLabel = routeLabels[routeDecision.route ?? "ai_estimate"];
+    progress("route", "complete", routeLabel[0], routeLabel[1]);
 
     if (isTooManyFoodDecision(routeDecision)) {
-      return buildTooManyFoodsResponse(language);
+      return attachDiagnostics(buildTooManyFoodsResponse(language));
     }
 
     if (!routeDecision.isFoodRelated || routeDecision.route === "not_food") {
-      return Response.json({
+      return respond({
         ok: true,
         isFoodRelated: false,
         foods: [],
@@ -188,26 +289,41 @@ export async function POST(request: Request) {
     }
 
     if (routeDecision.route === "local_exact" && hasOnlyStrictLocalMatches) {
-      return Response.json(buildStrictLocalResponse(strictLocalMatches, false, language));
+      return respond(measureSync("normalize", () => buildStrictLocalResponse(strictLocalMatches, false, language)));
     }
 
-    if (description && shouldUseBrandSearch(routeDecision, description)) {
-      const searchContext = await searchNutritionWithTavily(description);
-      if (searchContext) {
-        const searchedPayload = await extractAiPayloadFromSearch(provider, description, searchContext, language);
-        if (searchedPayload.isFoodRelated && searchedPayload.foods?.length) {
-          const foods = mergeStrictLocalAndAiFoods(strictLocalMatches, searchedPayload.foods, description, "ai-text", language);
-          const tooManyResponse = buildTooManyFoodsResponseIfNeeded(foods, language);
-          if (tooManyResponse) return tooManyResponse;
+    if (!provider) return missingProviderResponse();
 
-          return Response.json({
+    if (description && (ruleRouting || routing.router === "jev" ? routeDecision.route === "brand_search" : shouldUseBrandSearch(routeDecision, description))) {
+      progress("search", "active", "正在联网搜索品牌和产品资料…", "Searching the web for brand and product information…");
+      const searchOutcome = await measure("search", () => searchNutritionWithTavily(description, search, signal));
+      if (searchOutcome) {
+        progress("search", "complete", `已找到 ${search.resultCount} 条公开资料`, `Found ${search.resultCount} public sources`);
+        progress("organize", "active", "正在根据资料整理食物和营养…", "Organizing foods and nutrition from the sources…");
+        const searchedPayload = await measure("searchLlm", () => extractAiPayloadFromSearch(provider, description, searchOutcome.context, language, signal));
+        if (searchedPayload.isFoodRelated && searchedPayload.foods?.length) {
+          let foods = measureSync("normalize", () => mergeStrictLocalAndAiFoods(strictLocalMatches, searchedPayload.foods!, description, "ai-text", language));
+          const tooManyResponse = buildTooManyFoodsResponseIfNeeded(foods, language);
+          if (tooManyResponse) return attachDiagnostics(tooManyResponse);
+
+          const evidence = buildSearchEvidence(id("lookup"), brandMatches, searchOutcome.sources, foods.map(food => food.name),
+            foods.flatMap(food => food.brand ? [food.brand] : []));
+          if (evidence) foods = foods.map(food => ({ ...food, searchEvidence: evidence }));
+          progress("organize", "complete", `已整理 ${foods.length} 项食物及参考资料`, `Organized ${foods.length} foods and references`);
+          return respond({
             ok: true,
             provider: "tavily-ai",
             isFoodRelated: true,
-            message: searchedPayload.message || localized(language, "我先查了公开营养信息，再帮你整理好了；右侧数值可以继续手动微调。", "I checked public nutrition information and organized it for you; you can still fine-tune the values on the right."),
+            message: searchedPayload.foods.some(food => food.recognitionMode !== "brand-product")
+              ? localized(language, "已检索公开资料；结果包含行业估算，请按实际份量调整。", "Public sources were checked; results include estimates. Adjust to your actual portion.")
+              : searchedPayload.message || localized(language, "已根据公开营养资料整理结果。", "Results were organized from public nutrition information."),
             foods
           });
         }
+        progress("organize", "warning", "公开资料暂不足以生成结果，正在结合食物信息进行营养分析…", "Public sources were insufficient. Analyzing nutrition using the food information…");
+      } else {
+        progress("search", "warning", "联网搜索失败，正在结合食材组成与份量信息分析营养…",
+          "Web search was unsuccessful. Analyzing nutrition using ingredients and portion information…");
       }
     }
 
@@ -216,9 +332,9 @@ export async function POST(request: Request) {
       const foods = mergeStrictLocalAndAiFoods(strictLocalMatches, cleanedFoods, description, "ai-text", language);
       if (foods.length) {
         const tooManyResponse = buildTooManyFoodsResponseIfNeeded(foods, language);
-        if (tooManyResponse) return tooManyResponse;
+        if (tooManyResponse) return attachDiagnostics(tooManyResponse);
 
-        return Response.json({
+        return respond({
           ok: true,
           provider: "ai-fast-route",
           isFoodRelated: true,
@@ -228,8 +344,13 @@ export async function POST(request: Request) {
       }
     }
 
+    if (routing.effectiveRoute === "brand_search") {
+      routing.effectiveRoute = "ai_estimate";
+      routing.fallbackReason = search.status === "ok" ? "search_extraction_failed" : `search_${search.status}`;
+    }
+
     if (!description) {
-      return Response.json(
+      return respond(
         { ok: false, message: localized(language, "先写一下你吃了什么，我再帮你把营养素估出来。", "Tell me what you ate first so I can estimate the nutrients.") },
         { status: 400 }
       );
@@ -253,10 +374,10 @@ export async function POST(request: Request) {
       "每个 food 必须有 name、brand、foodType、portionLabel、meal、macros、recognitionMode、warning。",
       "macros 包含 protein/carbs/fat/calories/fiber，单位 g/g/g/kcal/g，四舍五入为整数。",
       "warning 是给用户的简短营养行动建议；高油、高糖、低纤维或精制主食偏多时，写成去皮少油、换无糖饮料、搭配蔬菜、部分主食换杂粮等具体做法；无需提醒时可为空。",
-      "warning 最多 24 个中文字，不写说教或疾病判断。",
+      "warning 最多 24 个中文字，不写说教或疾病判断。不在message或warning中描述数据库、模型、LLM或来源渠道。",
       "校验：calories 应大致等于 protein*4 + carbs*4 + fat*9，误差超过 25% 时先修正宏量营养素或热量。",
       "返回 JSON 字段：isFoodRelated、message、foods；food 字段同上。",
-      `用户手动描述：${description || "无"}`
+      `本次只需分析的食物：${analysisDescription || "无"}`
     ].filter(Boolean).join("\n");
     const userContent = prompt;
 
@@ -270,32 +391,49 @@ export async function POST(request: Request) {
         content: userContent
       }
     ]);
-    const { response, errorText } = await requestChatCompletion(provider, requestBody, mainAiTimeoutMs);
+    const fallbackFromWeb = routing.selectedRoute === "brand_search";
+    progress("estimate", "active", fallbackFromWeb ? "正在结合食材组成与份量信息进行营养分析…" : "正在分析食材、份量和营养…",
+      fallbackFromWeb ? "Analyzing nutrition using ingredients and portion information…" : "Analyzing ingredients, portions, and nutrition…");
+    const { response, errorText, json } = await measure("estimateLlm", async () => {
+      const completion = await requestChatCompletion(provider, requestBody, mainAiTimeoutMs, signal);
+      const json = completion.response?.ok ? await completion.response.json() : null;
+      return { ...completion, json };
+    });
 
     if (!response?.ok) {
-      if (strictLocalMatches.length) return Response.json(buildStrictLocalResponse(strictLocalMatches, true, language));
+      progress("estimate", "warning", fallbackFromWeb ? "营养分析暂未返回有效结果" : "估算服务暂未返回有效结果",
+        fallbackFromWeb ? "Nutrition analysis did not return a usable result" : "The estimation service did not return a usable result");
+      if (strictLocalMatches.length) {
+        routing.effectiveRoute = "local_exact";
+        return respond(buildStrictLocalResponse(strictLocalMatches, true, language));
+      }
 
-      const exactLocalResult = buildExactLocalResult(description, language);
-      if (exactLocalResult) return Response.json(exactLocalResult);
+      const exactLocalResult = canUseFixedLocal ? buildExactLocalResult(description, language) : null;
+      if (exactLocalResult) return respond(exactLocalResult);
 
-      return buildAiServiceErrorResponse(response, errorText, language);
+      return attachDiagnostics(buildAiServiceErrorResponse(response, errorText, language));
     }
 
-    const json = await response.json();
     const content = extractAssistantContent(json);
     let parsed = parseAiPayload(content);
 
     if (shouldRepairAiPayload(parsed, content, description)) {
-      parsed = await repairAiPayload(provider, description, content, parsed, language);
+      progress("repair", "active", "正在校验并修正结果格式…", "Checking and repairing the result format…");
+      parsed = await measure("repairLlm", () => repairAiPayload(provider, description, content, parsed, language, signal));
+      progress("repair", parsed.foods?.length ? "complete" : "warning", parsed.foods?.length ? "结果格式已整理" : "结果还需要补充信息", parsed.foods?.length ? "Result format checked" : "More information is needed");
     }
 
     if (!parsed.isFoodRelated || !parsed.foods?.length) {
-      if (strictLocalMatches.length) return Response.json(buildStrictLocalResponse(strictLocalMatches, true, language));
+      progress("estimate", "warning", "未能识别出完整食物，请补充描述", "Could not recognize a complete meal. Please add details.");
+      if (strictLocalMatches.length) {
+        routing.effectiveRoute = "local_exact";
+        return respond(buildStrictLocalResponse(strictLocalMatches, true, language));
+      }
 
-      const exactLocalResult = buildExactLocalResult(description, language);
-      if (exactLocalResult) return Response.json(exactLocalResult);
+      const exactLocalResult = canUseFixedLocal ? buildExactLocalResult(description, language) : null;
+      if (exactLocalResult) return respond(exactLocalResult);
 
-      return Response.json({
+      return respond({
         ok: true,
         isFoodRelated: false,
         message: parsed.message || localized(language, "我没算准这餐，可以再补充品牌、主食、配菜或份量。", "I couldn't estimate this meal. Try adding the brand, main item, side, or portion."),
@@ -304,12 +442,15 @@ export async function POST(request: Request) {
     }
 
     const source = "ai-text";
-    const cleanedFoods = cleanAiFoodsForDescription(parsed.foods, description);
-    const foods = mergeStrictLocalAndAiFoods(strictLocalMatches, cleanedFoods, description, source, language);
+    const cleanedFoods = cleanAiFoodsForDescription(parsed.foods, description)
+      .map((food): AiFood => ({ ...food, recognitionMode: "industry-average" }));
+    const foods = measureSync("normalize", () => mergeStrictLocalAndAiFoods(strictLocalMatches, cleanedFoods, description, source, language));
     const tooManyResponse = buildTooManyFoodsResponseIfNeeded(foods, language);
-    if (tooManyResponse) return tooManyResponse;
+    if (tooManyResponse) return attachDiagnostics(tooManyResponse);
 
-    return Response.json({
+    progress("estimate", "complete", fallbackFromWeb ? `已完成 ${foods.length} 项食物的营养分析` : `已估算 ${foods.length} 项食物`,
+      fallbackFromWeb ? `Completed nutrition analysis for ${foods.length} foods` : `Estimated ${foods.length} foods`);
+    return respond({
       ok: true,
       provider: "ai",
       isFoodRelated: true,
@@ -317,7 +458,7 @@ export async function POST(request: Request) {
       foods
     });
   } catch (error) {
-    return buildAiServiceErrorResponse(null, error instanceof Error ? error.message : "", language);
+    return attachDiagnostics(buildAiServiceErrorResponse(null, error instanceof Error ? error.message : "", language));
   }
 }
 
@@ -457,7 +598,8 @@ async function classifyFoodRoute(
   provider: ProviderConfig,
   description: string,
   strictLocalMatches: StrictLocalFoodMatch[],
-  language: Language
+  language: Language,
+  signal?: AbortSignal
 ): Promise<{ ok: true; decision: AiRouteDecision } | { ok: false; response: Response | null; errorText: string }> {
   const prompt = [
     "你是食物识别路由和营养估算助手。只返回严格 JSON 对象，不要 Markdown。",
@@ -493,7 +635,7 @@ async function classifyFoodRoute(
         content: prompt
       }
     ]),
-    routingAiTimeoutMs
+    routingAiTimeoutMs, signal
   );
 
   if (!response?.ok) return { ok: false, response: response ?? null, errorText };
@@ -663,7 +805,24 @@ type StrictLocalFoodMatch = {
   food: AiFood;
   tokens: string[];
   label: string;
+  weighted?: boolean;
+  preciseMacros?: MacroTotals;
 };
+
+function weightedMatchToStrict(match: WeightedNutritionMatch, language: Language): StrictLocalFoodMatch {
+  const { item, grams, macros } = match;
+  const nameEn = item.nameEn || item.name;
+  const warningZh = item.foodKind === "dish" ? "按参考配方计算，可按实际用油调整" : item.missingNutrients.length ? "部分营养指标暂缺，可手动补充" : "";
+  const warningEn = item.foodKind === "dish" ? "Reference recipe; adjust for the oil actually used." : item.missingNutrients.length ? "Some nutrient values are unavailable; you can add them manually." : "";
+  return {
+    weighted: true, preciseMacros: macros, tokens: [normalizeSearchText(match.foodText)], label: item.name,
+    food: { name: language === "en" ? nameEn : item.name, nameZh: item.name, nameEn,
+      brand: localized(language, "未标品牌", "Unbranded"), brandZh: "未标品牌", brandEn: "Unbranded",
+      foodType: localized(language, item.foodKind === "dish" ? "家常食品" : "食品原料", item.foodKind === "dish" ? "Prepared food" : "Ingredient"),
+      portionLabel: `${grams}g`, portionLabelZh: `${grams}g`, portionLabelEn: `${grams}g`,
+      macros, recognitionMode: "industry-average", warning: language === "en" ? warningEn : warningZh, warningZh, warningEn }
+  };
+}
 
 const exactSingleFoodRules: Array<{
   label: string;
@@ -784,9 +943,10 @@ function buildStrictLocalResponse(matches: StrictLocalFoodMatch[], partial = fal
     provider: "local-food-library",
     isFoodRelated: true,
     message: partial
-      ? localized(language, "AI 暂时没有稳定返回；我先把本地库严格命中的食物放进草稿箱，未命中的部分可以再补充识别。", "The AI didn't return a stable result, so I added the local library matches to your draft tray. You can recognize the rest again.")
-      : localized(language, "本地库已经严格命中这些食物，已直接放进草稿箱；右侧还可以继续手动微调。", "These foods matched the local library and were added to your draft tray. You can fine-tune the values on the right."),
-    foods: matches.map((match) => normalizeFood(match.food, "ai-text", language))
+      ? localized(language, "已添加能确认的食物；其余部分暂未完成，请补充食物名称或份量后再识别。", "Confirmed foods were added. Please provide the names or portions for the remaining foods and try again.")
+      : localized(language, "已按食物和份量计算营养并放进草稿箱，可以继续手动微调。", "Nutrition was calculated for the food and portion and added to your draft tray. You can fine-tune the values."),
+    partial,
+    foods: matches.map((match) => normalizeStrictLocalFood(match, language))
   };
 }
 
@@ -801,8 +961,14 @@ function getStrictLocalMatchPrompt(matches: StrictLocalFoodMatch[]) {
   return [
     "本地库已严格命中以下食物，并会由服务端计入最终结果：",
     ...lines,
-    "规则：不要重复输出这些已命中的食物；只估算用户输入中除这些项目以外的额外食物。如果没有额外食物，foods 返回空数组。"
+    "规则：不要重复输出这些已命中的份量；只分析剩余输入中的额外食物。剩余输入如果有同名食物的额外份量，仍需单独输出。如果没有额外食物，foods 返回空数组。"
   ].join("\n");
+}
+
+function normalizeStrictLocalFood(match: StrictLocalFoodMatch, language: Language) {
+  const food = normalizeFood(match.food, "ai-text", language);
+  // Keep source precision for later portion adjustments; round only displayed totals.
+  return match.preciseMacros ? { ...food, baseMacros: match.preciseMacros } : food;
 }
 
 function mergeStrictLocalAndAiFoods(
@@ -812,7 +978,7 @@ function mergeStrictLocalAndAiFoods(
   source: "ai-text" = "ai-text",
   language: Language = "zh"
 ) {
-  const localFoods = localMatches.map((match) => normalizeFood(match.food, "ai-text", language));
+  const localFoods = localMatches.map((match) => normalizeStrictLocalFood(match, language));
   const filteredAiFoods = filterAiFoodsCoveredByStrictLocal(aiFoods, localMatches)
     .map((food) => normalizeFood(applyBrandCatalogToAiFood(food, description), source, language));
 
@@ -824,7 +990,9 @@ function filterAiFoodsCoveredByStrictLocal(foods: AiFood[], localMatches: Strict
 
   return foods.filter((food) => {
     const foodText = normalizeSearchText(`${food.brand ?? ""}${food.name ?? ""}${food.foodType ?? ""}${food.portionLabel ?? ""}`);
-    return !localMatches.some((match) => match.tokens.some((token) => token.length >= 2 && foodText.includes(token)));
+    // Weighted matches have already been removed from the model's input. A
+    // remaining portion of the same food must not be silently dropped.
+    return !localMatches.some((match) => !match.weighted && match.tokens.some((token) => token.length >= 2 && foodText.includes(token)));
   });
 }
 
@@ -1067,8 +1235,8 @@ function applyBrandCatalogToAiFood(food: AiFood, description: string): AiFood {
   return {
     ...food,
     brand: match.brand,
-    recognitionMode: "brand-product",
-    warning: [food.warning, "品牌来自品牌库命中；营养值按公开信息或同品类份量估算。"].filter(Boolean).join("；")
+    recognitionMode: food.recognitionMode ?? "industry-average",
+    warning: food.warning
   };
 }
 
@@ -1150,9 +1318,9 @@ function isGenericDiningText(text: string) {
   return /(韩式烤肉|烤肉店|烤肉|烧烤|火锅|麻辣烫|冒菜|盖饭|盖浇饭|粉面|快餐|炒菜|素菜拼盘|蔬菜拼盘)/.test(text);
 }
 
-async function searchNutritionWithTavily(description: string) {
+async function searchNutritionWithTavily(description: string, diagnostic: SearchDiagnostics, signal?: AbortSignal): Promise<{ context: string; sources: SearchReference[] } | null> {
   const apiKey = process.env.TAVILY_API_KEY;
-  if (!apiKey) return "";
+  if (!apiKey) { diagnostic.status = "missing_config"; return null; }
 
   try {
     const response = await fetchWithTimeout("https://api.tavily.com/search", {
@@ -1164,41 +1332,58 @@ async function searchNutritionWithTavily(description: string) {
       body: JSON.stringify({
         query: buildFoodBrandSearchQuery(description),
         topic: "general",
-        search_depth: "basic",
-        max_results: 6,
+        search_depth: diagnostic.depth,
+        chunks_per_source: 1,
+        max_results: 3,
         include_answer: false,
         include_raw_content: false,
         include_images: false,
         country: "china"
       })
-    }, tavilySearchTimeoutMs);
+    }, tavilySearchTimeoutMs, signal);
 
-    if (!response.ok) return "";
+    if (!response.ok) {
+      diagnostic.status = `http_${response.status}`;
+      if (response.status === 400 || response.status === 422) {
+        const detail = await response.text();
+        diagnostic.invalidParameter = ["search_depth", "country", "chunks_per_source", "max_results"].find(name => detail.includes(name)) ?? "unknown";
+      }
+      return null;
+    }
     const payload = await response.json() as TavilySearchPayload;
+    if (typeof payload.response_time === "number" && Number.isFinite(payload.response_time)) diagnostic.providerMs = Math.round(payload.response_time * 1000);
     const results = (payload.results ?? [])
       .filter((result) => result.title || result.content)
-      .slice(0, 5);
+      .slice(0, 3);
 
-    if (!results.length) return "";
+    diagnostic.resultCount = results.length;
+    diagnostic.status = results.length ? "ok" : "empty";
+    if (!results.length) return null;
 
-    return results
+    const context = results
       .map((result, index) => {
         const source = result.url ? `来源：${result.url}` : "来源：未知";
         return `#${index + 1} ${result.title ?? "未命名结果"}\n${source}\n摘要：${(result.content ?? "").slice(0, 700)}`;
       })
       .join("\n\n");
+    const sources = results.flatMap(result => {
+      const url = safeExternalUrl(result.url);
+      return url ? [{ title: result.title || new URL(url).hostname, url }] : [];
+    });
+    return { context, sources };
   } catch {
-    return "";
+    diagnostic.status = "timeout_or_network_error";
+    return null;
   }
 }
 
-async function extractAiPayloadFromSearch(provider: ProviderConfig, description: string, searchContext: string, language: Language): Promise<AiPayload> {
+async function extractAiPayloadFromSearch(provider: ProviderConfig, description: string, searchContext: string, language: Language, signal?: AbortSignal): Promise<AiPayload> {
   const prompt = [
     "你是营养信息结构化助手。只返回严格 JSON 对象，不要 Markdown，不要解释。",
     outputLanguageInstruction(language),
     "任务：根据用户食物描述和搜索结果，提取或估算每个食物的营养素。",
-    "优先使用搜索结果中的品牌、产品、菜单、营养成分信息；如果搜索结果没有精确数值，但能确认食物类型，可结合行业平均估算。",
-    "如果搜索结果只找到品牌菜单或产品介绍，没有营养表，也要保留用户写出的品牌名，并结合中国餐饮份量基准估算。",
+    "只有使用匹配产品、地区及份量的公开营养数值时，recognitionMode=brand-product。没有匹配数值时可按行业平均估算，但 recognitionMode=industry-average，message 必须说明估算，不能声称查到该产品营养表。",
+    "如果只找到菜单或产品介绍，保留用户品牌，按常见份量估算并明确标注。份量、地区或产品不一致不能当作精确数值。",
     "严格只按用户写出的食物和份量估算；不要补充用户没写的配菜、主食或饮料。",
     getBrandCatalogPrompt(description),
     getChinesePortionBaselinePrompt(),
@@ -1226,7 +1411,7 @@ async function extractAiPayloadFromSearch(provider: ProviderConfig, description:
           content: prompt
         }
       ]),
-      searchAiTimeoutMs
+      searchAiTimeoutMs, signal
     );
 
     if (!response?.ok) return {};
@@ -1237,7 +1422,7 @@ async function extractAiPayloadFromSearch(provider: ProviderConfig, description:
   }
 }
 
-async function repairAiPayload(provider: ProviderConfig, description: string, firstContent: unknown, fallback: AiPayload, language: Language) {
+async function repairAiPayload(provider: ProviderConfig, description: string, firstContent: unknown, fallback: AiPayload, language: Language, signal?: AbortSignal) {
   const repairPrompt = [
     "你是食物营养 JSON 结构化器。只返回严格 JSON 对象，不要 Markdown，不要解释。",
     outputLanguageInstruction(language),
@@ -1270,7 +1455,7 @@ async function repairAiPayload(provider: ProviderConfig, description: string, fi
           content: repairPrompt
         }
       ]),
-      repairAiTimeoutMs
+      repairAiTimeoutMs, signal
     );
 
     if (!response?.ok) return fallback;
@@ -1404,19 +1589,20 @@ function getUserFacingAiErrorMessage(status: number, errorText: string, language
   return localized(language, "AI 服务暂时没有识别成功，请稍后再试。", "The AI service couldn't recognize it right now. Please try again later.");
 }
 
-async function requestChatCompletion(provider: ProviderConfig, body: string, timeoutMs = mainAiTimeoutMs) {
+async function requestChatCompletion(provider: ProviderConfig, body: string, timeoutMs = mainAiTimeoutMs, signal?: AbortSignal) {
   const maxAttempts = provider.name === "ccswitch" ? 2 : 1;
   let lastResponse: Response | null = null;
   let lastErrorText = "";
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     for (const endpoint of getChatCompletionUrls(provider.baseUrl, provider)) {
+      signal?.throwIfAborted();
       try {
         const response = await fetchWithTimeout(endpoint, {
           method: "POST",
           headers: getCompletionHeaders(provider),
           body
-        }, timeoutMs);
+        }, timeoutMs, signal);
 
         if (response.ok) return { response, errorText: "" };
 
@@ -1429,6 +1615,7 @@ async function requestChatCompletion(provider: ProviderConfig, body: string, tim
           }
         }
       } catch (error) {
+        signal?.throwIfAborted();
         lastErrorText = error instanceof Error ? error.message : "AI 请求超时或网络异常。";
         if (attempt === maxAttempts) {
           return {
@@ -1461,14 +1648,14 @@ function getCompletionHeaders(provider: ProviderConfig) {
   return headers;
 }
 
-async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit, timeoutMs: number) {
+async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit, timeoutMs: number, parentSignal?: AbortSignal) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     return await fetch(input, {
       ...init,
-      signal: controller.signal
+      signal: parentSignal ? AbortSignal.any([parentSignal, controller.signal]) : controller.signal
     });
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
@@ -1584,7 +1771,7 @@ function normalizeFood(food: AiFood, source: "ai-text", language: Language = "zh
     meal: food.meal && mealValues.includes(food.meal) ? food.meal : "snack",
     warning: language === "en" ? warningEn : warningZh,
     source,
-    recognitionMode: food.recognitionMode === "industry-average" ? "industry-average" : "brand-product",
+    recognitionMode: food.recognitionMode === "brand-product" ? "brand-product" : "industry-average",
     sourceLabel: language === "en" ? sourceLabelEn : sourceLabelZh,
     loggedAt: new Date().toISOString(),
     nameZh,

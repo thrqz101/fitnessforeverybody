@@ -90,13 +90,14 @@ export function calculateTargets(profile: UserProfile, day: DayState): MacroTota
     calculateMacroMultipliersFromTargets(targets, profile.weightKg)
   );
 
-  return roundMacros({
+  const customized = roundMacros({
     ...targets,
     protein: profile.weightKg * multipliers.protein,
     carbs: profile.weightKg * multipliers.carbs,
     fat: profile.weightKg * multipliers.fat,
     fiber
   });
+  return { ...customized, calories: calculateCaloriesFromMacros(customized) };
 }
 
 export function calculateRecommendedMacroMultipliers(profile: UserProfile, day: DayState): MacroMultipliers {
@@ -115,9 +116,9 @@ export function calculateCaloriesFromMacroMultipliers(weightKg: number, multipli
   const weight = Math.max(0, weightKg);
 
   return calculateCaloriesFromMacros({
-    protein: weight * multipliers.protein,
-    carbs: weight * multipliers.carbs,
-    fat: weight * multipliers.fat
+    protein: Math.round(weight * multipliers.protein),
+    carbs: Math.round(weight * multipliers.carbs),
+    fat: Math.round(weight * multipliers.fat)
   });
 }
 

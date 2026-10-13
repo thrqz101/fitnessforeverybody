@@ -17,11 +17,11 @@ export const localFoodDbTool: AgentTool = {
   function: {
     name: "query_local_food_db",
     description:
-      "查询本地「每100克营养素」食品数据库，返回某食物每100g的蛋白质/碳水/脂肪/热量/纤维；可选 grams 换算成实际份量。",
+      "查询可追溯的每100克可食部食品库（含参考家常配方），返回蛋白质/碳水/脂肪/热量/纤维；可选grams换算。必须明确生熟状态；歧义候选不得盲选，缺失项为0并有missingNutrients标记。",
     parameters: {
       type: "object",
       properties: {
-        food: { type: "string", description: "食物名称，如：鸡胸肉、米饭、苹果" },
+        food: { type: "string", description: "明确食物和状态，如：熟鸡胸肉、米饭、番茄炒蛋、苹果" },
         grams: { type: "number", description: "实际食用克数（可选，默认100）" }
       },
       required: ["food"],

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { normalizeSearchEvidence } from "@/lib/search-evidence";
 import { getBeijingDateKey } from "@/lib/dates";
 import { useI18n } from "@/lib/i18n";
 import { acknowledgeFeedbackMilestone, completeRecognitionFlow, emptyFeedbackProgress, feedbackProgressKey, nextFeedbackMilestone, parseFeedbackProgress } from "@/lib/feedback-progress";
@@ -251,7 +252,8 @@ function normalizeFoods(foods: Partial<FoodLogItem>[]): FoodLogItem[] {
     sourceLabel: food.sourceLabel,
     loggedAt: food.loggedAt ?? new Date().toISOString(),
     savedToCalendar: food.savedToCalendar ?? true,
-    recognitionBatchId: typeof food.recognitionBatchId === "string" ? food.recognitionBatchId : undefined
+    recognitionBatchId: typeof food.recognitionBatchId === "string" ? food.recognitionBatchId : undefined,
+    searchEvidence: normalizeSearchEvidence(food.searchEvidence)
   }));
 }
 
