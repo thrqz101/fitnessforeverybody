@@ -4,11 +4,15 @@ Read this guide before changing `src/features/recognition` or `POST /api/food-ai
 
 ## Contract
 
-`POST /api/food-ai` takes form data `description`, `lang` (`zh` | `en`) and, in cloud mode, a `requestId` UUID. It returns `{ ok, isFoodRelated, message, foods: FoodLogItem[], provider, routing, diagnostics }`. `GET /api/food-ai` is a provider warm-up that returns `{ ok: true }` or a 503 when no provider is configured.
+`POST /api/food-ai` takes form data `description`, `lang` (`zh` | `en`), optionally a typed-ahead `routeHint` with `routeHintConfidence`, and, in cloud mode, a `requestId` UUID. It returns `{ ok, isFoodRelated, message, foods: FoodLogItem[], provider, routing, diagnostics }`. `GET /api/food-ai` is a provider warm-up that returns `{ ok: true }` or a 503 when no provider is configured.
 
 With `Accept: application/x-ndjson` the same POST streams progress. Each line is `{ type: "progress", step: { id, status, labelZh, labelEn } }`, followed by exactly one `{ type: "result", status, result }`. The logical HTTP status is carried in the result event. Callers without that header receive the plain JSON response and status. Steps report only work that actually happened (input, brand, local, route, search, organize, estimate, repair, result); no model reasoning is streamed.
 
 `recognition/ui/recognition-client.ts` handles chunked UTF-8, partial JSON lines, broken streams, timeouts and cancellation. A stream without a result event is a failure. Progress is not persisted.
+
+## Typing-time routing
+
+While the user types, `recognition/ui/use-route-preview.ts` waits 500 ms after the last keystroke and calls `POST /api/food-route` (`server/route-preview.ts`). The preview uses the same evidence as recognition (`server/routing-evidence.ts`): when a known brand or a complete local match makes the rules certain, or the router is not `jev`, it returns `null` without any network call; otherwise it asks Jev. On submit, a preview for exactly the same text is sent as `routeHint`; recognition accepts it only for a known route with at least Jev's 0.8 confidence and only where it would otherwise call Jev, and marks the result `routing.prefetched`. A missing, pending (after 2.5 s) or invalid preview simply leaves the decision to the server. The preview endpoint requires a signed-in session whenever Supabase is configured.
 
 ## Pipeline
 
@@ -19,9 +23,9 @@ With `Accept: application/x-ndjson` the same POST streams progress. Each line is
 3. Brand match (`domain/brand-catalog.ts`): the brand catalogue in `data/food-brands.json` is matched first. Brand evidence always takes precedence over generic food values.
 4. Local match (`domain/local-match.ts`): without a brand, explicit weights resolve against the per-100g database (`shared/catalog/nutrition-db.ts`); otherwise fixed servings from `shared/catalog/food-catalog.ts` are used, unless the description has a nonstandard portion (half, large, several, grams).
 5. Route decision: `local_exact`, `brand_search`, `ai_estimate` or `not_food`.
-   - `FOOD_ROUTER=rules` (default, no network): `domain/food-router.ts` picks brand search when a brand matched, local when local matches cover the whole description, otherwise estimate.
-   - `FOOD_ROUTER=jev`: `domain/jev-router.ts` asks the TypeSafe Jev classifier; below 0.8 confidence, after 2 seconds, or on any error it falls back to the LLM router.
-   - `FOOD_ROUTER=llm`: `server/llm-steps.ts` `classifyFoodRoute`.
+   - `FOOD_ROUTER=jev` or unset (default): a known brand goes straight to brand search and a complete local match straight to local, with no network call. Only the remaining, uncertain descriptions (unknown store names, mixed or non-food input) ask the TypeSafe Jev classifier (`domain/jev-router.ts`), with brand hints and local matches as evidence. Below 0.8 confidence, after 2 seconds, without a resolved `TYPESAFE_API_KEY`, or on any error it falls back to the rules router and records `routing.fallbackReason`; there is no extra LLM routing call.
+   - `FOOD_ROUTER=rules` (no network): `domain/food-router.ts` picks brand search when a brand matched, local when local matches cover the whole description, otherwise estimate.
+   - `FOOD_ROUTER=llm`: `server/llm-steps.ts` `classifyFoodRoute`; this legacy mode also asks the model for `*Zh`/`*En` mirror fields.
    - `local_exact` is downgraded to `ai_estimate` whenever local coverage is incomplete.
 6. Brand search (`server/tavily-search.ts`, `server/llm-steps.ts`): a focused Tavily query returns at most 3 sources with one snippet each; an LLM call extracts foods from those sources. Search or extraction failure falls through to estimation and records `routing.fallbackReason`.
 7. Estimation (`domain/prompts.ts`, `server/llm-client.ts`): one LLM call with Chinese dining portion baselines; local matches are passed as fixed context and only the remaining foods are analysed. A malformed answer gets one repair call (`server/llm-steps.ts` `repairAiPayload`). If the provider fails, local matches are returned as a partial result when available.

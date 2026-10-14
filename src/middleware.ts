@@ -5,6 +5,7 @@ export async function middleware(request: NextRequest) {
   return updateSession(request);
 }
 
+// API routes verify the session themselves (requireApiUser), so they skip this extra Auth round trip.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|images/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"]
+  matcher: ["/((?!api/|_next/static|_next/image|favicon.ico|images/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"]
 };

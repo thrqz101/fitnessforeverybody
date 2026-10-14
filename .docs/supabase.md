@@ -7,7 +7,7 @@ Read this guide before changing `supabase/`, `src/shared/supabase`, `src/shared/
 - Browsers can only `select` their own rows, through RLS policies on every public table.
 - Every write goes through a Next.js API route. The route verifies the session with `requireApiUser()`, takes the user id from the session and calls a database function with the service-role client (`shared/supabase/admin.ts`).
 - Database functions are executable only by `service_role`; `anon` and `authenticated` cannot call them, so targets, recognition output, flow counts and the effective flag cannot be spoofed from the browser.
-- Sign-in uses Supabase Auth email one-time codes. `src/middleware.ts` refreshes the session cookie on every page and API request.
+- Sign-in uses Supabase Auth email one-time codes. `src/middleware.ts` refreshes the session cookie on page requests. API routes skip the middleware: `requireApiUser()` verifies the session and refreshes the cookie itself, which saves one Auth round trip per request.
 
 ## Tables
 

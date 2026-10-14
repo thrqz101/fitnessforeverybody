@@ -13,6 +13,8 @@ export type RoutingMeta = {
   confidence?: number;
   durationMs: number;
   fallbackReason: string | null;
+  /** The route was chosen by Jev while the user was typing and sent with the request. */
+  prefetched?: boolean;
 };
 export type JevResult =
   | { ok: true; route: FoodRoute; confidence: number; durationMs: number }
@@ -20,6 +22,16 @@ export type JevResult =
 
 export function isFoodRoute(value: unknown): value is FoodRoute {
   return foodRoutes.some((route) => route === value);
+}
+
+const minJevConfidence = 0.8;
+
+/** A Jev route sent by the browser. Only a known route with Jev's own confidence threshold is accepted. */
+export function readRouteHint(form: FormData): { route: FoodRoute; confidence: number } | null {
+  const route = form.get("routeHint");
+  const confidence = Number(form.get("routeHintConfidence"));
+  if (!isFoodRoute(route) || !Number.isFinite(confidence) || confidence < minJevConfidence || confidence > 1) return null;
+  return { route, confidence };
 }
 
 export function buildJevRequest(context: RoutingContext, model: string) {
@@ -85,7 +97,7 @@ export async function classifyWithJev(
     if (!response.ok) return fail(`http_${response.status}`);
     const answer = validateJevAnswer(await response.json());
     if (!answer) return fail("invalid_response");
-    if (answer.confidence < (options.minConfidence ?? 0.8)) return fail("low_confidence");
+    if (answer.confidence < (options.minConfidence ?? minJevConfidence)) return fail("low_confidence");
     return { ok: true, ...answer, durationMs: Date.now() - started };
   } catch {
     return fail(controller.signal.aborted ? "timeout" : "request_failed");
