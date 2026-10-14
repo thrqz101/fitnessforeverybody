@@ -123,9 +123,9 @@ The system validates the distribution first and accepts only conclusions with a 
 
 A failure at any step never interrupts recognition.
 
-### Performance
+### ⚡ Performance
 
-⚡ Average recognition time is about **2.5 seconds**, roughly **one eighth** of letting an LLM choose the functions through function calling.
+Average recognition time is about **2.5 seconds**, roughly **one eighth** of letting an LLM choose the functions through function calling.
 
 ## Tech Stack
 
