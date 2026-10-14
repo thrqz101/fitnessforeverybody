@@ -4,7 +4,7 @@ import { useI18n } from "@/shared/i18n/i18n";
 import { useAuth } from "@/shared/auth/AuthProvider";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import type { UserProfile, DayState, FoodLogItem, DayRecord, MacroTotals } from "@/shared/domain/types";
-import { defaultProfile, defaultDayState, calculateTargets, sumFoods, remainingMacros } from "@/shared/domain/nutrition";
+import { defaultProfile, defaultDayState, calculateTargets, sumFoods, remainingMacros, addMacros } from "@/shared/domain/nutrition";
 import { hasMeaningfulGap } from "@/shared/domain/recommendation-fit";
 import { getBeijingDateKey } from "@/shared/domain/dates";
 import { emptyFeedbackProgress, parseFeedbackProgress, feedbackProgressKey, completeRecognitionFlow, type FeedbackProgress, acknowledgeFeedbackMilestone, nextFeedbackMilestone } from "@/shared/domain/feedback-progress";
@@ -396,6 +396,12 @@ export function useFitnessState(snapshotBeforeWrite = false) {
       setFeedbackProgress((progress) => completeRecognitionFlow(progress, food.recognitionBatchId));
       return;
     }
+    // Optimistic: show the food as counted at once; the server reply replaces it, and a failure resyncs.
+    setFoods((current) => current.map((item) => (item.id === id ? { ...item, savedToCalendar: true } : item)));
+    setDayMeta((current) => {
+      const today = current[currentDateKey];
+      return today ? { ...current, [currentDateKey]: { ...today, totals: addMacros(today.totals, food.macros) } } : current;
+    });
     void withBusy(id, async () => {
       try {
         const result = food.cloud
@@ -404,6 +410,11 @@ export function useFitnessState(snapshotBeforeWrite = false) {
         applyEntryResult(id, result);
         setFeedbackProgress((progress) => completeRecognitionFlow(progress, food.recognitionBatchId));
       } catch (error) {
+        setFoods((current) => current.map((item) => (item.id === id ? { ...item, savedToCalendar: false } : item)));
+        setDayMeta((current) => {
+          const today = current[currentDateKey];
+          return today ? { ...current, [currentDateKey]: { ...today, totals: remainingMacros(today.totals, food.macros) } } : current;
+        });
         failWith(error, true);
       }
     });

@@ -89,3 +89,19 @@ export async function requestFoodAi(form: FormData, language: Language, options:
     return { ok: false, retryable: !options.signal?.aborted, message: fallback };
   } finally { clearTimeout(timer); }
 }
+
+export type RoutePreviewResult = { route: string; confidence: number } | null;
+
+/** Typing-time route preview; any failure simply means recognition decides the route itself. */
+export async function previewFoodRoute(description: string, signal?: AbortSignal): Promise<RoutePreviewResult> {
+  try {
+    const response = await fetch('/api/food-route', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ description }), signal
+    });
+    if (!response.ok) return null;
+    const body = await response.json() as { preview?: RoutePreviewResult };
+    return body.preview ?? null;
+  } catch {
+    return null;
+  }
+}

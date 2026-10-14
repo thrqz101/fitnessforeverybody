@@ -53,7 +53,7 @@ src/
     auth/                 AuthProvider and sign-in helpers
     i18n/                 Language context, translation tables
     ui/                   Generic components: Dialog, LanguageSwitch, number-input helpers
-  middleware.ts           Refreshes the Supabase session cookie
+  middleware.ts           Refreshes the Supabase session cookie on page requests (API routes verify their own session)
 data/                     Brand catalogue, per-100g database (full copy is local only), recipes
 scripts/nutrition/        Builds the full per-100g database from pinned USDA archives (run on Vercel builds)
 scripts/dev/              Real-backend smoke tests

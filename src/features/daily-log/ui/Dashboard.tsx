@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useRecognitionProgress } from "@/features/recognition/ui/use-recognition-progress";
 import { weightedScore, formatScorePercent } from "@/shared/domain/score";
 import { requestFoodAi } from "@/features/recognition/ui/recognition-client";
+import { useRoutePreview } from "@/features/recognition/ui/use-route-preview";
 import { pick, type Language } from "@/shared/i18n/i18n-utils";
 import { MessageSquareText, Loader2, ScanLine, ArrowRight, Trash2, Utensils, Sparkles, Check, ChevronRight } from "lucide-react";
 import { RecognitionProgress } from "@/features/recognition/ui/RecognitionProgress";
@@ -77,6 +78,7 @@ export function Dashboard({
 }: DashboardProps) {
   const { t, language } = useI18n();
   const [mealDescription, setMealDescription] = useState("");
+  const routeHintFor = useRoutePreview(mealDescription);
   const [recognitionNotice, setRecognitionNotice] = useState<RecognitionNoticeState | null>(null);
   const [isRecognizing, setIsRecognizing] = useState(false);
   const progress = useRecognitionProgress();
@@ -114,6 +116,11 @@ export function Dashboard({
     setRecognitionNotice({ key: "AI 正在拆解食材、份量和营养结构…" });
 
     try {
+      const routeHint = await routeHintFor(description);
+      if (routeHint) {
+        form.append("routeHint", routeHint.route);
+        form.append("routeHintConfidence", String(routeHint.confidence));
+      }
       const aiResult = await requestFoodAi(form, language, requestProgress);
       if (!aiResult.ok || !aiResult.result?.ok) {
         setRecognitionNotice({ text: withRetryHint(aiResult.message || aiResult.result?.message || t("AI 这次没算准。"), language) });

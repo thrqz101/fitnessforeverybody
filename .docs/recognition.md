@@ -4,11 +4,15 @@ Read this guide before changing `src/features/recognition` or `POST /api/food-ai
 
 ## Contract
 
-`POST /api/food-ai` takes form data `description`, `lang` (`zh` | `en`) and, in cloud mode, a `requestId` UUID. It returns `{ ok, isFoodRelated, message, foods: FoodLogItem[], provider, routing, diagnostics }`. `GET /api/food-ai` is a provider warm-up that returns `{ ok: true }` or a 503 when no provider is configured.
+`POST /api/food-ai` takes form data `description`, `lang` (`zh` | `en`), optionally a typed-ahead `routeHint` with `routeHintConfidence`, and, in cloud mode, a `requestId` UUID. It returns `{ ok, isFoodRelated, message, foods: FoodLogItem[], provider, routing, diagnostics }`. `GET /api/food-ai` is a provider warm-up that returns `{ ok: true }` or a 503 when no provider is configured.
 
 With `Accept: application/x-ndjson` the same POST streams progress. Each line is `{ type: "progress", step: { id, status, labelZh, labelEn } }`, followed by exactly one `{ type: "result", status, result }`. The logical HTTP status is carried in the result event. Callers without that header receive the plain JSON response and status. Steps report only work that actually happened (input, brand, local, route, search, organize, estimate, repair, result); no model reasoning is streamed.
 
 `recognition/ui/recognition-client.ts` handles chunked UTF-8, partial JSON lines, broken streams, timeouts and cancellation. A stream without a result event is a failure. Progress is not persisted.
+
+## Typing-time routing
+
+While the user types, `recognition/ui/use-route-preview.ts` waits 500 ms after the last keystroke and calls `POST /api/food-route` (`server/route-preview.ts`). The preview uses the same evidence as recognition (`server/routing-evidence.ts`): when a known brand or a complete local match makes the rules certain, or the router is not `jev`, it returns `null` without any network call; otherwise it asks Jev. On submit, a preview for exactly the same text is sent as `routeHint`; recognition accepts it only for a known route with at least Jev's 0.8 confidence and only where it would otherwise call Jev, and marks the result `routing.prefetched`. A missing, pending (after 2.5 s) or invalid preview simply leaves the decision to the server. The preview endpoint requires a signed-in session whenever Supabase is configured.
 
 ## Pipeline
 

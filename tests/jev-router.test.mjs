@@ -84,8 +84,9 @@ function loadHandler(fetcher, router = 'jev', extraEnv = {}, cloudStubs = {}) {
 }
 const meal = { isFoodRelated: true, foods: [{ name: '牛肉面', brand: '小林面馆', foodType: '面食', portionLabel: '一碗', macros: { protein: 25, carbs: 70, fat: 15, calories: 515, fiber: 3 } }] };
 const completion = value => Response.json({ choices: [{ message: { content: JSON.stringify(value) } }] });
-async function post(handler, description = context.description) {
+async function post(handler, description = context.description, fields = {}) {
   const form = new FormData(); form.set('description', description); form.set('lang', 'zh');
+  for (const [key, value] of Object.entries(fields)) form.set(key, value);
   return (await handler(new Request('http://localhost/api/food-ai', { method: 'POST', body: form }))).json();
 }
 test('HTTP handler sends unknown brand to Tavily and returns normalized food', async () => {
@@ -134,6 +135,50 @@ test('Jev is the default router when FOOD_ROUTER is not set', async () => {
   }, 'jev', { FOOD_ROUTER: undefined }));
   assert.equal(result.routing.router, 'jev');
   assert.ok(urls[0].includes('typesafe'));
+});
+test('a route Jev chose while typing is reused without a second Jev call', async () => {
+  const urls = [];
+  const result = await post(loadHandler(async url => {
+    urls.push(url);
+    if (url.includes('typesafe')) throw new Error('Jev must not be called again');
+    return completion(meal);
+  }), context.description, { routeHint: 'ai_estimate', routeHintConfidence: '0.95' });
+  assert.equal(result.routing.router, 'jev');
+  assert.equal(result.routing.prefetched, true);
+  assert.equal(result.routing.effectiveRoute, 'ai_estimate');
+  assert.equal(urls.length, 1);
+});
+test('an unknown or low-confidence route hint is ignored and Jev decides', async () => {
+  for (const fields of [{ routeHint: 'delete_all', routeHintConfidence: '1' }, { routeHint: 'ai_estimate', routeHintConfidence: '0.5' }]) {
+    const urls = [];
+    const result = await post(loadHandler(async url => {
+      urls.push(url);
+      if (url.includes('typesafe')) return Response.json(payload('ai_estimate'));
+      return completion(meal);
+    }), context.description, fields);
+    assert.equal(result.routing.prefetched, undefined);
+    assert.ok(urls[0].includes('typesafe'));
+  }
+});
+function loadPreview(fetcher, env = { FOOD_ROUTER: 'jev' }) {
+  return loadTsGraph('src/features/recognition/server/route-preview.ts', {
+    stubs: {
+      '@/features/recognition/domain/jev-router': { ...jevModule, classifyWithJev: context => jevModule.classifyWithJev(context, { apiKey: 'test-placeholder', fetcher }) },
+      '@/features/recognition/domain/food-router': foodRouter,
+      '@/features/recognition/domain/brand-catalog': brands,
+      '@/shared/catalog/nutrition-db': nutritionDb
+    },
+    globals: { process: { env }, URL, AbortController, AbortSignal, setTimeout, clearTimeout, Response, console }
+  }).previewFoodRoute;
+}
+test('typing-time preview asks Jev only when the rules are uncertain', async () => {
+  const silent = loadPreview(async () => { throw new Error('Unexpected network call'); });
+  assert.equal(await silent('一碗白米饭'), null);
+  assert.equal(await silent('麦当劳巨无霸'), null);
+  assert.equal(await loadPreview(async () => { throw new Error('Unexpected network call'); }, { FOOD_ROUTER: 'rules' })('小林面馆牛肉面'), null);
+  const preview = await loadPreview(async () => Response.json(payload('brand_search', 0.93)))('小林面馆牛肉面加鸡蛋');
+  assert.equal(preview.route, 'brand_search');
+  assert.equal(preview.confidence, 0.93);
 });
 test('HTTP handler rejects non-food choice without calling estimation', async () => {
   let calls = 0;
