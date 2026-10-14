@@ -24,7 +24,6 @@ Secrets never live in files. `.env` (git-ignored) contains only 1Password refere
 | `AI_PROVIDER` and the provider's key, base URL and model | Server | LLM for recognition and recommendations |
 | `TAVILY_API_KEY`, `FOOD_SEARCH_DEPTH` | Server | Brand and packaged-food web search |
 | `FOOD_ROUTER`, `TYPESAFE_MODEL`, `TYPESAFE_API_KEY` | Server | Recognition routing mode (Jev by default) and the Jev classifier |
-| `EXA_API_KEY` | Server | Nutrition agent web search |
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Browser | Supabase project; leave empty to run in local mode |
 | `SUPABASE_SECRET_KEY` | Server | Service-role key used by API routes; bypasses RLS |
 

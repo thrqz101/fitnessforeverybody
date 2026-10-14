@@ -62,7 +62,7 @@ import * as evidenceCore from '../src/shared/domain/search-evidence.ts';
 import * as nutritionDb from '../src/shared/catalog/nutrition-db.ts';
 import { loadTsGraph } from './helpers/load-ts.mjs';
 const evidenceModule = {};
-vm.runInNewContext(ts.transpileModule(fs.readFileSync(new URL('../src/features/recognition/domain/build-search-evidence.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:evidenceModule,require:()=>evidenceCore,URL});
+vm.runInNewContext(ts.transpileModule(fs.readFileSync(new URL('../src/features/recognition/domain/build-search-evidence.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:evidenceModule,require:id=>id.includes('brand-catalog')?brands:evidenceCore,URL});
 function loadHandler(fetcher, router = 'jev', extraEnv = {}, cloudStubs = {}) {
   const env = { FOOD_ROUTER: router, AI_PROVIDER: 'deepseek', DEEPSEEK_API_KEY: 'test-placeholder', TAVILY_API_KEY: 'test-placeholder', ...extraEnv };
   const dependencies = {
@@ -83,6 +83,7 @@ function loadHandler(fetcher, router = 'jev', extraEnv = {}, cloudStubs = {}) {
   return route.POST;
 }
 const meal = { isFoodRelated: true, foods: [{ name: '牛肉面', brand: '小林面馆', foodType: '面食', portionLabel: '一碗', macros: { protein: 25, carbs: 70, fat: 15, calories: 515, fiber: 3 } }] };
+const looked = (food = {}) => ({ ...meal, foods: [{ ...meal.foods[0], recognitionMode: 'brand-product', ...food }] });
 const completion = value => Response.json({ choices: [{ message: { content: JSON.stringify(value) } }] });
 async function post(handler, description = context.description, fields = {}) {
   const form = new FormData(); form.set('description', description); form.set('lang', 'zh');
@@ -95,7 +96,7 @@ test('HTTP handler sends unknown brand to Tavily and returns normalized food', a
     calls.push(url);
     if (url.includes('typesafe')) return Response.json(payload());
     if (url.includes('tavily')) return Response.json({ results: [{ title: '菜单', content: '牛肉面', url: 'https://example.test/menu' }] });
-    return completion(meal);
+    return completion(looked());
   }));
   assert.equal(result.ok, true);
   assert.equal(result.provider, 'tavily-ai');
@@ -186,6 +187,10 @@ test('typing-time preview rejects vague input and too many foods by rule, and a 
   assert.match((await silent('我今天吃什么', 'zh')).message, /具体吃了什么/);
   assert.match((await silent('米饭、鸡蛋、牛奶、苹果、鸡胸肉、青菜、豆浆', 'zh')).message, /最多识别 6 个/);
   assert.equal(await silent('米饭、鸡蛋、牛奶、苹果、鸡胸肉、青菜', 'zh'), null);
+  for (const seven of ['鸡蛋、牛奶、米饭、鸡胸肉、西兰花、苹果、香蕉', '鸡蛋 牛奶 米饭 鸡胸肉 西兰花 苹果 香蕉', 'eggs, milk, rice, chicken, broccoli, apple, banana']) {
+    assert.match((await silent(seven, 'zh')).message, /最多识别 6 个/, seven);
+  }
+  assert.equal(await silent('红烧 牛肉 面 加 青菜 和 鸡蛋', 'zh'), null);
   const notFood = await loadPreview(async () => Response.json(payload('not_food', 0.95)))('今天好累不想动', 'zh');
   assert.equal(notFood.route, 'not_food');
   assert.match(notFood.message, /具体食物/);
@@ -223,8 +228,8 @@ test('known brand is sent to search without calling Jev', async () => {
   const urls = [];
   const result = await post(loadHandler(async url => {
     urls.push(url);
-    if (url.includes('tavily')) return Response.json({ results: [{ title: '菜单', content: '巨无霸', url: 'https://example.test/menu' }] });
-    return completion(meal);
+    if (url.includes('tavily')) return Response.json({ results: [{ title: '菜单', content: '巨无霸', url: 'https://www.mcdonalds.com.cn/menu' }] });
+    return completion(looked({ name: '巨无霸', brand: '麦当劳' }));
   }), '麦当劳巨无霸');
   assert.equal(result.routing.router, 'rules');
   assert.equal(result.routing.effectiveRoute, 'brand_search');
@@ -290,10 +295,10 @@ test('rules branded product uses fast search and only one LLM call', async () =>
       const body = JSON.parse(init.body);
       assert.equal(body.search_depth, 'fast'); assert.equal(body.max_results, 3);
       assert.equal(body.chunks_per_source, 1);
-      return Response.json({ results: [{title:'产品营养表',url:'https://example.test/nutrition',content:'巨无霸 580kcal'}], response_time:0.5 });
+      return Response.json({ results: [{title:'产品营养表',url:'https://www.mcdonalds.com.cn/nutrition',content:'巨无霸 580kcal'}], response_time:0.5 });
     }
     assert.ok(JSON.parse(init.body).messages[1].content.includes('不输出中英文镜像字段'));
-    return completion({...meal,foods:[{...meal.foods[0],name:'巨无霸',brand:'麦当劳'}]});
+    return completion(looked({name:'巨无霸',brand:'麦当劳'}));
   }, 'rules', {FOOD_SEARCH_DEPTH:'fast'}), '麦当劳巨无霸汉堡一个，不含薯条和饮料');
   assert.equal(result.provider, 'tavily-ai'); assert.equal(result.routing.router,'rules');
   assert.equal(result.diagnostics.llmCalls, 1); assert.equal(calls.length, 2);
@@ -349,7 +354,7 @@ test('only successful web extraction attaches actual references and verified off
       {title:'官方菜单',url:'https://www.mcdonalds.com.cn/menu',content:'巨无霸'},
       {title:'普通页面',url:'https://mcdonalds.com.cn.evil.test/menu',content:'巨无霸'}
     ]});
-    return completion({...meal,foods:[{...meal.foods[0],name:'巨无霸',brand:'麦当劳'}]});
+    return completion(looked({name:'巨无霸',brand:'麦当劳'}));
   },'rules'),'麦当劳巨无霸一个');
   const evidence=result.foods[0].searchEvidence;
   assert.equal(evidence.status,'succeeded');
@@ -373,15 +378,15 @@ test('successful search followed by failed extraction and estimate fallback has 
   assert.equal(result.provider,'ai');assert.equal(result.foods[0].searchEvidence,undefined);
 });
 test('unsafe returned URLs do not create a reference panel', async () => {
-  const result=await post(loadHandler(async url=>url.includes('tavily')?Response.json({results:[{title:'菜单',url:'javascript:alert(1)',content:'巨无霸'}]}):completion(meal),'rules'),'麦当劳巨无霸');
-  assert.equal(result.provider,'tavily-ai');assert.equal(result.foods[0].searchEvidence,undefined);
+  const result=await post(loadHandler(async url=>url.includes('tavily')?Response.json({results:[{title:'菜单',url:'javascript:alert(1)',content:'巨无霸'}]}):completion(looked({name:'巨无霸',brand:'麦当劳'})),'rules'),'麦当劳巨无霸');
+  assert.equal(result.provider,'ai');assert.equal(result.routing.fallbackReason,'search_no_matching_source');assert.equal(result.foods[0].searchEvidence,undefined);
 });
 test('stream reports real search progress before the blocked upstream request finishes', async () => {
   let release;
   const blocked=new Promise(resolve=>{release=resolve;});
   const handler=loadHandler(async url=>{
-    if(url.includes('tavily')){await blocked;return Response.json({results:[{title:'菜单',url:'https://example.test/menu',content:'巨无霸'}]});}
-    return completion(meal);
+    if(url.includes('tavily')){await blocked;return Response.json({results:[{title:'菜单',url:'https://www.mcdonalds.com.cn/menu',content:'巨无霸'}]});}
+    return completion(looked({name:'巨无霸',brand:'麦当劳'}));
   },'rules');
   const form=new FormData();form.set('description','麦当劳巨无霸');form.set('lang','zh');
   const response=await handler(new Request('http://localhost/api/food-ai',{method:'POST',headers:{Accept:'application/x-ndjson'},body:form}));
@@ -433,11 +438,34 @@ test('ambiguous raw/cooked food is not assigned the first nutritional row',async
   const result=await post(loadHandler(async()=>{calls++;return completion({isFoodRelated:true,foods:[{...meal.foods[0],name:'鸡胸肉',portionLabel:'100g'}]});},'rules'),'鸡胸肉100g');
   assert.equal(calls,1);assert.equal(result.routing.effectiveRoute,'ai_estimate');
 });
+test('a brand search without a matching source or matching numbers is reported as an estimate that keeps the brand', async () => {
+  const cases = [
+    ['pages unrelated to the brand', { title: '菜单', url: 'https://example.test/menu', content: '巨无霸' }, looked({ name: '巨无霸', brand: '麦当劳' })],
+    ['official page but no matching product numbers', { title: '官方菜单', url: 'https://www.mcdonalds.com.cn/menu', content: '巨无霸' }, looked({ name: '巨无霸', brand: '麦当劳', recognitionMode: 'industry-average' })]
+  ];
+  for (const [label, source, answer] of cases) {
+    const result = await post(loadHandler(async url => url.includes('tavily') ? Response.json({ results: [source] }) : completion(answer), 'rules'), '麦当劳巨无霸一个');
+    assert.equal(result.ok, true, label);
+    assert.equal(result.provider, 'ai', label);
+    assert.equal(result.routing.selectedRoute, 'brand_search', label);
+    assert.equal(result.routing.effectiveRoute, 'ai_estimate', label);
+    assert.equal(result.routing.fallbackReason, 'search_no_matching_source', label);
+    assert.equal(result.foods[0].brand, '麦当劳', label);
+    assert.equal(result.foods[0].recognitionMode, 'industry-average', label);
+    assert.equal(result.foods[0].searchEvidence, undefined, label);
+  }
+  const named = await post(loadHandler(async url => url.includes('tavily')
+    ? Response.json({ results: [{ title: '麦当劳巨无霸营养成分表', url: 'https://example.test/nutrition', content: '巨无霸' }] })
+    : completion(looked({ name: '巨无霸', brand: '麦当劳' })), 'rules'), '麦当劳巨无霸一个');
+  assert.equal(named.provider, 'tavily-ai');
+  assert.equal(named.routing.effectiveRoute, 'brand_search');
+  assert.equal(named.foods[0].recognitionMode, 'brand-product');
+});
 test('a known brand with an explicit generic-food weight still searches the brand',async()=>{
   let searches=0;
   const result=await post(loadHandler(async(url)=>{
     if(url.includes('tavily')){searches++;return Response.json({results:[{title:'营养资料',url:'https://www.mcdonalds.com.cn/menu',content:'米饭150g'}]});}
-    return completion({isFoodRelated:true,foods:[{...meal.foods[0],name:'米饭',brand:'麦当劳',portionLabel:'150g'}]});
+    return completion(looked({name:'米饭',brand:'麦当劳',portionLabel:'150g'}));
   },'rules'),'麦当劳米饭150g');
   assert.equal(searches,1);assert.equal(result.routing.effectiveRoute,'brand_search');assert.ok(result.foods[0].searchEvidence);
 });

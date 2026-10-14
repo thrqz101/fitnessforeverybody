@@ -7,6 +7,7 @@ import { useRecognitionProgress } from "@/features/recognition/ui/use-recognitio
 import { weightedScore, formatScorePercent } from "@/shared/domain/score";
 import { requestFoodAi } from "@/features/recognition/ui/recognition-client";
 import { useRoutePreview } from "@/features/recognition/ui/use-route-preview";
+import { ruleRejectionMessage } from "@/features/recognition/domain/explicit-items";
 import { pick, type Language } from "@/shared/i18n/i18n-utils";
 import { MessageSquareText, Loader2, ScanLine, ArrowRight, Trash2, Utensils, Sparkles, Check, ChevronRight } from "lucide-react";
 import { RecognitionProgress } from "@/features/recognition/ui/RecognitionProgress";
@@ -126,6 +127,12 @@ export function Dashboard({
       setRecognitionNotice({ key: "先告诉我你吃了什么，品牌、份量和配菜越具体越好。", tone: "error" });
       return;
     }
+    // Vague input and too many foods are pure rules: reject on the spot, with no request and no progress steps.
+    const rejection = ruleRejectionMessage(description, language);
+    if (rejection) {
+      setRecognitionNotice({ text: rejection, tone: "error" });
+      return;
+    }
 
     const form = new FormData();
     form.append("description", description);
@@ -134,7 +141,7 @@ export function Dashboard({
 
     try {
       const routeHint = await routeHintFor(description);
-      // Vague input, too many foods or a not_food choice was already decided while typing.
+      // A not_food choice was already decided while typing.
       if (routeHint?.message) {
         setRecognitionNotice({ text: routeHint.message, tone: "error" });
         return;

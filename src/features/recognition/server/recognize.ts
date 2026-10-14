@@ -6,7 +6,7 @@ import { type CloudRun, beginCloudRecognition } from "@/features/recognition/ser
 import { persistRecognition } from "@/features/recognition/server/persist";
 import { findFoodBrandMatches, isBrandOnlyDescription } from "@/features/recognition/domain/brand-catalog";
 import { foodRouterMode, selectRuleFoodRoute } from "@/features/recognition/domain/food-router";
-import { buildSearchEvidence } from "@/features/recognition/domain/build-search-evidence";
+import { buildSearchEvidence, searchFoundBrandProduct } from "@/features/recognition/domain/build-search-evidence";
 import { id, cleanAiFoodsForDescription, parseAiPayload, shouldRepairAiPayload } from "@/features/recognition/domain/ai-foods";
 import type { TimingStage, SearchDiagnostics, AiRouteDecision, AiFood } from "@/features/recognition/domain/types";
 import { buildEstimatePrompt, localized } from "@/features/recognition/domain/prompts";
@@ -167,9 +167,24 @@ export async function recognizeFood(request: Request, report?: ProgressReporter,
         progress("organize", "active", "正在根据资料整理食物和营养…", "Organizing foods and nutrition from the sources…");
         const searchedPayload = await measure("searchLlm", () => extractAiPayloadFromSearch(provider, description, searchOutcome.context, language, signal));
         if (searchedPayload.isFoodRelated && searchedPayload.foods?.length) {
-          let foods = measureSync("normalize", () => mergeStrictLocalAndAiFoods(strictLocalMatches, searchedPayload.foods!, description, "ai-text", language));
+          // A search that returned pages but no matching product numbers is an estimate, not a lookup.
+          const found = searchFoundBrandProduct(searchedPayload.foods, brandMatches, searchOutcome.sources);
+          const extracted = found ? searchedPayload.foods : searchedPayload.foods.map((food): AiFood => ({ ...food, recognitionMode: "industry-average" }));
+          let foods = measureSync("normalize", () => mergeStrictLocalAndAiFoods(strictLocalMatches, extracted, description, "ai-text", language));
           const tooManyResponse = buildTooManyFoodsResponseIfNeeded(foods, language);
           if (tooManyResponse) return attachDiagnostics(tooManyResponse);
+          if (!found) {
+            routing.effectiveRoute = "ai_estimate";
+            routing.fallbackReason = "search_no_matching_source";
+            progress("organize", "warning", "没找到可核对该产品的营养资料，已按同类产品估算", "No source matched this product. Estimated from similar products.");
+            return respond({
+              ok: true,
+              provider: "ai",
+              isFoodRelated: true,
+              message: localized(language, "没找到该产品可核对的营养资料，已保留品牌并按同类产品估算；请按实际份量调整。", "No source matching this product was found. The brand is kept and values are estimated from similar products; adjust to your actual portion."),
+              foods
+            });
+          }
 
           const evidence = buildSearchEvidence(id("lookup"), brandMatches, searchOutcome.sources, foods.map(food => food.name),
             foods.flatMap(food => food.brand ? [food.brand] : []));

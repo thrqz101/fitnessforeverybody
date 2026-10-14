@@ -3,8 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   experimental: {
     outputFileTracingIncludes: {
-      "/api/food-ai": ["./data/nutrition-100g.json"],
-      "/api/nutrition-agent": ["./data/nutrition-100g.json"]
+      "/api/food-ai": ["./data/nutrition-100g.json"]
     }
   },
   async redirects() {

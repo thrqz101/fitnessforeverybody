@@ -1,10 +1,17 @@
 import { type Language, normalizeLanguage } from "@/shared/i18n/i18n-utils";
 import { getProviderConfig, requestChatCompletion, buildChatCompletionBody, extractAssistantContent } from "@/features/recommendation/server/llm-client";
 import { getDesiredCount, buildRecommendationPrompt, localized, parseRecommendPayload, normalizeRecommendations } from "@/features/recommendation/domain/ai-recommendations";
+import { requireApiUser } from "@/shared/supabase/api-auth";
+import { getSupabasePublicConfig } from "@/shared/supabase/config";
 
 export const runtime = "nodejs";
 
+/** Signed-in users only when the backend is configured, like recognition itself: every call spends LLM credit. */
 export async function POST(request: Request) {
+  if (getSupabasePublicConfig()) {
+    const auth = await requireApiUser();
+    if (auth instanceof Response) return auth;
+  }
   let language: Language = "zh";
 
   try {
