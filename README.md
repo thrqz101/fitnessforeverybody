@@ -97,16 +97,9 @@ Recognition is a routing problem: which function should handle a given meal desc
 | `local_exact` | Matches the built-in nutrition database and calculates exactly from grams or standard servings |
 | `ai_estimate` | The fallback when neither of the above matches: an estimate based on industry averages, constrained by prompt engineering (Chinese dining portion baselines and a macro-to-calorie consistency check) |
 
-```mermaid
-flowchart LR
-  A[Meal description] --> R{Decidable by rules?}
-  R -- Known brand / complete local match --> F
-  R -- No --> J[Jev routing]
-  J -- Confidence ≥ 0.8 --> F[brand_search · local_exact · ai_estimate]
-  J -- Timeout or low confidence --> R2[Rule fallback] --> F
-  J -- not_food --> X[Rejected immediately]
-  F -- Source does not match / partly uncovered --> E[Downgraded to ai_estimate]
-```
+<p align="center">
+  <img alt="Recognition flow: rules short-circuit known brands and complete local matches, Jev routes the rest to brand_search, local_exact or ai_estimate, and failures downgrade to ai_estimate." src=".docs/images/recognition-flow.png" width="100%">
+</p>
 
 ### Jev routing
 
@@ -132,7 +125,7 @@ A failure at any step never interrupts recognition.
 
 ### Performance
 
-Average recognition time is about 2.5 seconds, roughly one eighth of letting an LLM choose the functions through function calling.
+⚡ Average recognition time is about **2.5 seconds**, roughly **one eighth** of letting an LLM choose the functions through function calling.
 
 ## Tech Stack
 
