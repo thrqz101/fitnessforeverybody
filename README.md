@@ -31,12 +31,13 @@
 
 1. 💡 [Why Fitness for Everybody?](#why-fitness-for-everybody)
 2. ✨ [Features](#features)
-3. 🧱 [Tech Stack](#tech-stack)
-4. 🗂️ [Project Structure](#project-structure)
-5. 🚀 [Getting Started](#getting-started)
-6. 📚 [Documentation](#documentation)
-7. 🤝 [Contributing](#contributing)
-8. 📄 [License](#license)
+3. 🧠 [How Recognition Works](#how-recognition-works)
+4. 🧱 [Tech Stack](#tech-stack)
+5. 🗂️ [Project Structure](#project-structure)
+6. 🚀 [Getting Started](#getting-started)
+7. 📚 [Documentation](#documentation)
+8. 🤝 [Contributing](#contributing)
+9. 📄 [License](#license)
 
 ## Why Fitness for Everybody?
 
@@ -85,6 +86,53 @@ Describe a meal in plain language. The app splits it into individual foods and e
 - Your records follow you across devices, and you can delete your account and all data at any time.
 
 > Nutrition values are estimates for everyday guidance, not medical or dietary advice.
+
+## How Recognition Works
+
+Recognition is a routing problem: which function should handle a given meal description?
+
+| Function | Responsibility |
+| --- | --- |
+| `brand_search` | Retrieves public brand information and extracts structured nutrition data |
+| `local_exact` | Matches the built-in nutrition database and calculates exactly from grams or standard servings |
+| `ai_estimate` | The fallback when neither of the above matches: an estimate based on industry averages, constrained by prompt engineering (Chinese dining portion baselines and a macro-to-calorie consistency check) |
+
+```mermaid
+flowchart LR
+  A[Meal description] --> R{Decidable by rules?}
+  R -- Known brand / complete local match --> F
+  R -- No --> J[Jev routing]
+  J -- Confidence ≥ 0.8 --> F[brand_search · local_exact · ai_estimate]
+  J -- Timeout or low confidence --> R2[Rule fallback] --> F
+  J -- not_food --> X[Rejected immediately]
+  F -- Source does not match / partly uncovered --> E[Downgraded to ai_estimate]
+```
+
+### Jev routing
+
+Letting an LLM pick the function through function calling means waiting for a full model inference on every decision, which is slow and inefficient. Function selection is handed to Jev instead:
+
+- **Input:** a structured state made of the original sentence, brand hints, and local candidates with their coverage;
+- **Judgement:** predefined criteria, such as brand products first and a direct local result only when local coverage is complete;
+- **Output:** a probability distribution and a confidence score over four routes.
+
+The system validates the distribution first and accepts only conclusions with a confidence of at least 0.8.
+
+- **Decision separated from generation:** Jev handles routing; the LLM only generates content (reading sources, estimating nutrition) and never chooses tools.
+- **Predictive routing:** prediction starts 500 ms after the user stops typing, so the route is ready on submit; input judged not to be food is rejected on submit.
+- **Deterministic short-circuit:** a known brand or a complete local match is routed by rules directly, with no request.
+
+### Graceful degradation
+
+- **Brand sources do not match the brand:** the result becomes an estimate, with no sources attached.
+- **Local data covers only part of the meal:** matched foods are kept as fixed data, and only the rest goes to `ai_estimate`.
+- **Jev times out (2 s) or lacks confidence:** the rules decide.
+
+A failure at any step never interrupts recognition.
+
+### Performance
+
+Average recognition time is about 2.5 seconds, roughly one eighth of letting an LLM choose the functions through function calling.
 
 ## Tech Stack
 
