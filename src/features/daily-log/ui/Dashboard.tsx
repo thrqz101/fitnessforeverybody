@@ -82,6 +82,8 @@ export function Dashboard({
   const [recognitionNotice, setRecognitionNotice] = useState<RecognitionNoticeState | null>(null);
   const [isRecognizing, setIsRecognizing] = useState(false);
   const progress = useRecognitionProgress();
+  // Sources belong to the latest recognition only, never to every food logged today.
+  const [lastRecognizedFoods, setLastRecognizedFoods] = useState<FoodLogItem[]>([]);
   const draftFoods = foods.filter((food) => !food.savedToCalendar);
   const savedFoods = foods.filter((food) => food.savedToCalendar);
   const animatedTotals = useAnimatedMacroTotals(totals);
@@ -112,6 +114,7 @@ export function Dashboard({
     form.append("description", description);
     form.append("lang", language);
     const requestProgress = progress.begin();
+    setLastRecognizedFoods([]);
     setIsRecognizing(true);
     setRecognitionNotice({ key: "AI 正在拆解食材、份量和营养结构…" });
 
@@ -131,6 +134,7 @@ export function Dashboard({
         setRecognitionNotice({ key: "这段描述里没有识别到明确食物，请补充菜名或份量。" });
         return;
       }
+      setLastRecognizedFoods(recognizedFoods);
       onAddFoods(recognizedFoods);
       setMealDescription("");
       setRecognitionNotice({ text: pick(language,
@@ -186,7 +190,7 @@ export function Dashboard({
               <button key={example} type="button" disabled={isRecognizing} onClick={() => setMealDescription(example)}>{t(example)}</button>
             ))}
           </div>
-          <RecognitionProgress steps={progress.steps} running={isRecognizing} foods={foods} />
+          <RecognitionProgress steps={progress.steps} running={isRecognizing} foods={lastRecognizedFoods} />
           {recognitionNotice && !isRecognizing ? <div className="recognition-toast">{"key" in recognitionNotice ? t(recognitionNotice.key, recognitionNotice.vars) : recognitionNotice.text}</div> : null}
         </div>
       </section>

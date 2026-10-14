@@ -180,6 +180,12 @@ test('typing-time preview asks Jev only when the rules are uncertain', async () 
   assert.equal(preview.route, 'brand_search');
   assert.equal(preview.confidence, 0.93);
 });
+test('a generic place such as 楼下面馆 or 公司食堂 is not stored as a brand; a named store is', async () => {
+  for (const [brand, expected] of [['楼下面馆', '未识别品牌'], ['公司食堂', '未识别品牌'], ['小林面馆', '小林面馆']]) {
+    const result = await post(loadHandler(async () => completion({ isFoodRelated: true, foods: [{ ...meal.foods[0], brand }] }), 'rules'), `${brand}的牛肉面`);
+    assert.equal(result.foods[0].brand, expected, brand);
+  }
+});
 test('HTTP handler rejects non-food choice without calling estimation', async () => {
   let calls = 0;
   const result = await post(loadHandler(async () => { calls++; return Response.json(payload('not_food')); }), '请帮我安排健康计划');

@@ -29,12 +29,12 @@ While the user types, `recognition/ui/use-route-preview.ts` waits 500 ms after t
    - `local_exact` is downgraded to `ai_estimate` whenever local coverage is incomplete.
 6. Brand search (`server/tavily-search.ts`, `server/llm-steps.ts`): a focused Tavily query returns at most 3 sources with one snippet each; an LLM call extracts foods from those sources. Search or extraction failure falls through to estimation and records `routing.fallbackReason`.
 7. Estimation (`domain/prompts.ts`, `server/llm-client.ts`): one LLM call with Chinese dining portion baselines; local matches are passed as fixed context and only the remaining foods are analysed. A malformed answer gets one repair call (`server/llm-steps.ts` `repairAiPayload`). If the provider fails, local matches are returned as a partial result when available.
-8. Normalisation (`domain/ai-foods.ts`): foods not supported by the description are dropped, brands are filled from the catalogue, macros are normalised, and local and AI foods are merged without duplicates. The prompt requires `calories ≈ protein×4 + carbs×4 + fat×9` within 25%.
+8. Normalisation (`domain/ai-foods.ts`): foods not supported by the description are dropped, brands are filled from the catalogue, generic places such as “楼下面馆” or “公司食堂” are never stored as brands (`isGenericVenue`), macros are normalised, and local and AI foods are merged without duplicates. The prompt requires `calories ≈ protein×4 + carbs×4 + fat×9` within 25%.
 9. Persistence (`server/persist.ts`): in cloud mode the foods are stored as draft entries before the response is sent. A failed save is reported as a failure, never as success.
 
 ## Search evidence
 
-Only a brand search that returned sources and produced foods attaches `FoodLogItem.searchEvidence` (`domain/build-search-evidence.ts`). Local matches, direct estimates, brand-only matches and search fallbacks carry no sources. Source URLs come from real search results; official pages come from verified brand records, never from model output. Only credential-free HTTP(S) links are accepted (`shared/domain/search-evidence.ts`). Evidence is saved with the food and shown below the result.
+Only a brand search that returned sources and produced foods attaches `FoodLogItem.searchEvidence` (`domain/build-search-evidence.ts`). Local matches, direct estimates, brand-only matches and search fallbacks carry no sources. Source URLs come from real search results; official pages come from verified brand records, never from model output. Only credential-free HTTP(S) links are accepted (`shared/domain/search-evidence.ts`). Evidence is saved with the food. The recognition panel shows only the evidence of the latest recognition on the page; it appears once a recognition starts, stays open while it runs and collapses when it finishes.
 
 ## LLM providers
 
