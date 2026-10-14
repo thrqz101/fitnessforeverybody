@@ -112,19 +112,29 @@ function chineseOrDefault(value: string | undefined, fallback: string) {
   return value && isChineseText(value) ? value : fallback;
 }
 
+const genericVenuePrefix = /^(?:楼下|楼上|隔壁|附近|门口|对面|路边|街边|小区|公司|单位|学校|医院|宿舍|家里|家附近|自家|自己|某|一家|这家|那家|(?:the\s+)?(?:downstairs|nearby|local|office|school|company|home)\b)/i;
+const genericVenueName = /^(?:食堂|外卖|面馆|饭店|饭馆|餐厅|餐馆|小吃店|快餐店|便利店|家常|家常菜|自制|自己做的?|路边摊|大排档|夜市|cafeteria|canteen|takeout|takeaway|homemade)$/i;
+
+/** “楼下面馆”“公司食堂”: a place or kind of shop, not a brand. Such names are not stored as brands. */
+export function isGenericVenue(brand?: string) {
+  const text = (brand ?? "").trim();
+  return Boolean(text) && (genericVenuePrefix.test(text) || genericVenueName.test(text));
+}
+
 export function normalizeFood(food: AiFood, source: "ai-text", language: Language = "zh"): FoodLogItem {
   const macros = normalizeMacros(food.macros);
+  const genericBrand = isGenericVenue(food.brand) || isGenericVenue(food.brandZh) || isGenericVenue(food.brandEn);
 
   const baseName = food.name?.trim() || localized(language, "AI 识别食物", "AI recognized food");
-  const baseBrand = food.brand?.trim() || localized(language, "未识别品牌", "Unknown brand");
+  const baseBrand = (!genericBrand && food.brand?.trim()) || localized(language, "未识别品牌", "Unknown brand");
   const baseFoodType = food.foodType?.trim() || localized(language, "食品", "Food");
   const basePortionLabel = food.portionLabel?.trim() || localized(language, "AI 估算份量", "AI estimated portion");
   const warning = food.warning?.trim() || "";
 
   const nameZh = chineseOrDefault(food.nameZh?.trim(), language === "zh" ? baseName : translateToZh(baseName));
   const nameEn = food.nameEn?.trim() || (language === "en" ? baseName : translateToEn(nameZh));
-  const brandZh = chineseOrDefault(food.brandZh?.trim(), language === "zh" ? baseBrand : translateToZh(baseBrand));
-  const brandEn = food.brandEn?.trim() || (language === "en" ? baseBrand : translateToEn(brandZh));
+  const brandZh = chineseOrDefault(genericBrand ? undefined : food.brandZh?.trim(), language === "zh" ? baseBrand : translateToZh(baseBrand));
+  const brandEn = (!genericBrand && food.brandEn?.trim()) || (language === "en" ? baseBrand : translateToEn(brandZh));
   const foodTypeZh = chineseOrDefault(food.foodTypeZh?.trim(), language === "zh" ? baseFoodType : translateToZh(baseFoodType));
   const foodTypeEn = food.foodTypeEn?.trim() || (language === "en" ? baseFoodType : translateToEn(foodTypeZh));
   const portionLabelZh = chineseOrDefault(food.portionLabelZh?.trim(), language === "zh" ? basePortionLabel : translateToZh(basePortionLabel));

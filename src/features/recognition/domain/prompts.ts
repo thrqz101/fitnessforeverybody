@@ -39,7 +39,7 @@ export function buildEstimatePrompt(language: Language, description: string, ana
     "任务：根据用户本次文字描述，把每个食物拆成 foods，并估算营养素。",
     "如果用户没有说具体食物、品牌、菜品、套餐、配料或份量，例如只说“我今天吃什么”，返回 isFoodRelated=false 和空 foods，不要硬猜。",
     "品牌+产品优先；识别不出品牌时，用同品类行业平均估算，recognitionMode=industry-average。",
-    "如果用户文字里出现疑似品牌名或门店名，不要把 brand 留空；brand 填用户写出的品牌/门店，warning 说明是否查到公开资料。",
+    "只有真实的品牌或有名字的具体店铺（如“麦当劳”“小林面馆”）才填 brand；“楼下面馆”“公司食堂”“路边摊”“外卖”“家里做的”这类泛指的地点或店铺类型不是品牌，brand 留空。",
     getBrandCatalogPrompt(description),
     getStrictLocalMatchPrompt(strictLocalMatches),
     "普通自然语言描述优先按中国餐饮行业平均估算，不要套用固定菜单模板。",

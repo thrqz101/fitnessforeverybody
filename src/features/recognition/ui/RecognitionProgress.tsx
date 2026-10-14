@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '@/shared/i18n/i18n';
 import type { RecognitionStep } from '@/features/recognition/domain/events';
 import type { FoodLogItem } from '@/shared/domain/types';
-import { normalizeSearchEvidence } from '@/shared/domain/search-evidence';
 import { RecognitionSources } from './RecognitionSources';
 
 export function RecognitionProgress({ steps, running, foods = [] }: { steps: RecognitionStep[]; running: boolean; foods?: FoodLogItem[] }) {
@@ -12,13 +11,13 @@ export function RecognitionProgress({ steps, running, foods = [] }: { steps: Rec
   const [expanded, setExpanded] = useState(true);
   const viewport = useRef<HTMLDivElement>(null);
   const failed = steps.some(step => step.status === 'error');
-  const hasSources = foods.some(food => normalizeSearchEvidence(food.searchEvidence));
   useEffect(() => { setExpanded(running); }, [running]);
   useEffect(() => {
     const element = viewport.current;
     if (element && expanded) element.scrollTo({ top: element.scrollHeight, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }, [steps, expanded]);
-  if (!steps.length && !hasSources) return null;
+  // Shown only after a recognition started on this page: open while it runs, collapsed once it finishes.
+  if (!steps.length) return null;
   const title = running ? (language === 'en' ? 'Working on your meal' : '正在分析这一餐')
     : failed ? (language === 'en' ? 'Recognition needs another try' : '识别暂未完成') : (language === 'en' ? 'View recognition process and sources' : '查看识别过程与来源');
   return <details className="recognition-progress" open={expanded} onToggle={event => setExpanded(event.currentTarget.open)} data-testid="recognition-progress">
