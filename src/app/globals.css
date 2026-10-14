@@ -412,6 +412,7 @@ textarea:focus-visible {
 .food-examples button { padding: 7px 11px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; color: rgba(255,255,255,.74); font-size: 10px; font-weight: 800; background: rgba(255,255,255,.08); backdrop-filter: blur(8px); }
 .food-examples button:hover { color: #1d2a22; background: white; }
 .recognition-toast { margin-top: 13px; padding: 11px 13px; border-radius: 15px; color: #1f382a; font-size: 12px; font-weight: 800; background: #f2ce67; }
+.recognition-toast--error { color: #b3402a; background: #fdecea; }
 
 /* Visual nutrition story */
 .nutrition-console .nutrition-story {

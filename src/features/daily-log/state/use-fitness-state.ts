@@ -4,7 +4,7 @@ import { useI18n } from "@/shared/i18n/i18n";
 import { useAuth } from "@/shared/auth/AuthProvider";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import type { UserProfile, DayState, FoodLogItem, DayRecord, MacroTotals } from "@/shared/domain/types";
-import { defaultProfile, defaultDayState, calculateTargets, sumFoods, remainingMacros, addMacros } from "@/shared/domain/nutrition";
+import { defaultProfile, defaultDayState, calculateTargets, sumFoods, remainingMacros, addMacros, emptyMacros } from "@/shared/domain/nutrition";
 import { hasMeaningfulGap } from "@/shared/domain/recommendation-fit";
 import { getBeijingDateKey } from "@/shared/domain/dates";
 import { emptyFeedbackProgress, parseFeedbackProgress, feedbackProgressKey, completeRecognitionFlow, type FeedbackProgress, acknowledgeFeedbackMilestone, nextFeedbackMilestone } from "@/shared/domain/feedback-progress";
@@ -374,20 +374,46 @@ export function useFitnessState(snapshotBeforeWrite = false) {
       setFoods((current) => current.filter((item) => item.id !== id));
       return;
     }
+    // Optimistic: the card disappears at once; a failure puts it back and resyncs.
+    const index = foods.findIndex((item) => item.id === id);
+    setFoods((current) => current.filter((item) => item.id !== id));
+    if (food.savedToCalendar) adjustTodayTotals(food.macros, "subtract");
     void withBusy(id, async () => {
       try {
         const result = await cloudApi.deleteEntry(id);
-        setFoods((current) => current.filter((item) => item.id !== id));
         if (result.day) {
           const next = result.day;
           setDayMeta((current) => ({ ...current, [next.dateKey]: next }));
         }
       } catch (error) {
+        setFoods((current) => current.some((item) => item.id === id) ? current : [...current.slice(0, index), food, ...current.slice(index)]);
+        if (food.savedToCalendar) adjustTodayTotals(food.macros, "add");
         failWith(error, true);
       }
     });
   }
-
+  function adjustTodayTotals(macros: MacroTotals, direction: "add" | "subtract") {
+    setDayMeta((current) => {
+      const today = current[currentDateKey];
+      if (!today) return current;
+      const totals = direction === "add" ? addMacros(today.totals, macros) : remainingMacros(today.totals, macros);
+      return { ...current, [currentDateKey]: { ...today, totals } };
+    });
+  }
+  /** Deletes every food of today, drafts and counted ones. Cloud mode only: counted foods are server records. */
+  function clearAllFoods() {
+    if (!cloudMode) return;
+    const removed = foods;
+    setFoods([]);
+    adjustTodayTotals(removed.filter((food) => food.savedToCalendar).reduce((sum, food) => addMacros(sum, food.macros), emptyMacros()), "subtract");
+    const deletions = removed.filter((food) => food.cloud).map((food) => track(() => cloudApi.deleteEntry(food.id)));
+    void Promise.allSettled(deletions).then((results) => {
+      const failed = results.find((result): result is PromiseRejectedResult => result.status === "rejected");
+      // The server recomputes the day after each deletion; one resync brings back the exact totals.
+      if (failed) failWith(failed.reason, true);
+      else void resync(true);
+    });
+  }
   function saveFoodToCalendar(id: string) {
     const food = foods.find((item) => item.id === id);
     if (!food || food.savedToCalendar) return;
@@ -398,10 +424,7 @@ export function useFitnessState(snapshotBeforeWrite = false) {
     }
     // Optimistic: show the food as counted at once; the server reply replaces it, and a failure resyncs.
     setFoods((current) => current.map((item) => (item.id === id ? { ...item, savedToCalendar: true } : item)));
-    setDayMeta((current) => {
-      const today = current[currentDateKey];
-      return today ? { ...current, [currentDateKey]: { ...today, totals: addMacros(today.totals, food.macros) } } : current;
-    });
+    adjustTodayTotals(food.macros, "add");
     void withBusy(id, async () => {
       try {
         const result = food.cloud
@@ -411,10 +434,7 @@ export function useFitnessState(snapshotBeforeWrite = false) {
         setFeedbackProgress((progress) => completeRecognitionFlow(progress, food.recognitionBatchId));
       } catch (error) {
         setFoods((current) => current.map((item) => (item.id === id ? { ...item, savedToCalendar: false } : item)));
-        setDayMeta((current) => {
-          const today = current[currentDateKey];
-          return today ? { ...current, [currentDateKey]: { ...today, totals: remainingMacros(today.totals, food.macros) } } : current;
-        });
+        adjustTodayTotals(food.macros, "subtract");
         failWith(error, true);
       }
     });
@@ -469,7 +489,7 @@ export function useFitnessState(snapshotBeforeWrite = false) {
   return { profile, day, foods, records, currentDateKey, selectedDateKey, hasProfile, hydrated,
     topUpPromptOpen, setTopUpPromptOpen, setDay: updateDay, setSelectedDateKey, savedFoods, targets, totals, gaps,
     selectedDay, selectedFoods, selectedTargets, selectedTotals, todayLabel, completeProfile,
-    addFoods, chooseRecommendation, removeFood, saveFoodToCalendar, clearDraftFoods,
+    addFoods, chooseRecommendation, removeFood, saveFoodToCalendar, clearDraftFoods, clearAllFoods,
     completedRecognitionFlows: feedbackProgress.completedBatchIds.length,
     feedbackMilestone: nextFeedbackMilestone(feedbackProgress), acknowledgeFeedbackInvitation,
     localImportState, readLegacyImport, importLegacyRecords, skipLegacyImport,

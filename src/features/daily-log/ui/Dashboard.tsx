@@ -31,6 +31,7 @@ type DashboardProps = {
   onRemoveFood: (id: string) => void;
   onSaveFood: (id: string) => void;
   onClearDrafts: () => void;
+  onClearAll: () => void;
   /** Cloud mode: server-computed weighted score (0..1) and confirmed recognition count for today. */
   score?: number | null;
   busyFoodIds?: string[];
@@ -38,9 +39,10 @@ type DashboardProps = {
   allowDeleteSaved?: boolean;
 };
 
-type RecognitionNoticeState =
+type RecognitionNoticeState = (
   | { key: string; vars?: Record<string, string | number> }
-  | { text: string };
+  | { text: string }
+) & { tone?: "error" };
 
 const quickExamples = [
   "一份鸡胸肉沙拉和拿铁",
@@ -72,6 +74,7 @@ export function Dashboard({
   onRemoveFood,
   onSaveFood,
   onClearDrafts,
+  onClearAll,
   score,
   busyFoodIds = [],
   allowDeleteSaved = false
@@ -80,6 +83,12 @@ export function Dashboard({
   const [mealDescription, setMealDescription] = useState("");
   const routeHintFor = useRoutePreview(mealDescription);
   const [recognitionNotice, setRecognitionNotice] = useState<RecognitionNoticeState | null>(null);
+  const [confirmClearAll, setConfirmClearAll] = useState(false);
+  useEffect(() => {
+    if (!confirmClearAll) return;
+    const timer = window.setTimeout(() => setConfirmClearAll(false), 5000);
+    return () => window.clearTimeout(timer);
+  }, [confirmClearAll]);
   const [isRecognizing, setIsRecognizing] = useState(false);
   const progress = useRecognitionProgress();
   // Sources belong to the latest recognition only, never to every food logged today.
@@ -106,7 +115,7 @@ export function Dashboard({
     if (isRecognizing) return;
     const description = mealDescription.trim();
     if (!description) {
-      setRecognitionNotice({ key: "先告诉我你吃了什么，品牌、份量和配菜越具体越好。" });
+      setRecognitionNotice({ key: "先告诉我你吃了什么，品牌、份量和配菜越具体越好。", tone: "error" });
       return;
     }
 
@@ -126,12 +135,12 @@ export function Dashboard({
       }
       const aiResult = await requestFoodAi(form, language, requestProgress);
       if (!aiResult.ok || !aiResult.result?.ok) {
-        setRecognitionNotice({ text: withRetryHint(aiResult.message || aiResult.result?.message || t("AI 这次没算准。"), language) });
+        setRecognitionNotice({ text: withRetryHint(aiResult.message || aiResult.result?.message || t("AI 这次没算准。"), language), tone: "error" });
         return;
       }
       const recognizedFoods = aiResult.result.foods ?? [];
       if (!aiResult.result.isFoodRelated || !recognizedFoods.length) {
-        setRecognitionNotice({ key: "这段描述里没有识别到明确食物，请补充菜名或份量。" });
+        setRecognitionNotice({ key: "这段描述里没有识别到明确食物，请补充菜名或份量。", tone: "error" });
         return;
       }
       setLastRecognizedFoods(recognizedFoods);
@@ -142,7 +151,7 @@ export function Dashboard({
         `Recognized ${recognizedFoods.length} foods. Confirm them in today's food records to update your nutrition progress.`
       ) });
     } catch {
-      setRecognitionNotice({ text: withRetryHint(t("AI 连接暂时没有响应。"), language) });
+      setRecognitionNotice({ text: withRetryHint(t("AI 连接暂时没有响应。"), language), tone: "error" });
     } finally {
       setIsRecognizing(false);
     }
@@ -191,7 +200,7 @@ export function Dashboard({
             ))}
           </div>
           <RecognitionProgress steps={progress.steps} running={isRecognizing} foods={lastRecognizedFoods} />
-          {recognitionNotice && !isRecognizing ? <div className="recognition-toast">{"key" in recognitionNotice ? t(recognitionNotice.key, recognitionNotice.vars) : recognitionNotice.text}</div> : null}
+          {recognitionNotice && !isRecognizing ? <div className={recognitionNotice.tone === "error" ? "recognition-toast recognition-toast--error" : "recognition-toast"} role={recognitionNotice.tone === "error" ? "alert" : "status"}>{"key" in recognitionNotice ? t(recognitionNotice.key, recognitionNotice.vars) : recognitionNotice.text}</div> : null}
         </div>
       </section>
   );
@@ -206,6 +215,10 @@ export function Dashboard({
             <span><strong>{foods.length}</strong> {t("今日输入")}</span>
             <span><strong>{savedFoods.length}</strong> {t("已计入")}</span>
             {draftFoods.length ? <button type="button" className="text-action text-coral" onClick={onClearDrafts}><Trash2 size={15} /> {t("清空待确认")}</button> : null}
+            {allowDeleteSaved && savedFoods.length ? (confirmClearAll ? <>
+              <button type="button" className="text-action text-coral" onClick={() => { setConfirmClearAll(false); onClearAll(); }}><Trash2 size={15} /> {pick(language, `确认清空 ${foods.length} 条`, `Clear ${foods.length} items`)}</button>
+              <button type="button" className="text-action" onClick={() => setConfirmClearAll(false)}>{pick(language, "取消", "Cancel")}</button>
+            </> : <button type="button" className="text-action text-coral" onClick={() => setConfirmClearAll(true)}><Trash2 size={15} /> {pick(language, "清空全部", "Clear all")}</button>) : null}
           </div>
         </div>
 
