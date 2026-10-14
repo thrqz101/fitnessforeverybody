@@ -150,7 +150,7 @@ export function AppRoot({ mode }: { mode: "landing" | "workspace" }) {
               profile={state.profile} day={state.day} targets={state.targets} totals={state.totals} gaps={state.gaps} foods={state.foods} todayLabel={state.todayLabel}
               onNavigate={(view) => view === "settings" ? setSettingsOpen(true) : navigate(view)}
               onDayChange={state.setDay} onAddFoods={(foods) => { state.addFoods(foods); navigate("recognition", true); }}
-              onRemoveFood={state.removeFood} onSaveFood={state.saveFoodToCalendar} onClearDrafts={state.clearDraftFoods}
+              onRemoveFood={state.removeFood} onSaveFood={state.saveFoodToCalendar} onClearDrafts={state.clearDraftFoods} onClearAll={state.clearAllFoods}
               score={state.todayScore} busyFoodIds={state.busyFoodIds} allowDeleteSaved={state.cloudMode} />
           </div>
           {visited.current.has("recommend") && <section id="recommend" role="region" aria-labelledby="tab-recommend" aria-label={labels.recommend} hidden={tab !== "recommend"} className="precision-functional-section">

@@ -307,6 +307,7 @@ html:has(.precision-preview), body:has(.precision-preview) {
 .precision-preview .food-examples button { color:#657a68; background:#ffffffb3; border-color:#dde7d9; backdrop-filter:none; }
 .precision-preview .food-examples button:hover { background:#e3eddf; color:#315b46; }
 .precision-preview .recognition-toast { background:#e3eedf; color:#3f664a; font-weight:400; }
+.precision-preview .recognition-toast--error { background:#fdecea; color:#b3402a; }
 .precision-preview .nutrition-console .nutrition-story { padding:28px 32px; border-color:#e3e8e0; }
 .precision-preview .nutrition-console .meal-timeline { min-height:0; padding:28px 32px; }
 .precision-preview .empty-meal-state { min-height:180px; }
