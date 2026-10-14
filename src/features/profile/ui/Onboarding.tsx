@@ -28,7 +28,7 @@ export function Onboarding({
   onBack,
   submitLabel = "进入 Dashboard"
 }: OnboardingProps) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [profile, setProfile] = useState<UserProfile>(() => {
     const merged = { ...defaultProfile, ...initialProfile };
     return {
@@ -201,7 +201,7 @@ export function Onboarding({
                 <button
                   type="button"
                   onClick={() => setBodyFatOpen(true)}
-                  className="inline-flex min-h-10 items-center justify-center rounded-[18px] border border-moss/25 bg-mint/50 px-3 text-sm font-black text-moss"
+                  className="inline-flex min-h-10 items-center justify-center rounded-[18px] border border-moss/25 bg-mint/50 px-3 py-2 text-center text-sm font-black text-moss"
                 >
                   {t("查看体脂率评判标准图")}
                 </button>
@@ -238,9 +238,9 @@ export function Onboarding({
               </label>
             </div>
             <div className="grid gap-3 rounded-[18px] border border-ink/10 bg-paper p-4 text-sm leading-6 text-ink/62">
-              <p><span className="font-black text-ink">{t("目标逻辑：")}</span>{t(goalLogic[profile.goal])}</p>
-              <p><span className="font-black text-ink">{t("训练结构：")}</span>{t(trainingDescriptions[profile.trainingStyle])}</p>
-              <p><span className="font-black text-ink">{t("饮食结构：")}</span>{t(dietDescriptions[profile.eatingPattern])}</p>
+              <p><span className="font-black text-ink">{t("目标逻辑：")}</span>{language === "en" ? " " : ""}{t(goalLogic[profile.goal])}</p>
+              <p><span className="font-black text-ink">{t("训练结构：")}</span>{language === "en" ? " " : ""}{t(trainingDescriptions[profile.trainingStyle])}</p>
+              <p><span className="font-black text-ink">{t("饮食结构：")}</span>{language === "en" ? " " : ""}{t(dietDescriptions[profile.eatingPattern])}</p>
             </div>
             <button
               type="submit"
