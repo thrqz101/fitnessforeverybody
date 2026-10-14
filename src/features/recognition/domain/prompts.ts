@@ -1,4 +1,5 @@
 import { type Language, pick } from "@/shared/i18n/i18n-utils";
+import { foodRouterMode } from "@/features/recognition/domain/food-router";
 import { getBrandCatalogPrompt } from "@/features/recognition/domain/brand-catalog";
 import { getStrictLocalMatchPrompt } from "@/features/recognition/domain/local-match";
 import type { StrictLocalFoodMatch } from "@/features/recognition/domain/types";
@@ -11,7 +12,7 @@ export function outputLanguageInstruction(language: Language) {
       ? "All user-facing text fields (name, brand, foodType, portionLabel, warning, message) must be written in English."
       : "所有面向用户的字段 name、brand、foodType、portionLabel、warning、message 必须使用中文。";
 
-  if (!["jev", "llm"].includes(process.env.FOOD_ROUTER ?? "rules")) {
+  if (foodRouterMode(process.env.FOOD_ROUTER) !== "llm") {
     return `${targetInstruction} 只输出当前语言字段，不输出中英文镜像字段。Keep macro JSON keys as protein, carbs, fat, calories, fiber.`;
   }
   return `${targetInstruction} Also include bilingual mirror fields for every food: nameZh, nameEn, brandZh, brandEn, foodTypeZh, foodTypeEn, portionLabelZh, portionLabelEn, warningZh, warningEn, sourceLabelZh, sourceLabelEn. The Zh fields must always be Chinese; the En fields must always be English. Keep macro JSON keys as protein, carbs, fat, calories, fiber.`;

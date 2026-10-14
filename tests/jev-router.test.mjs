@@ -113,17 +113,27 @@ test('HTTP handler falls back to estimate when search yields no sources', async 
   assert.equal(result.routing.effectiveRoute, 'ai_estimate');
   assert.equal(result.foods.length, 1);
 });
-test('HTTP handler falls back to old LLM routing and reuses its estimate', async () => {
-  let calls = 0;
+test('HTTP handler falls back to instant rules routing when Jev is unavailable', async () => {
+  const urls = [];
   const result = await post(loadHandler(async url => {
-    calls++;
+    urls.push(url);
     if (url.includes('typesafe')) return new Response('', { status: 429 });
-    return completion({ ...meal, route: 'ai_estimate' });
+    return completion(meal);
   }));
-  assert.equal(result.provider, 'ai-fast-route');
-  assert.equal(result.routing.router, 'llm');
+  assert.equal(result.routing.router, 'rules');
   assert.equal(result.routing.fallbackReason, 'http_429');
-  assert.equal(calls, 2);
+  assert.equal(result.foods[0].macros.calories, 515);
+  assert.equal(urls.length, 2, 'one Jev call and one estimate; no extra LLM routing call');
+});
+test('Jev is the default router when FOOD_ROUTER is not set', async () => {
+  const urls = [];
+  const result = await post(loadHandler(async url => {
+    urls.push(url);
+    if (url.includes('typesafe')) return Response.json(payload('ai_estimate'));
+    return completion(meal);
+  }, 'jev', { FOOD_ROUTER: undefined }));
+  assert.equal(result.routing.router, 'jev');
+  assert.ok(urls[0].includes('typesafe'));
 });
 test('HTTP handler rejects non-food choice without calling estimation', async () => {
   let calls = 0;
@@ -140,18 +150,24 @@ test('llm switch bypasses Jev entirely', async () => {
   assert.equal(result.routing.router, 'llm');
   assert.equal(result.provider, 'ai-fast-route');
 });
-test('complete local match returns catalog values without an estimation request', async () => {
-  let calls = 0;
-  const result = await post(loadHandler(async (url, init) => {
-    calls++;
-    assert.ok(url.includes('typesafe'));
-    assert.equal(JSON.parse(init.body).state.localCoverageComplete, true);
-    return Response.json(payload('local_exact'));
-  }), '一碗白米饭');
+test('complete local match is decided by rules without calling Jev or estimation', async () => {
+  const result = await post(loadHandler(async () => { throw new Error('Unexpected network call'); }), '一碗白米饭');
   assert.equal(result.provider, 'local-food-library');
+  assert.equal(result.routing.router, 'rules');
+  assert.equal(result.routing.fallbackReason, null);
   assert.equal(result.routing.effectiveRoute, 'local_exact');
   assert.equal(result.foods[0].name, '白米饭');
-  assert.equal(calls, 1);
+});
+test('known brand is sent to search without calling Jev', async () => {
+  const urls = [];
+  const result = await post(loadHandler(async url => {
+    urls.push(url);
+    if (url.includes('tavily')) return Response.json({ results: [{ title: '菜单', content: '巨无霸', url: 'https://example.test/menu' }] });
+    return completion(meal);
+  }), '麦当劳巨无霸');
+  assert.equal(result.routing.router, 'rules');
+  assert.equal(result.routing.effectiveRoute, 'brand_search');
+  assert.equal(urls.some(url => url.includes('typesafe')), false);
 });
 test('partial local match cannot suppress additional food even when Jev picks local', async () => {
   const result = await post(loadHandler(async (url, init) => {

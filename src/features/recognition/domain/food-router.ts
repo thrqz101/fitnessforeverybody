@@ -1,5 +1,18 @@
 import type { FoodRoute } from "./jev-router";
 
+export type FoodRouterMode = "jev" | "rules" | "llm";
+
+/** FOOD_ROUTER selects the router; Jev is the default and falls back to the instant rules router. */
+export function foodRouterMode(value: string | undefined): FoodRouterMode {
+  switch (value) {
+    case "rules":
+    case "llm":
+      return value;
+    default:
+      return "jev";
+  }
+}
+
 export type RuleRoutingInput = {
   description: string;
   hasBrand: boolean;

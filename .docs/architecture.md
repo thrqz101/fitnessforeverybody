@@ -14,7 +14,7 @@ Next.js 14 App Router on Vercel  ── src/app/api/**/route.ts
   │                    │
   │                    ├── LLM provider (MiniMax / DeepSeek / ccswitch / DashScope, OpenAI-compatible)
   │                    ├── Tavily web search (brand and packaged-food nutrition)
-  │                    ├── TypeSafe Jev router (optional, FOOD_ROUTER=jev)
+  │                    ├── TypeSafe Jev router (default route classifier)
   │                    └── Exa web search (nutrition agent only)
   ▼
 Supabase: Postgres + Auth (email one-time code) + RLS
@@ -94,7 +94,7 @@ Dashboard (daily-log/ui)
             2. explicit-items             vague or more than 6 foods → early reply
             3. brand-catalog              brand match always precedes generic food values
             4. local-match                per-100g DB for explicit weights, fixed catalogue servings otherwise
-            5. route decision             rules (default) | Jev | LLM → local_exact | brand_search | ai_estimate | not_food
+            5. route decision             Jev (default, falls back to rules) | rules | LLM → local_exact | brand_search | ai_estimate | not_food
             6. tavily-search + llm-steps  brand_search: search, then extract foods from the sources
             7. llm-client                 ai_estimate: one estimation call, optional repair call
             8. ai-foods                   normalise foods, merge with local matches, attach search evidence

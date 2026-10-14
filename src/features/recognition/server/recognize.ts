@@ -5,7 +5,7 @@ import { type CloudRun, beginCloudRecognition } from "@/features/recognition/ser
 import { persistRecognition } from "@/features/recognition/server/persist";
 import { findFoodBrandMatches, getBrandCatalogPrompt, isBrandOnlyDescription } from "@/features/recognition/domain/brand-catalog";
 import { matchWeightedNutrition } from "@/shared/catalog/nutrition-db";
-import { hasNonstandardPortion, selectRuleFoodRoute } from "@/features/recognition/domain/food-router";
+import { foodRouterMode, hasNonstandardPortion, selectRuleFoodRoute } from "@/features/recognition/domain/food-router";
 import { buildSearchEvidence } from "@/features/recognition/domain/build-search-evidence";
 import { id, cleanAiFoodsForDescription, parseAiPayload, shouldRepairAiPayload } from "@/features/recognition/domain/ai-foods";
 import type { TimingStage, SearchDiagnostics, AiRouteDecision, AiFood } from "@/features/recognition/domain/types";
@@ -90,7 +90,7 @@ export async function recognizeFood(request: Request, report?: ProgressReporter,
 
     const provider = getProviderConfig();
 
-    const ruleRouting = !["jev", "llm"].includes(process.env.FOOD_ROUTER ?? "rules");
+    const routerMode = foodRouterMode(process.env.FOOD_ROUTER);
     progress("brand", "active", "正在检查品牌信息…", "Checking brand information…");
     const brandMatches = measureSync("brandMatch", () => findFoodBrandMatches(description));
     progress("brand", "complete", brandMatches.length ? `已识别品牌：${brandMatches.map(b => b.brand).join("、")}` : "未匹配到品牌，继续检查食物",
@@ -110,7 +110,9 @@ export async function recognizeFood(request: Request, report?: ProgressReporter,
     const analysisDescription = weighted?.matches.length && !weighted.complete ? weighted.remainingDescription : description;
     progress("route", "active", "正在选择识别方式…", "Choosing how to recognize this meal…");
     const routingStarted = Date.now();
-    const jev = process.env.FOOD_ROUTER === "jev"
+    // Jev only decides what the rules cannot: no known brand and no complete local match.
+    const rulesAreCertain = brandMatches.length > 0 || hasOnlyStrictLocalMatches;
+    const jev = routerMode === "jev" && !rulesAreCertain
       ? await classifyWithJev({
           description,
           localCandidates: strictLocalMatches.map((match) => ({ label: match.label, food: match.food })),
@@ -119,18 +121,12 @@ export async function recognizeFood(request: Request, report?: ProgressReporter,
         }, { signal })
       : null;
     let routeDecision: AiRouteDecision;
-    if (ruleRouting) {
-      const route = selectRuleFoodRoute({ description, hasBrand: brandMatches.length > 0,
-        brandOnly: isBrandOnlyDescription(description, brandMatches), localCoverageComplete: hasOnlyStrictLocalMatches });
-      routeDecision = { route, isFoodRelated: route !== "not_food" };
-      routing = { router: "rules", selectedRoute: route, effectiveRoute: route,
-        durationMs: Date.now() - routingStarted, fallbackReason: null };
-    } else if (jev?.ok) {
+    if (jev?.ok) {
       const route = effectiveFoodRoute(jev.route, hasOnlyStrictLocalMatches);
       routeDecision = { route, isFoodRelated: route !== "not_food" };
       routing = { router: "jev", selectedRoute: jev.route, effectiveRoute: route,
         confidence: jev.confidence, durationMs: Date.now() - routingStarted, fallbackReason: null };
-    } else {
+    } else if (routerMode === "llm") {
       if (!provider) return missingProviderResponse();
       llmCalls++;
       const routingResult = await classifyFoodRoute(provider, analysisDescription, strictLocalMatches, language, signal);
@@ -141,8 +137,14 @@ export async function recognizeFood(request: Request, report?: ProgressReporter,
       const selectedRoute = routeDecision.route!;
       routeDecision.route = effectiveFoodRoute(selectedRoute, hasOnlyStrictLocalMatches);
       routing = { router: routingResult.ok ? "llm" : "rules", selectedRoute,
-        effectiveRoute: routeDecision.route, durationMs: Date.now() - routingStarted,
-        fallbackReason: jev && !jev.ok ? jev.reason : null };
+        effectiveRoute: routeDecision.route, durationMs: Date.now() - routingStarted, fallbackReason: null };
+    } else {
+      // Rules mode, or Jev was unavailable: decide instantly from the brand and local matches.
+      const route = selectRuleFoodRoute({ description, hasBrand: brandMatches.length > 0,
+        brandOnly: isBrandOnlyDescription(description, brandMatches), localCoverageComplete: hasOnlyStrictLocalMatches });
+      routeDecision = { route, isFoodRelated: route !== "not_food" };
+      routing = { router: "rules", selectedRoute: route, effectiveRoute: route,
+        durationMs: Date.now() - routingStarted, fallbackReason: jev && !jev.ok ? jev.reason : null };
     }
 
     timings.routing = Date.now() - routingStarted;
@@ -174,7 +176,7 @@ export async function recognizeFood(request: Request, report?: ProgressReporter,
 
     if (!provider) return missingProviderResponse();
 
-    if (description && (ruleRouting || routing.router === "jev" ? routeDecision.route === "brand_search" : shouldUseBrandSearch(routeDecision, description))) {
+    if (description && (routerMode !== "llm" ? routeDecision.route === "brand_search" : shouldUseBrandSearch(routeDecision, description))) {
       progress("search", "active", "正在联网搜索品牌和产品资料…", "Searching the web for brand and product information…");
       const searchOutcome = await measure("search", () => searchNutritionWithTavily(description, search, signal));
       if (searchOutcome) {
