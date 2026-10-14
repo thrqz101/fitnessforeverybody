@@ -7,6 +7,7 @@ import type { UserProfile, DayState, FoodLogItem, DayRecord, MacroTotals } from 
 import { defaultProfile, defaultDayState, calculateTargets, sumFoods, remainingMacros, addMacros, emptyMacros } from "@/shared/domain/nutrition";
 import { hasMeaningfulGap } from "@/shared/domain/recommendation-fit";
 import { getBeijingDateKey } from "@/shared/domain/dates";
+import { weightedScore } from "@/shared/domain/score";
 import { emptyFeedbackProgress, parseFeedbackProgress, feedbackProgressKey, completeRecognitionFlow, type FeedbackProgress, acknowledgeFeedbackMilestone, nextFeedbackMilestone } from "@/shared/domain/feedback-progress";
 import type { CloudDay, LocalImportState, CloudState } from "@/shared/api/types";
 import { cloudApi, describeCloudError, type EntryResult } from "@/shared/api/client";
@@ -397,7 +398,9 @@ export function useFitnessState(snapshotBeforeWrite = false) {
       const today = current[currentDateKey];
       if (!today) return current;
       const totals = direction === "add" ? addMacros(today.totals, macros) : remainingMacros(today.totals, macros);
-      return { ...current, [currentDateKey]: { ...today, totals } };
+      // Same formula as the database, so the daily score moves with the totals before the server replies.
+      const score = today.targets ? weightedScore(totals, today.targets) : today.score;
+      return { ...current, [currentDateKey]: { ...today, totals, score } };
     });
   }
   /** Deletes every food of today, drafts and counted ones. Cloud mode only: counted foods are server records. */

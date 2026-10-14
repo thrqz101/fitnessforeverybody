@@ -10,6 +10,7 @@ import { useRoutePreview } from "@/features/recognition/ui/use-route-preview";
 import { pick, type Language } from "@/shared/i18n/i18n-utils";
 import { MessageSquareText, Loader2, ScanLine, ArrowRight, Trash2, Utensils, Sparkles, Check, ChevronRight } from "lucide-react";
 import { RecognitionProgress } from "@/features/recognition/ui/RecognitionProgress";
+import { DeleteConfirmDialog, type DeleteRequest } from "@/features/daily-log/ui/DeleteConfirmDialog";
 import { getLocalizedFoodField } from "@/shared/i18n/translations";
 import { macroKeys, completion } from "@/shared/domain/nutrition";
 import { macroLabels } from "@/shared/domain/labels";
@@ -83,12 +84,19 @@ export function Dashboard({
   const [mealDescription, setMealDescription] = useState("");
   const routeHintFor = useRoutePreview(mealDescription);
   const [recognitionNotice, setRecognitionNotice] = useState<RecognitionNoticeState | null>(null);
-  const [confirmClearAll, setConfirmClearAll] = useState(false);
-  useEffect(() => {
-    if (!confirmClearAll) return;
-    const timer = window.setTimeout(() => setConfirmClearAll(false), 5000);
-    return () => window.clearTimeout(timer);
-  }, [confirmClearAll]);
+  const [deleteRequest, setDeleteRequest] = useState<DeleteRequest | null>(null);
+  function confirmDelete(request: DeleteRequest) {
+    switch (request.kind) {
+      case "one": return onRemoveFood(request.id);
+      case "drafts": return onClearDrafts();
+      case "all": return onClearAll();
+      default: {
+        const unhandled: never = request;
+        throw new Error(`Unhandled delete request ${JSON.stringify(unhandled)}`);
+      }
+    }
+  }
+  const askDeleteFood = (food: FoodLogItem) => setDeleteRequest({ kind: "one", id: food.id, name: getLocalizedFoodField(food, "name", language), counted: Boolean(food.savedToCalendar) });
   const [isRecognizing, setIsRecognizing] = useState(false);
   const progress = useRecognitionProgress();
   // Sources belong to the latest recognition only, never to every food logged today.
@@ -206,6 +214,7 @@ export function Dashboard({
   );
   const journalPanel = (
     <section className="experience-section meal-timeline">
+        {deleteRequest ? <DeleteConfirmDialog request={deleteRequest} onConfirm={() => confirmDelete(deleteRequest)} onClose={() => setDeleteRequest(null)} /> : null}
         <div className="section-heading">
           <div>
             <span className="experience-kicker">Today&apos;s journal</span>
@@ -214,11 +223,8 @@ export function Dashboard({
           <div className="meal-timeline__summary">
             <span><strong>{foods.length}</strong> {t("今日输入")}</span>
             <span><strong>{savedFoods.length}</strong> {t("已计入")}</span>
-            {draftFoods.length ? <button type="button" className="text-action text-coral" onClick={onClearDrafts}><Trash2 size={15} /> {t("清空待确认")}</button> : null}
-            {allowDeleteSaved && savedFoods.length ? (confirmClearAll ? <>
-              <button type="button" className="text-action text-coral" onClick={() => { setConfirmClearAll(false); onClearAll(); }}><Trash2 size={15} /> {pick(language, `确认清空 ${foods.length} 条`, `Clear ${foods.length} items`)}</button>
-              <button type="button" className="text-action" onClick={() => setConfirmClearAll(false)}>{pick(language, "取消", "Cancel")}</button>
-            </> : <button type="button" className="text-action text-coral" onClick={() => setConfirmClearAll(true)}><Trash2 size={15} /> {pick(language, "清空全部", "Clear all")}</button>) : null}
+            {draftFoods.length ? <button type="button" className="text-action text-coral" onClick={() => setDeleteRequest({ kind: "drafts", count: draftFoods.length })}><Trash2 size={15} /> {t("清空待确认")}</button> : null}
+            {allowDeleteSaved && savedFoods.length ? <button type="button" className="text-action text-coral" onClick={() => setDeleteRequest({ kind: "all", count: foods.length })}><Trash2 size={15} /> {pick(language, "清空全部", "Clear all")}</button> : null}
           </div>
         </div>
 
@@ -234,7 +240,7 @@ export function Dashboard({
               <article key={food.id} className="meal-entry meal-entry--draft">
                 <div className="meal-entry__top">
                   <span>{t("待确认")}</span>
-                  <button type="button" disabled={busyFoodIds.includes(food.id)} onClick={() => onRemoveFood(food.id)} aria-label={`${t("删除")}${getLocalizedFoodField(food, "name", language)}`}><Trash2 size={15} /></button>
+                  <button type="button" disabled={busyFoodIds.includes(food.id)} onClick={() => askDeleteFood(food)} aria-label={`${t("删除")}${getLocalizedFoodField(food, "name", language)}`}><Trash2 size={15} /></button>
                 </div>
                 <h3>{getLocalizedFoodField(food, "name", language)}</h3>
                 <p>{food.brand ? getLocalizedFoodField(food, "brand", language) : t("AI 估算")} · {getLocalizedFoodField(food, "portionLabel", language)}</p>
@@ -247,7 +253,7 @@ export function Dashboard({
               <article key={food.id} className="meal-entry meal-entry--saved">
                 <div className="meal-entry__top">
                   <span><Check size={13} /> {t("已记录")}</span>
-                  {allowDeleteSaved ? <button type="button" disabled={busyFoodIds.includes(food.id)} onClick={() => onRemoveFood(food.id)} aria-label={`${t("删除")}${getLocalizedFoodField(food, "name", language)}`}><Trash2 size={15} /></button> : null}
+                  {allowDeleteSaved ? <button type="button" disabled={busyFoodIds.includes(food.id)} onClick={() => askDeleteFood(food)} aria-label={`${t("删除")}${getLocalizedFoodField(food, "name", language)}`}><Trash2 size={15} /></button> : null}
                 </div>
                 <h3>{getLocalizedFoodField(food, "name", language)}</h3>
                 <p>{food.brand ? getLocalizedFoodField(food, "brand", language) : t("日常饮食")} · {getLocalizedFoodField(food, "portionLabel", language)}</p>
