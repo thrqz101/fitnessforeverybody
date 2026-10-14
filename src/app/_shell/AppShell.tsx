@@ -63,7 +63,7 @@ export function PrecisionHero({ animated, onStart }: { animated: boolean; onStar
         <img src="/images/wellness-hero-v2.png" alt={t("摆放着三文鱼、牛油果、蔬菜和谷物的均衡餐")} className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-700" fetchPriority="high" />
         <div className="absolute bottom-6 left-6 z-20 bg-white/90 backdrop-blur p-4 rounded-2xl shadow-lg border border-white/20 precision-floating-card">
           <div className="text-sm text-zinc-500 font-medium mb-1">{text("从每一餐开始", "One meal at a time")}</div>
-          <div className="text-3xl font-medium tracking-tighter text-zinc-900 flex items-center gap-3">{text("看懂营养", "Eat with clarity")}<ArrowRight size={22} /></div>
+          <div className="text-3xl font-medium tracking-tighter text-zinc-900">{text("看懂营养", "Eat with clarity")}</div>
         </div>
       </div>
     </div>

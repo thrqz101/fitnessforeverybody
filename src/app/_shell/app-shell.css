@@ -19,6 +19,8 @@
 .precision-preview .language-switch button.is-active { background:white; color:#315b46; box-shadow:0 1px 3px #0001; }
 .precision-icon-button { display:inline-grid; place-items:center; width:38px; height:38px; border:1px solid #e4e4e7; border-radius:50%; background:white; color:#315b46; }
 .precision-icon-button:hover { background:#f4f4f5; }
+/* Avoid a lone last word or character, such as “养。”, in either language. */
+.precision-preview :is(h1,h2,h3,p) { text-wrap:pretty; }
 .precision-hero { background-image:radial-gradient(#e5e7eb 1px,transparent 1px); background-size:24px 24px; }
 .precision-preview .precision-hero h1 { font-weight:500; letter-spacing:-.055em; }
 .precision-hero-visual { isolation:isolate; }
@@ -144,10 +146,14 @@
 .precision-preview .progress-overview__copy h1 { color:#315b46; font-size:38px; font-weight:500; line-height:1.1; }
 .precision-preview .progress-overview__dashboard { grid-template-columns:130px minmax(0,1fr); background:white; border:1px solid #e4e4e7; box-shadow:none; border-radius:20px; }
 .precision-preview .progress-overview__ring { width:130px; filter:grayscale(1); box-shadow:none; }
+.precision-preview .progress-overview__ring strong { font-size:30px; }
+.precision-preview .progress-overview__ring span { max-width:86px; }
 .precision-preview .progress-overview__facts { grid-template-columns:1fr; gap:5px; }
 .precision-preview .progress-overview__facts span { display:flex; align-items:center; justify-content:space-between; background:#fafafa; border-color:#e4e4e7; padding:10px; border-radius:10px; }
 .precision-preview .progress-overview__facts strong { font-size:16px; }
 .precision-preview .progress-workspace { grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:24px; }
+/* Side by side only once the calendar column is wide enough for seven readable day cells. */
+@media (max-width:1023px) { .precision-preview .progress-workspace { grid-template-columns:minmax(0,1fr); } }
 .precision-preview .day-nutrition-card__score,.precision-preview .day-nutrient-row { background:#fafafa; border-color:#e4e4e7; }
 .precision-preview .day-nutrient-row__ring { filter:grayscale(1); }
 .precision-review-rail { display:flex; gap:24px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:thin; padding:2px 1px 20px; }
@@ -413,6 +419,17 @@ html:has(.precision-preview), body:has(.precision-preview) {
   .precision-preview .nutrition-story .text-action { font-size:11px; }
   .precision-preview .precision-tabs { gap:4px; }
   .precision-preview .precision-tabs > button { padding:12px 13px; font-size:13px; }
+  /* Longer English labels wrap inside their tab instead of pushing Feedback off screen. */
+  .precision-preview .precision-tabs > button { flex:1 1 auto; white-space:normal; word-break:keep-all; line-height:1.25; justify-content:center; text-align:center; }
+  .precision-preview .precision-tabs > button svg { flex-shrink:0; }
+}
+@media (max-width:420px) {
+  .precision-preview .precision-tabs > button { padding:12px 10px; font-size:12px; }
+}
+@media (max-width:360px) {
+  .precision-preview .precision-tabs > button { padding:12px 9px; }
+  /* Feedback keeps its icon; the label stays available to screen readers. */
+  .precision-preview .precision-feedback-label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 }
 
 /* Softer food text and a quiet sage summary, retaining the report layout. */
@@ -423,7 +440,7 @@ html:has(.precision-preview), body:has(.precision-preview) {
 .precision-preview .nutrition-summary__energy small,
 .precision-preview .nutrition-summary__balance { color:#687b6c; }
 .precision-preview .nutrition-summary__balance strong { color:#315b46; }
-.precision-preview .nutrition-summary__energy { border-left-color:#d2ddcd; }
+.precision-preview .nutrition-summary__energy { border-left-color:#d2ddcd; border-top-color:#d2ddcd; }
 .precision-preview .nutrition-summary__context { color:#6d7c6e; border-top-color:#d6e0d0; }
 .precision-preview .nutrition-summary__track { background:#dce5d4; }
 .precision-preview .nutrition-summary__track > i { background:#7f9e6d; }
@@ -433,3 +450,8 @@ html:has(.precision-preview), body:has(.precision-preview) {
 .precision-review-stars { display:inline-flex; align-items:center; gap:3px; color:#b29245; }
 .precision-review-example-label { padding:4px 8px; border:1px solid #e1e7da; border-radius:6px; color:#74836e; background:#f7f9f3; font-size:10px; white-space:nowrap; }
 .precision-review-avatar { display:grid; place-items:center; width:40px; height:40px; flex:none; border-radius:50%; background:#eaf0e4; color:#728567; font-size:15px; }
+
+/* Settings grids default to an auto column, which grows to the longest English select option; let them shrink to the dialog on phones. */
+@media (max-width:639px) {
+  .precision-preview .settings-shell .grid:not(.place-items-center) { grid-template-columns:minmax(0,1fr); }
+}

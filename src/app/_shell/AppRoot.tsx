@@ -39,6 +39,7 @@ export function AppRoot({ mode }: { mode: "landing" | "workspace" }) {
   const initialViewApplied = useRef(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pendingTab, setPendingTab] = useState<ToolTab | null>(null);
+  const [queuedTab, setQueuedTab] = useState<ToolTab | null>(null);
   const [focusRequest, setFocusRequest] = useState<{ target: ToolTab; records?: boolean } | null>(null);
   const visited = useRef(new Set<ToolTab>(["recognition"]));
   const labels: Record<ToolTab, string> = {
@@ -107,10 +108,18 @@ export function AppRoot({ mode }: { mode: "landing" | "workspace" }) {
     navigate(intent);
   }, [auth.status, loginIntent, state.hydrated]);
 
+  useEffect(() => {
+    if (!queuedTab || auth.status === "loading" || (auth.status === "signed_in" && !state.hydrated)) return;
+    const queued = queuedTab;
+    setQueuedTab(null);
+    navigate(queued);
+  }, [auth.status, queuedTab, state.hydrated]);
+
   function navigate(nextTab: ToolTab, records = false) {
-    if (auth.status === "loading") return;
+    // A click while the session or the records are still loading is kept and replayed once they are ready.
+    if (auth.status === "loading") { setQueuedTab(nextTab); return; }
     if (auth.status === "signed_out") { setLoginIntent(nextTab); auth.openLogin(); return; }
-    if (!state.hydrated) return;
+    if (!state.hydrated) { setQueuedTab(nextTab); return; }
     if (mode === "landing") {
       if (!state.hasProfile) { setPendingTab(nextTab); setSettingsOpen(true); }
       else router.push(nextTab === "recognition" ? "/workspace" : `/workspace?view=${nextTab}`);
@@ -138,7 +147,7 @@ export function AppRoot({ mode }: { mode: "landing" | "workspace" }) {
         <div className="precision-tools-heading"><div><p className="precision-eyebrow">{text("你的每日营养空间", "YOUR DAILY NUTRITION SPACE")}</p><h2>{tab === "calendar" ? t("趋势与日历") : text("今天，吃得更明白。", "A little more clarity, every day.")}</h2></div><span className="precision-free-label">{text("全部功能，完全免费", "Every feature. Completely free.")}</span></div>
         <nav className="precision-tabs" aria-label={text("主要功能", "Main tools")}>
           {primaryViews.map((key) => <button key={key} id={`tab-${key}`} aria-current={tab === key ? "page" : undefined} className={tab === key ? "is-active" : ""} onClick={() => navigate(key)}>{labels[key]}</button>)}
-          <button onClick={() => openFeedback()} aria-haspopup="dialog" className="precision-feedback-action"><MessageSquare size={15} />{text("意见反馈", "Feedback")}</button>
+          <button onClick={() => openFeedback()} aria-haspopup="dialog" className="precision-feedback-action"><MessageSquare size={15} aria-hidden="true" /><span className="precision-feedback-label">{text("意见反馈", "Feedback")}</span></button>
         </nav>
         {auth.status === "signed_out" ? <div className="precision-locked-tools">
           <section id={tab} className="precision-locked-card"><div className="precision-locked-icon"><LockKeyhole size={22} /></div><span className="precision-eyebrow">{text("需要登录", "SIGN IN REQUIRED")}</span><h3>{text("登录后使用识别、记录和反馈", "Sign in to use recognition, records and feedback")}</h3><p>{text("用邮箱验证码登录，无需密码，数据会保存到你的账号。", "Sign in with an emailed code. No password needed, and your data is saved to your account.")}</p><button className="precision-button" onClick={auth.openLogin}>{text("登录", "Sign in")}<ArrowRight size={16} /></button></section>

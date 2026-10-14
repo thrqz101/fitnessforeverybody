@@ -88,8 +88,8 @@ export function TrainingCalendar({
             <div><strong>{scoreText}%</strong><span>{t("今日营养达标率")}</span></div>
           </div>
           <div className="progress-overview__facts">
-            <span><small>{t("饮食记录")}</small><strong>{foods.length}<i> {t("餐")}</i></strong></span>
-            <span><small>{t("训练时长")}</small><strong>{day.durationMinutes}<i> {t("分钟")}</i></strong></span>
+            <span><small>{t("饮食记录")}</small><strong>{foods.length}<i> {language === "en" ? (foods.length === 1 ? "meal" : "meals") : "餐"}</i></strong></span>
+            <span><small>{t("训练时长")}</small><strong>{day.durationMinutes}<i> {language === "en" ? "min" : "分钟"}</i></strong></span>
             <span><small>{t("今日节奏")}</small><strong>{day.isTrainingDay ? t(day.trainingPart) : t("恢复")}</strong></span>
           </div>
         </div>

@@ -874,7 +874,7 @@ html[data-language="en"] .food-hero__content h1 {
 .nutrition-summary__attainment > strong > span { margin-left:4px; font-size:28px; font-weight:400; letter-spacing:0; }
 .nutrition-summary__attainment > span,.nutrition-summary__energy > span { color:#d1ded2; font-size:11px; line-height:1.5; }
 .nutrition-summary__energy { display:grid; gap:7px; padding-left:20px; border-left:1px solid #ffffff26; }
-.nutrition-summary__energy > strong { font-size:30px; font-weight:500; letter-spacing:-.025em; }
+.nutrition-summary__energy > strong { font-size:30px; font-weight:500; line-height:1.15; letter-spacing:-.025em; white-space:nowrap; }
 .nutrition-summary__energy small { font-size:12px; font-weight:400; color:#d1ded2; letter-spacing:0; }
 .nutrition-summary__track { height:5px; overflow:hidden; border-radius:9px; background:#ffffff26; }
 .nutrition-summary__track > i { display:block; height:100%; border-radius:inherit; background:#d1dfb5; }
@@ -899,7 +899,16 @@ html[data-language="en"] .food-hero__content h1 {
 @media (max-width:420px) {
   .nutrition-summary { padding:20px; }
   .nutrition-summary__attainment > strong { font-size:64px; }
-  .nutrition-summary__numbers { gap:12px; }
-  .nutrition-summary__energy { padding-left:12px; }
+  /* The large score needs the full width; calories move below it instead of squeezing beside it. */
+  .nutrition-summary__numbers { grid-template-columns:minmax(0,1fr); gap:16px; }
+  .nutrition-summary__energy { padding:14px 0 0; border-left:0; border-top:1px solid #ffffff26; }
   .nutrition-summary__energy > strong { font-size:25px; }
+}
+
+/* English badge words do not fit a phone-width calendar day; show the icon and keep the word for screen readers. */
+.calendar-dot__icon { display:none; }
+@media (max-width:640px) {
+  html[data-language="en"] .calendar-dot { display:inline-grid; place-items:center; width:16px; height:16px; padding:0; }
+  html[data-language="en"] .calendar-dot__icon { display:block; }
+  html[data-language="en"] .calendar-dot__label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 }
