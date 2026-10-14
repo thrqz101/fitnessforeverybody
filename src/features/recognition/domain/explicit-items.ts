@@ -18,10 +18,12 @@ export function exceedsExplicitFoodItemLimit(description: string) {
 }
 
 function countExplicitFoodItems(description: string) {
-  const splitText = description
+  const separated = description
     .replace(/[()（）\[\]【】]/g, " ")
     .replace(/(还有|另外|另加|再加|以及|加上|配上|配了|包含|包括|其中|分别|点了|吃了|喝了|一共|总共|和|跟|及)/g, "、")
     .replace(/[+＋&、，,;；/／|｜\n]+/g, "、");
+  // Chinese lists are often space-separated; English names contain spaces, so only split text that has Chinese.
+  const splitText = /[\u4e00-\u9fff]/.test(description) ? separated.replace(/\s+/g, "、") : separated;
 
   const items = splitText
     .split("、")
@@ -38,7 +40,7 @@ function cleanExplicitFoodPart(value: string) {
     .replace(/^(我|我们|本人|自己|今天|早上|上午|中午|下午|晚上|夜宵|早餐|午餐|晚餐|这顿|这一顿|本餐)/, "")
     .replace(/^(\d+|[一二两三四五六七八九十]+)\s*(个人|人|位|个|份|碗|杯|根|块|片|只|条|盘|盒|袋|瓶)?/, "")
     .replace(/^(i|we|my|our|today|this morning|this afternoon|this evening|for breakfast|for lunch|for dinner|for a snack|for a meal|ate|had|drank|ordered)\s+/i, "")
-    .replace(/^(\d+|[a-zA-Z]+)\s*(pieces?|items?|servings?|cups?|bowls?|plates?|boxes?|bags?|bottles?|cans?)?\s*/i, "")
+    .replace(/^(?:\d+|(?:an?|one|two|three|four|five|six|seven|eight|nine|ten)\b)\s*(?:(?:pieces?|items?|servings?|cups?|bowls?|plates?|boxes?|bags?|bottles?|cans?)\b\s*)?(?:of\s+)?/i, "")
     .trim();
 }
 
@@ -48,8 +50,8 @@ function isLikelyExplicitFoodPart(value: string) {
   if (/^(个人|人|位|聚餐|多人|一起|一起吃|分着吃|分食|吃饭|吃了一顿)$/.test(text)) return false;
   if (hasFoodBrandMatch(value)) return true;
 
-  return /饭|米|面|粉|粥|饺|馄|包|馒|饼|糕|肉|鸡|鸭|鹅|牛|羊|猪|鱼|虾|蟹|贝|蛋|豆|菜|瓜|果|菇|笋|藕|奶|茶|咖啡|可乐|饮料|酒|汉堡|薯|披萨|寿司|沙拉|汤|串|丸|肠|棒|餐|火锅|烤|炸|煎|炒|蒸|拌|卤|烧|炖|煮/.test(text)
-    || /chicken|beef|pork|lamb|fish|shrimp|salmon|tuna|egg|tofu|rice|noodle|pasta|bread|burger|pizza|sandwich|salad|soup|steak|fries|snack|fruit|apple|banana|orange|berry|vegetable|yogurt|milk|coffee|tea|protein|shake|wrap|taco|burrito|bowl|meal/i.test(text);
+  return /饭|米|面|粉|粥|饺|馄|包|馒|饼|糕|肉|鸡|鸭|鹅|牛|羊|猪|鱼|虾|蟹|贝|蛋|豆|菜|瓜|果|菇|笋|藕|奶|茶|咖啡|可乐|饮料|酒|汉堡|薯|披萨|寿司|沙拉|汤|串|丸|肠|棒|餐|火锅|烤|炸|煎|炒|蒸|拌|卤|烧|炖|煮|蕉|橙|柚|桃|梨|莓|葡萄|枣|栗|花|椒|芹|茄|萝卜|麦|燕|酱|酪|粽|糍|腿|排|翅|蛎|蛤|螺|参/.test(text)
+    || /chicken|beef|pork|lamb|fish|shrimp|salmon|tuna|egg|tofu|rice|noodle|pasta|bread|burger|pizza|sandwich|salad|soup|steak|fries|snack|fruit|apple|banana|orange|berry|vegetable|yogurt|milk|coffee|tea|protein|shake|wrap|taco|burrito|bowl|meal|broccoli|carrot|tomato|potato|corn|cucumber|lettuce|spinach|avocado|mango|grape|pear|peach|melon|cherry|oat|cereal|toast|pancake|cake|cookie|chocolate|cheese|ham|bacon|sausage|nut|almond|bean|juice/i.test(text);
 }
 
 export function vagueFoodMessage(language: Language) {

@@ -14,8 +14,7 @@ Next.js 14 App Router on Vercel  ── src/app/api/**/route.ts
   │                    │
   │                    ├── LLM provider (MiniMax / DeepSeek / ccswitch / DashScope, OpenAI-compatible)
   │                    ├── Tavily web search (brand and packaged-food nutrition)
-  │                    ├── TypeSafe Jev router (default route classifier)
-  │                    └── Exa web search (nutrition agent only)
+  │                    └── TypeSafe Jev router (default route classifier)
   ▼
 Supabase: Postgres + Auth (email one-time code) + RLS
 ```
@@ -43,7 +42,6 @@ src/
     daily-log/            Today's dashboard, training calendar, client state (useFitnessState)
     account/              Sign-in, account and legacy-import dialogs
     feedback/             Feedback dialog
-    agent/                Function-calling nutrition agent (POST /api/nutrition-agent)
   shared/
     domain/               Cross-feature types and pure rules: nutrition targets, macro labels,
                           recommendation fit, score, dates, feedback progress, search evidence

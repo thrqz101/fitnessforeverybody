@@ -54,7 +54,7 @@ It is built for people who:
 
 ### 🥗 AI meal recognition
 
-Describe a meal in plain language. An AI agent with autonomous function calling breaks it into individual foods and estimates the nutrition of each one.
+Describe a meal in plain language. The app splits it into individual foods and estimates the nutrition of each one, looking up brands on the web when needed.
 
 - Handles takeaway, chain-restaurant meals, mixed dishes and home cooking, including brands, portions and grams.
 - Shows its progress live. Results land in a review list where you can adjust portions before they count toward today.
@@ -106,8 +106,7 @@ fitnessforeverybody/
 │   │   ├── profile/          # Body profile and goals
 │   │   ├── daily-log/        # Daily progress and calendar
 │   │   ├── account/          # Sign-in and account
-│   │   ├── feedback/         # In-app feedback
-│   │   └── agent/            # AI agent
+│   │   └── feedback/         # In-app feedback
 │   └── shared/               # Shared logic, components and types
 ├── data/                     # Static data
 ├── supabase/                 # Database migrations and tests

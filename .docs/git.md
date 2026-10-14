@@ -4,7 +4,7 @@ Read this guide for authorised commits, pushes and PR creation. Git writes requi
 
 ## Titles and review
 
-Use Conventional Commits: `type(scope): concise description`, with the owning feature as the scope (`recognition`, `recommendation`, `profile`, `daily-log`, `account`, `feedback`, `agent`, `api`, `ui`, `db`). PR titles describe the aggregate change. Keep related implementation and tests together, and describe the final behaviour, validation, review order and deployment boundary. Use a body file for multiline PR descriptions so intentional newlines remain intact.
+Use Conventional Commits: `type(scope): concise description`, with the owning feature as the scope (`recognition`, `recommendation`, `profile`, `daily-log`, `account`, `feedback`, `api`, `ui`, `db`). PR titles describe the aggregate change. Keep related implementation and tests together, and describe the final behaviour, validation, review order and deployment boundary. Use a body file for multiline PR descriptions so intentional newlines remain intact.
 
 Work on a branch, never directly on `main`. Preserve other people's work. History rewrites require explicit authorisation for the exact target and operation; retain a recoverable backup before a destructive rewrite.
 

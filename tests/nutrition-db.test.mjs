@@ -1,8 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
-import vm from 'node:vm';
-import ts from 'typescript';
 import * as dbModule from '../src/shared/catalog/nutrition-db.ts';
 const {getNutritionDb,resolveNutritionFood,searchNutritionDb,scalePer100gToGrams,matchWeightedNutrition,validateNutritionDb}=dbModule;
 const db=getNutritionDb();
@@ -68,13 +66,7 @@ test('invalid or old approximate DB is rejected instead of silently used',()=>{
   assert.throws(()=>validateNutritionDb({...db,foods:[{...db.foods[0],basisGrams:1000}]}));
   assert.throws(()=>validateNutritionDb({...db,foods:[{...db.foods[0],per100g:{...db.foods[0].per100g,protein:NaN}}]}));
 });
-test('fuzzy matches are suggestions and tool never picks an ambiguous first result',async()=>{
+test('fuzzy matches are suggestions and never pick an ambiguous first result',()=>{
   assert.ok(searchNutritionDb('鸡胸').length>0);assert.equal(resolveNutritionFood('鸡胸').item,undefined);
-  const module={};
-  const code=ts.transpileModule(fs.readFileSync('src/features/agent/server/tools/food-nutrition.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-  vm.runInNewContext(code,{exports:module,require:()=>dbModule});
-  const ambiguous=await module.queryLocalFoodDb({food:'鸡胸肉',grams:100});assert.equal(ambiguous.ok,false);assert.equal(ambiguous.needsClarification,true);
-  const suggestion=await module.queryLocalFoodDb({food:'鸡胸',grams:100});assert.equal(suggestion.ok,false);
-  const result=await module.queryLocalFoodDb({food:'米饭',grams:150});assert.equal(result.ok,true);assert.equal(result.macros.calories,195);
-  assert.equal((await module.queryLocalFoodDb({food:'米饭',grams:-10})).reason,'invalid_weight');
+  assert.equal(resolveNutritionFood('米饭').item.id,'rice-cooked');
 });

@@ -26,7 +26,7 @@ Region, meal-slot and style filters (`domain/filters.ts`) are applied after rank
 
 ## AI candidates
 
-`POST /api/recommend-ai` receives the profile, day settings, gaps, targets, totals, main-meal count, the light-only flag, the desired count (30) and up to 50 existing options to avoid duplicates. `domain/ai-recommendations.ts` builds the prompt from the food catalogue summary and normalises the answer: categories are restricted to `meal`, `topup`, `protein` and `snack`, macros are rounded and non-negative, and light-only requests drop meals and anything above 560 kcal. Failures leave the local pool in place and show a notice; the request is never retried automatically.
+`POST /api/recommend-ai` requires a signed-in session whenever Supabase is configured (401 `unauthenticated` otherwise; the client shows its generic failure notice and keeps the local pool). It receives the profile, day settings, gaps, targets, totals, main-meal count, the light-only flag, the desired count (30) and up to 50 existing options to avoid duplicates. `domain/ai-recommendations.ts` builds the prompt from the food catalogue summary and normalises the answer: categories are restricted to `meal`, `topup`, `protein` and `snack`, macros are rounded and non-negative, and light-only requests drop meals and anything above 560 kcal. Failures leave the local pool in place and show a notice; the request is never retried automatically.
 
 ## Shuffle
 
