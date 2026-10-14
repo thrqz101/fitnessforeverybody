@@ -6,6 +6,10 @@ import { isVagueFoodDescription } from "@/features/recognition/domain/explicit-i
 import { localized } from "@/features/recognition/domain/prompts";
 import { hasMeaningfulResidualAfterLocal, normalizeSearchText, splitSearchTokens, cleanExactFoodToken } from "@/features/recognition/domain/local-match";
 
+export function notFoodMessage(language: Language) {
+  return localized(language, "我没有测出这一餐，请输入具体食物、品牌、套餐、配菜、饮料或份量。", "I couldn't identify that meal. Please enter a specific food, brand, combo, side, drink, or portion.");
+}
+
 export function parseAiRouteDecision(content: unknown): AiRouteDecision {
   const payload = parseAiPayload(content) as AiRouteDecision;
   return payload && typeof payload === "object" ? payload : {};
@@ -37,7 +41,7 @@ export function buildFallbackRouteDecision(
     return {
       isFoodRelated: false,
       route: "not_food",
-      message: localized(language, "我没有测出这一餐，请输入具体食物、品牌、套餐、配菜、饮料或份量。", "I couldn't identify that meal. Please enter a specific food, brand, combo, side, drink, or portion.")
+      message: notFoodMessage(language)
     };
   }
 

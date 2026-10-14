@@ -10,11 +10,11 @@ import { buildSearchEvidence } from "@/features/recognition/domain/build-search-
 import { id, cleanAiFoodsForDescription, parseAiPayload, shouldRepairAiPayload } from "@/features/recognition/domain/ai-foods";
 import type { TimingStage, SearchDiagnostics, AiRouteDecision, AiFood } from "@/features/recognition/domain/types";
 import { buildEstimatePrompt, localized } from "@/features/recognition/domain/prompts";
-import { isVagueFoodDescription, exceedsExplicitFoodItemLimit, buildTooManyFoodsResponse, isTooManyFoodDecision, buildTooManyFoodsResponseIfNeeded } from "@/features/recognition/domain/explicit-items";
+import { isVagueFoodDescription, exceedsExplicitFoodItemLimit, vagueFoodMessage, buildTooManyFoodsResponse, isTooManyFoodDecision, buildTooManyFoodsResponseIfNeeded } from "@/features/recognition/domain/explicit-items";
 import { getProviderConfig, buildChatCompletionBody, requestChatCompletion, mainAiTimeoutMs, buildAiServiceErrorResponse, extractAssistantContent } from "@/features/recognition/server/llm-client";
 import { buildStrictLocalResponse, mergeStrictLocalAndAiFoods, buildExactLocalResult } from "@/features/recognition/domain/local-match";
 import { classifyFoodRoute, extractAiPayloadFromSearch, repairAiPayload } from "@/features/recognition/server/llm-steps";
-import { normalizeRouteDecision, buildFallbackRouteDecision, shouldUseBrandSearch } from "@/features/recognition/domain/route-decision";
+import { normalizeRouteDecision, buildFallbackRouteDecision, shouldUseBrandSearch, notFoodMessage } from "@/features/recognition/domain/route-decision";
 import { searchNutritionWithTavily } from "@/features/recognition/server/tavily-search";
 
 export async function recognizeFood(request: Request, report?: ProgressReporter, signal?: AbortSignal) {
@@ -71,22 +71,18 @@ export async function recognizeFood(request: Request, report?: ProgressReporter,
     language = normalizeLanguage(form.get("lang"));
     progress("input", "complete", "已收到食物描述", "Food description received");
 
-    const started = await beginCloudRecognition(form, description, language);
-    if (started.mode === "reply") return started.response;
-    if (started.mode === "run") cloud = started.run;
-
+    // Rule rejections answer before the recognition is recorded, so they cost no database write.
     if (isVagueFoodDescription(description)) {
-      return respond({
-        ok: true,
-        isFoodRelated: false,
-        foods: [],
-        message: localized(language, "你还没告诉我具体吃了什么喔。可以写成“肯德基香辣鸡腿堡 + 中薯 + 无糖可乐”这种，我再帮你估算。", "Tell me what you ate first. For example: \"KFC spicy chicken sandwich + medium fries + sugar-free cola\", and I'll estimate it for you.")
-      });
+      return respond({ ok: true, isFoodRelated: false, foods: [], message: vagueFoodMessage(language) });
     }
 
     if (exceedsExplicitFoodItemLimit(description)) {
       return attachDiagnostics(buildTooManyFoodsResponse(language));
     }
+
+    const started = await beginCloudRecognition(form, description, language);
+    if (started.mode === "reply") return started.response;
+    if (started.mode === "run") cloud = started.run;
 
     const provider = getProviderConfig();
 
@@ -153,7 +149,7 @@ export async function recognizeFood(request: Request, report?: ProgressReporter,
         ok: true,
         isFoodRelated: false,
         foods: [],
-        message: routeDecision.message || localized(language, "我没有测出这一餐，请输入具体食物、品牌、套餐、配菜、饮料或份量。", "I couldn't identify that meal. Please enter a specific food, brand, combo, side, drink, or portion.")
+        message: routeDecision.message || notFoodMessage(language)
       });
     }
 

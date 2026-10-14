@@ -90,13 +90,14 @@ export async function requestFoodAi(form: FormData, language: Language, options:
   } finally { clearTimeout(timer); }
 }
 
-export type RoutePreviewResult = { route: string; confidence: number } | null;
+/** A preview with a message rejects the input before recognition starts. */
+export type RoutePreviewResult = { route: string; confidence: number; message?: string } | null;
 
 /** Typing-time route preview; any failure simply means recognition decides the route itself. */
-export async function previewFoodRoute(description: string, signal?: AbortSignal): Promise<RoutePreviewResult> {
+export async function previewFoodRoute(description: string, language: Language, signal?: AbortSignal): Promise<RoutePreviewResult> {
   try {
     const response = await fetch('/api/food-route', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ description }), signal
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ description, lang: language }), signal
     });
     if (!response.ok) return null;
     const body = await response.json() as { preview?: RoutePreviewResult };

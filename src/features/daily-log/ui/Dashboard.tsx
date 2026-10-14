@@ -82,7 +82,7 @@ export function Dashboard({
 }: DashboardProps) {
   const { t, language } = useI18n();
   const [mealDescription, setMealDescription] = useState("");
-  const routeHintFor = useRoutePreview(mealDescription);
+  const routeHintFor = useRoutePreview(mealDescription, language);
   const [recognitionNotice, setRecognitionNotice] = useState<RecognitionNoticeState | null>(null);
   const [deleteRequest, setDeleteRequest] = useState<DeleteRequest | null>(null);
   function confirmDelete(request: DeleteRequest) {
@@ -130,13 +130,18 @@ export function Dashboard({
     const form = new FormData();
     form.append("description", description);
     form.append("lang", language);
-    const requestProgress = progress.begin();
-    setLastRecognizedFoods([]);
     setIsRecognizing(true);
-    setRecognitionNotice({ key: "AI 正在拆解食材、份量和营养结构…" });
 
     try {
       const routeHint = await routeHintFor(description);
+      // Vague input, too many foods or a not_food choice was already decided while typing.
+      if (routeHint?.message) {
+        setRecognitionNotice({ text: routeHint.message, tone: "error" });
+        return;
+      }
+      const requestProgress = progress.begin();
+      setLastRecognizedFoods([]);
+      setRecognitionNotice({ key: "AI 正在拆解食材、份量和营养结构…" });
       if (routeHint) {
         form.append("routeHint", routeHint.route);
         form.append("routeHintConfidence", String(routeHint.confidence));

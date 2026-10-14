@@ -173,12 +173,22 @@ function loadPreview(fetcher, env = { FOOD_ROUTER: 'jev' }) {
 }
 test('typing-time preview asks Jev only when the rules are uncertain', async () => {
   const silent = loadPreview(async () => { throw new Error('Unexpected network call'); });
-  assert.equal(await silent('一碗白米饭'), null);
-  assert.equal(await silent('麦当劳巨无霸'), null);
-  assert.equal(await loadPreview(async () => { throw new Error('Unexpected network call'); }, { FOOD_ROUTER: 'rules' })('小林面馆牛肉面'), null);
-  const preview = await loadPreview(async () => Response.json(payload('brand_search', 0.93)))('小林面馆牛肉面加鸡蛋');
+  assert.equal(await silent('一碗白米饭', 'zh'), null);
+  assert.equal(await silent('麦当劳巨无霸', 'zh'), null);
+  assert.equal(await loadPreview(async () => { throw new Error('Unexpected network call'); }, { FOOD_ROUTER: 'rules' })('小林面馆牛肉面', 'zh'), null);
+  const preview = await loadPreview(async () => Response.json(payload('brand_search', 0.93)))('小林面馆牛肉面加鸡蛋', 'zh');
   assert.equal(preview.route, 'brand_search');
   assert.equal(preview.confidence, 0.93);
+  assert.equal(preview.message, undefined);
+});
+test('typing-time preview rejects vague input and too many foods by rule, and a not_food choice from Jev', async () => {
+  const silent = loadPreview(async () => { throw new Error('Unexpected network call'); }, { FOOD_ROUTER: 'rules' });
+  assert.match((await silent('我今天吃什么', 'zh')).message, /具体吃了什么/);
+  assert.match((await silent('米饭、鸡蛋、牛奶、苹果、鸡胸肉、青菜、豆浆', 'zh')).message, /最多识别 6 个/);
+  assert.equal(await silent('米饭、鸡蛋、牛奶、苹果、鸡胸肉、青菜', 'zh'), null);
+  const notFood = await loadPreview(async () => Response.json(payload('not_food', 0.95)))('今天好累不想动', 'zh');
+  assert.equal(notFood.route, 'not_food');
+  assert.match(notFood.message, /具体食物/);
 });
 test('a generic place such as 楼下面馆 or 公司食堂 is not stored as a brand; a named store is', async () => {
   for (const [brand, expected] of [['楼下面馆', '未识别品牌'], ['公司食堂', '未识别品牌'], ['小林面馆', '小林面馆']]) {

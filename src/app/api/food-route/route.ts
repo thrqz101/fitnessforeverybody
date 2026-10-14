@@ -1,5 +1,6 @@
 import { previewFoodRoute } from "@/features/recognition/server/route-preview";
 import { readJson } from "@/shared/api/route-helpers";
+import { normalizeLanguage } from "@/shared/i18n/i18n-utils";
 import { requireApiUser } from "@/shared/supabase/api-auth";
 import { getSupabasePublicConfig } from "@/shared/supabase/config";
 
@@ -14,5 +15,5 @@ export async function POST(request: Request) {
   }
   const body = await readJson(request);
   const description = typeof body?.description === "string" ? body.description : "";
-  return Response.json({ ok: true, preview: await previewFoodRoute(description, request.signal) }, { headers: { "Cache-Control": "no-store" } });
+  return Response.json({ ok: true, preview: await previewFoodRoute(description, normalizeLanguage(body?.lang), request.signal) }, { headers: { "Cache-Control": "no-store" } });
 }

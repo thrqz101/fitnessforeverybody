@@ -90,8 +90,8 @@ All writes go through Next.js API routes. A route calls `requireApiUser()`, whic
 Dashboard (daily-log/ui)
   └─ requestFoodAi (recognition/ui/recognition-client)   POST /api/food-ai, Accept: application/x-ndjson
        └─ route.ts → streamRecognition(recognizeFood)
-            1. beginCloudRecognition      idempotent by requestId; replays finished results
-            2. explicit-items             vague or more than 6 foods → early reply
+            1. explicit-items             vague or more than 6 foods → early reply, nothing recorded
+            2. beginCloudRecognition      idempotent by requestId; replays finished results
             3. brand-catalog              brand match always precedes generic food values
             4. local-match                per-100g DB for explicit weights, fixed catalogue servings otherwise
             5. route decision             Jev (default, falls back to rules) | rules | LLM → local_exact | brand_search | ai_estimate | not_food
