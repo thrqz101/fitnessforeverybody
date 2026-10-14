@@ -13,7 +13,7 @@ export function useAnimatedMacroTotals(target: MacroTotals) {
   useEffect(() => {
     const from = displayedRef.current;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const duration = reduceMotion ? 1 : 1500;
+    const duration = reduceMotion ? 1 : 600;
     const startedAt = performance.now();
     let frame = 0;
 
