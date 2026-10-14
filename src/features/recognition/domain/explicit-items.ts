@@ -52,18 +52,27 @@ function isLikelyExplicitFoodPart(value: string) {
     || /chicken|beef|pork|lamb|fish|shrimp|salmon|tuna|egg|tofu|rice|noodle|pasta|bread|burger|pizza|sandwich|salad|soup|steak|fries|snack|fruit|apple|banana|orange|berry|vegetable|yogurt|milk|coffee|tea|protein|shake|wrap|taco|burrito|bowl|meal/i.test(text);
 }
 
-export function buildTooManyFoodsResponse(language: Language = "zh") {
-  return Response.json(
-    {
-      ok: false,
-      message: localized(
-        language,
-        `一次最多识别 ${maxRecognizedFoodItems} 个食物，请分批输入。`,
-        `You can recognize up to ${maxRecognizedFoodItems} foods at a time. Please split them into batches.`
-      )
-    },
-    { status: 400 }
+export function vagueFoodMessage(language: Language) {
+  return localized(language, "你还没告诉我具体吃了什么喔。可以写成“肯德基香辣鸡腿堡 + 中薯 + 无糖可乐”这种，我再帮你估算。", "Tell me what you ate first. For example: \"KFC spicy chicken sandwich + medium fries + sugar-free cola\", and I'll estimate it for you.");
+}
+
+export function tooManyFoodsMessage(language: Language) {
+  return localized(
+    language,
+    `一次最多识别 ${maxRecognizedFoodItems} 个食物，请分批输入。`,
+    `You can recognize up to ${maxRecognizedFoodItems} foods at a time. Please split them into batches.`
   );
+}
+
+/** Input the rules reject before any recognition work: no specific food, or more foods than one request handles. */
+export function ruleRejectionMessage(description: string, language: Language) {
+  if (isVagueFoodDescription(description)) return vagueFoodMessage(language);
+  if (exceedsExplicitFoodItemLimit(description)) return tooManyFoodsMessage(language);
+  return null;
+}
+
+export function buildTooManyFoodsResponse(language: Language = "zh") {
+  return Response.json({ ok: false, message: tooManyFoodsMessage(language) }, { status: 400 });
 }
 
 export function buildTooManyFoodsResponseIfNeeded(foods: unknown[], language: Language = "zh") {
